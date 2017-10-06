@@ -1,2 +1,1439 @@
-\section{Quantum Computing Section}
-QUANTUM COMPUTING SECTION.
+%%%%%%%%%%%%%%%%%%%%%%%%% Preliminaries on quantum computing %%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Preliminaries on quantum computing}
+% historical background
+Quantum computing is one of the \textit{unconventional} models of computation. Its main difference from classical computing is its use of \textit{quantum mechanical effects} in physical systems as resource for computation. It is in these effects where quantum computing hopes to gain advantages over its classical counterparts.
+
+One related classical model of computation to quantum computing is \textit{reversible computing} \cite{Bennett1973,Toffoli1980}. Several researchers during the 1970's worked on this model to find more energy-efficient ways of doing computation. It was known that deletion of information consumes a huge amount of energy during computation. Reversible computation aims for minimization of energy loss when processing information . The  computation on scratch bits is reversed to restore them into their initial state to avoid erasure of data. Quantum computation is also reversible but not for the same purpose of achieving energy-efficient computation. Instead, its reversibility is intended to model the reversibility of time evolution of closed physical systems \cite{C1Williams2011,C2Chuang2000}. Transformation in these systems can be described by Schrodinger's equation. Several researchers on reversible computing were involved or at least inspired the first known results in quantum computing. In 1985, as a result of discussions with C. Bennet who's working on the limits of physical computation, physicist R. Feynman presented his proposal of quantum mechanical simulators \cite{Feynman1982, Feynman1985}. As early as 1959, Feynman has already been expressing interest in the new possibilities which could result in understanding computation in the quantum setting \cite{Feynman1985}. D. Deutsch, A. Barenco, A. Ekert and U. Vazirani were among early researchers on the universality of computing components, universal quantum computer and quantum circuits \cite{Deutsch1985, Deutsch1989, Deutsch1995}.
+
+Several quantum algorithms were developed and resulted to class separation in complexity of computational problems. One such algorithm is P. Shor's polynomial-time algorithm for prime factorization \cite{Shor1994}. The hardness of prime factorization is the basis for some cryptography systems. The best classical solution to this problem as of Shor's discovery of his algorithm requires exponential amount of time \cite{Lenstra1990} and so Shor's algorithm provided an exponential speed-up. L. Grover's unstructured database search algorithm \cite{Grover1996} is also one of the early interesting quantum algorithms. Grover's quantum search algorithm provides sub-linear speed-up in searching for a solution in an unstructured search space provided that an \textit{oracle} is present and that it identifies the unknown target item in time complexity $\Om(1)$. In order to make use of Grover's quantum search algorithm for a specific search problem one has to provide concrete design of the operation of the oracle.
+
+In the succeeding sections we will briefly introduce the following topics in quantum computing:
+\begin{itemize}
+	\item Quantum bits and registers
+	\item Vector representation of quantum states
+	\item Quantum operators and their matrix representation
+	\item Quantum gates and the quantum circuit model
+	\item Studies in quantum computing related to our work
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Qubits and quantum registers %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quantum bits and registers}
+The same with classical computation a two-state system is used in quantum computing to represent information. This two-state system in quantum computing is called a \textit{quantum bit}, or \textit{qubit}. The $\vert 0 \rangle$ and $\vert 1 \rangle$ states of a qubit correspond to the 0 and 1 states of a classical bit, respectively. The notation used for qubits in this study is the Dirac \textit{bra-ket} notation used in the study of quantum mechanics. Unlike bits, qubits can be in a \textit{linear superposition} of states. Let 
+\[
+	\vert \psi \rangle = \alpha_0 \vert 0 \rangle + \alpha_1 \vert 1 \rangle
+\]
+where $\alpha_0, \alpha_1 \in \mathbb{C}$. $\vert \psi \rangle$ is a linear superposition of states $\vert 0 \rangle$ and $\vert 1 \rangle$. $\alpha_0$ and $\alpha_1$ are called \textit{complex amplitudes} and they describe the probability of the qubit \textit{collapsing} into the classical states $0$ and $1$, respectively. A qubit in a superposition state collapses into a classical state when the physical system represented by the qubit it is subjected to a disturbance, or a so called \textit{measurement} operation. The probability of a qubit collapsing into a classical state is the modulo square of the state's complex amplitude, $\vert \alpha_0 \vert^2$ for state 0 and $\vert \alpha_1 \vert^2$ for state 1. The sum of the probabilities of the states in a superposition state equates to unity,
+\begin{equation}
+	\sum_{i=0}^{1} \vert \alpha_i \vert^2 = 1
+\end{equation}
+
+Just as classical registers are composed of bits a \textit{quantum register} is composed of qubits. We refer to a quantum register simply as \textit{register} from hereon. Let \textit{A} be a register composed of \textit{n} qubits. The state of register \textit{A} is denoted as 
+\begin{align*}
+\vert q_0 \rangle \otimes \vert q_1 \rangle \otimes \ldots \otimes \vert q_{n-1} \rangle
+\end{align*} 
+where $\otimes$ is a \textit{tensor product} operator and $q_i \in \{0,1\}$. We use the shorthand notation for the state of the register $\vert i \rangle$ where 
+\begin{align*}
+i = \sum_{j=0}^{n-1} 2^{j} \times q_j
+\end{align*}
+Since individual qubits can be in a linear superposition of states, a register composed of several qubits can also be in a linear superposition of states. A superposition state of a register is denoted as 
+\begin{equation}
+	\label{eqn:uniform-superposition}
+	\vert \delta \rangle = \sum_{i=0}^{2^n-1} \alpha_i \vert i \rangle
+\end{equation}
+The same with the individual qubits in linear superposition state, the summation of the square modulo of complex amplitudes $\alpha_i$ of the states in the superposition state $\vert \delta \rangle$ of a register must also equate to 1,
+\[
+	\sum_{i=0}^{2^n-1} \vert \alpha_i \vert^2 = 1
+\]
+
+In bra-ket notation $\vert \cdot \rangle$ is called a \textit{ket}. $\vert 0 \rangle$ is read as \textit{ket-0} and $\vert 1 \rangle$ is read as \textit{ket-1}. Every ket state has a dual state called its \textit{bra} state and is denoted as $\langle \cdot \vert$. $\rangle 0 \vert$ is read as \textit{bra-0} and $\rangle 1 \vert$ is read as \textit{bra-1}. Given a state 
+\begin{align*}
+\vert \psi \rangle &= \alpha_0 \vert 0 \rangle + \alpha_1 \vert 1 \rangle
+\end{align*}
+its corresponding dual bra state is 
+\[
+	\langle \psi \vert = \alpha_0^* \langle 0 \vert + \alpha_1^* \langle 1 \vert
+\]
+where $\alpha_0^*, \alpha_1^*$ are \textit{complex conjugates} of the complex amplitudes $\alpha_0$ and $\alpha_1$, respectively. (The complex conjugate of a complex number $(\text{a} + i\text{b})$ is the complex number $(\text{a} - i\text{b})$.) Given the concept of bra and ket states an \textit{inner product} is defined on quantum states. This concept of inner product of quantum states provides us with a \textit{measurement of similarity between quantum states}. Suppose $\vert \phi \rangle = \beta_0\vert 0 \rangle + \beta_1\vert 1 \rangle$. The inner product between states $\vert \psi \rangle$ and $\vert \phi \rangle$ is defined as
+\[
+	\langle \psi \vert \phi \rangle = \alpha_0^* \beta_0 + \alpha_1^* \beta_1
+\]
+Since we are working on normalized states in quantum computation the value of an inner product ranges from 0 to 1 inclusive. An inner product of two quantum states equating to 1 implies that the states are the same states while an inner product of 0 implies that the states are opposite of each other. This provides us with an idea of \textit{overlap} of a quantum state with respect to another quantum state. Quantum states with inner product of 1 overlap with each other.
+
+One particular difference between probabilities in quantum computing and that of classical probabilistic computation is the possibility of occurrence of \textit{quantum interference} effects between the possible pathways of computation which may affect probabilities of occurrence of results. The different pathways of a computation which may lead to a particular result may interfere constructively. This \textit{positive interference} leads to an increase in the probability of occurrence of the particular classical result associated with the interfering computational pathways. A \textit{negative interference} among the pathways on the other hand will result to a decrease in probability of that computational result. Let 
+\begin{align}
+\vert \varphi \rangle = \alpha_j\vert j \rangle + \alpha_k\vert k \rangle
+\end{align} 
+be the state of a quantum register. In the quantum setting we do not have information on whether the register exists in state $\vert j \rangle$ or in state $\vert k \rangle$ until we disturb the system. All we know is that the register is in the linear superposition state $\vert \varphi \rangle$. Given an observable \textit{A} which can act on the register and its associated eigenvalue \textit{a} when the register is in state $\vert \varphi_{a} \rangle$, the classical way of computing for the probability of getting the value \textit{a} when the register is in state $\vert \varphi \rangle$ is
+\begin{align}
+	\textbf{Prob}(a) &= \vert c_j \vert^2 \vert \langle \varphi_a \vert j \rangle \vert^2 + \vert c_k \vert^2 \vert \langle \varphi_k \vert k \rangle \vert^2
+\end{align}
+where $\vert c_j \vert^2, \vert c_k \vert^2$ are the probabilities of obtaining states $\vert j \rangle$ and $\vert k \rangle$ respectively, and $\vert \langle \varphi_{a} \vert j \rangle \vert^{2}, \vert \langle \varphi_{a} \vert k \rangle \vert^{2}$ are the probabilities of obtaining the value \textit{a} when the register is in state $\vert j \rangle$ and $\vert k \rangle$ respectively. In the quantum setting we know that the register exists in the state $\vert \varphi \rangle$ and so the probability of getting the value \textit{a} after applying the observable \textit{A} to the register will be
+\begin{equation*}
+	\begin{split}
+	\textbf{Prob}(a) &= \vert \langle \varphi_a \vert \varphi \rangle \vert^2\\
+	&= \vert c_j \langle \varphi_a \vert j \rangle + c_k \langle \varphi_a \vert k \rangle \vert^2\\
+	&= \vert c_j \vert^2 \vert \langle {\varphi}_a \vert j \rangle \vert^2 + \vert c_k \vert^2 \vert \langle \varphi_a \vert k \rangle \vert^2 + 2\textbf{Re}(c_j c_k^{*} \langle \varphi_a \vert j \rangle \langle \varphi_a \vert k \rangle^{*})
+	\end{split}
+\end{equation*}
+There is an additional real factor in the probability of occurrence in the quantum setting which results from quantum interference effects between the computational pathways. This interference factor is not evident in the classical probability of getting the value \textit{a} from the system.
+
+%%%%%%%%%%%%%%%%%%%%%%%%% State vectors %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Vector representation of quantum states}
+Quantum states of qubits can be alternatively represented as vectors. A vector representing a quantum state is composed of one or more complex elements and one or more 0 elements since the amplitude of a quantum state is a complex number. With the vector representation of a quantum state, quantum computation can be interpreted as a series of operations in a mathematical abstraction called a \textit{complex vector space}. The elements of this space are tuples of complex values corresponding to complex amplitudes of quantum states in a superposition. The behavior of quantum states are mathematically equivalent to that of physical vectors and so elements of such complex vector space are called \textit{state vectors}. The operations \textit{vector addition} and \textit{scalar multiplication} are defined in this space. The state of a qubit can be represented as an element of a 2-dimensional complex vector space $\mathbb{C}^2$. This space is composed of 2-tuples of complex numbers denoted as a column vector. The quantum states $\vert 0 \rangle$ and $\vert 1 \rangle$ are represented as the following state vectors
+\begin{align}
+\vert 0 \rangle =
+\begin{pmatrix}
+	1\\
+	0
+\end{pmatrix}
+\quad\quad
+\vert 1 \rangle =
+\begin{pmatrix}
+	0\\
+	1
+\end{pmatrix}
+\end{align}
+A superposition state such as $\vert \psi \rangle$ corresponds to a state vector
+\begin{equation*}
+	\begin{split}
+		\vert \psi \rangle &= \alpha_0\vert 0 \rangle + \alpha_1\vert 1 \rangle\\
+		&= \alpha_0
+		\begin{pmatrix}
+			1\\
+			0
+		\end{pmatrix}
+		+
+		\alpha_1
+		\begin{pmatrix}
+			0\\
+			1
+		\end{pmatrix}\\
+		&=
+		\begin{pmatrix}
+			\alpha_0\\
+			\alpha_1
+		\end{pmatrix}
+	\end{split}
+\end{equation*}
+Let $B=\left\{
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix},
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix}
+\right\}$. All state vectors in space $\mathbb{C}^2$ can be represented as a linear combination of the vectors in \textit{B}, e.g. $\vert \psi \rangle$. We say that set \textit{B} \textit{spans} the space $\mathbb{C}^2$ and that \textit{B} is a \textit{spanning set} for $\mathbb{C}^2$. A spanning set for a complex vector space is also not unique. Any set of vectors in which any of the elements of the set can be represented as a linear combination of the rest of the elements is called a \textit{linearly independent} set. If a spanning set \textit{B} of a complex vector space is linearly independent we call such set as a \textit{basis} for the space.
+
+The state of a register is a generalization of the state of a single qubit. The state of a quantum register corresponds to the tensor product of \textit{n} 2-dimension complex state vectors which correspond to the quantum states of the \textit{n} individual qubits composing the register. Given a register in state $\vert 01 \rangle$ its state can be represented as in state vector form as
+\begin{equation*}
+	\begin{split}
+		\vert 01 \rangle &=
+		\begin{pmatrix}
+			1\\
+			0
+		\end{pmatrix}
+		\otimes
+		\begin{pmatrix}
+			0\\
+			1
+		\end{pmatrix}\\
+		&=
+		\begin{pmatrix}
+		1 \cdot 
+			\begin{pmatrix}
+			0\\
+			1
+			\end{pmatrix}\\
+		0 \cdot
+			\begin{pmatrix}
+			0\\
+			1
+			\end{pmatrix}
+		\end{pmatrix}\\
+		&=
+		\begin{pmatrix}
+			0\\
+			1\\
+			0\\
+			0
+		\end{pmatrix}
+	\end{split}
+\end{equation*}
+For a general \textit{n}-qubit register the resulting tensor product is an element of the complex vector space $\mathbb{C}^{2^n}$. A general linear superposition state 
+\begin{align}
+\vert \varphi \rangle &= \sum_{i=0}^{2^{n} - 1} \alpha_{i} \vert i \rangle
+\end{align}
+can be represented as a linear combination of $2^n$ $2^n$-dimension complex state vectors such as
+\begin{equation*}
+	\begin{split}
+		\vert \varphi \rangle &= \sum_{i=0}^{2^n-1} \alpha_i \vert i \rangle\\
+		&=\alpha_0 
+			\begin{pmatrix}
+				1\\
+				0\\
+				\vdots\\
+				0
+			\end{pmatrix}
+			+
+			\alpha_1 
+			\begin{pmatrix}
+				0\\
+				1\\
+				\vdots\\
+				0
+			\end{pmatrix}
+			+ \ldots +
+			\alpha_{2^n-1} 
+			\begin{pmatrix}
+				0\\
+				0\\
+				\vdots\\
+				1
+			\end{pmatrix}\\
+		&=\begin{pmatrix}
+				\alpha_0\\
+				\alpha_1\\
+				\vdots\\
+				\alpha_{2^n-1}
+			\end{pmatrix}
+	\end{split}
+\end{equation*}
+where
+\[
+	\left\{ 
+		\begin{pmatrix}
+			1\\
+			0\\
+			\vdots\\
+			0
+		\end{pmatrix},
+		\begin{pmatrix}
+			0\\
+			1\\
+			\vdots\\
+			0
+		\end{pmatrix},
+		\ldots,
+		\begin{pmatrix}
+			0\\
+			0\\
+			\vdots\\
+			1
+		\end{pmatrix}
+	\right\}
+\]
+is a basis for the space $\mathbb{C}^{2^n}$.
+%%%%%%%%%%%%%%%%%%%%%%%%% Quantum operators %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quantum operators and their matrix representation}
+The mathematical definition of an \textit{operator} is a mapping from one vector space $V$ to another vector space $W$. The concept of operator has also found its application in quantum mechanics. Dynamical variables in physical systems, e.g. position, angular momentum, are called \textit{observables} for the reason that we need to observe such variables in a physical system in order to determine their value. One postulate in quantum theory states that there corresponds an operator to each observable dynamical variable. Thus, to determine the value of a specific dynamical variable of a quantum system we act an observable to the quantum physical system which in the case of quantum computing is a quantum register. This is usually followed by a measurement operation to make the quantum physical system collapse into a particular classical state. The resulting classical state will correspond to a classical value which is an eigenvalue of the observable.
+
+A \textit{linear operator} \textit{U} is an operator which satisfies the relation 
+\[
+	U\left( \alpha \vert \psi \rangle + \beta \vert \delta \rangle \right) = \alpha\left( U\vert \psi \rangle \right) + \beta\left( U\vert \delta \rangle \right)
+\]
+where $\alpha, \beta \in \mathbb{C}$ and $\vert \psi \rangle, \vert \delta \rangle$ are states. Given operator \textit{U} we denote its \textit{adjoint} as $U^{\dagger}=\left(U^{*}\right)^T$ where $(\cdot)^{*}$ denotes complex conjugate operation and $(\cdot)^{T}$ denotes a transpose operation. Quantum operators are linear operators and map a complex vector space \textit{V} to itself. These operators are also \textit{Hermitian}. An operator \textit{U} is Hermitian if it satisfies the condition $U=U^{\dagger}$. Furthermore, quantum operators are \textit{unitary}. An operator \textit{U} is unitary if it satisfies the condition $UU^{\dagger} = U^{\dagger}U = I$. Unitary operators describe the time evolution of a closed quantum physical system. We denote the set of unitary operators acting on \textit{k} qubits as $U(k)$.
+
+Since quantum states can be abstracted using state vectors in a complex vector space, quantum operators can be represented as matrices which are both Hermitian and unitary. Unitary operators with corresponding matrices having determinant of $+1$ are called \textit{special unitary} operators. The set of special unitary operators acting on \textit{k} qubits is denoted as $SU(k)$. The complex conjugate of an operator, i.e. $U^*$, corresponds to the complex conjugate of its matrix representation while its transpose, i.e. $U^T$, corresponds to the matrix's transpose. These matrices transform vectors of a complex vector space \textit{V} to itself. A quantum operator \textit{U} on an \textit{n}-qubit register can be modeled as a unitary $2^n \times 2^n$ matrix operation on a vector $v \in \mathbb{C}^{2^n}$. Computation on a quantum computer is a sequence of unitary operations applied to one or more registers. The resulting state of the register can be transformed back to its initial state by applying the reverse of the sequence of unitary operations. Example of quantum operators are the Pauli operators 
+\begin{equation*}
+	X = 
+	\begin{pmatrix}
+		0	&	1\\
+		1	&	0
+	\end{pmatrix}
+	\quad
+	Y = 
+	\begin{pmatrix}
+		0	&	i\\
+		-i	&	0
+	\end{pmatrix}
+	\quad
+	Z = 
+	\begin{pmatrix}
+		1	&	0\\
+		0	&	-1
+	\end{pmatrix}
+\end{equation*}
+Application of these operators into a single qubit results to
+\begin{align*}
+	X\vert 0 \rangle = 
+	\begin{pmatrix}
+		0	&	1\\
+		1	&	0
+	\end{pmatrix}
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix} = 
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix}
+	= \vert 1 \rangle \quad & \quad X\vert 1 \rangle = 
+	\begin{pmatrix}
+		0	&	1\\
+		1	&	0
+	\end{pmatrix}\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix} = 
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix}
+	= \vert 0 \rangle\\
+	Y\vert 0 \rangle = 
+	\begin{pmatrix}
+		0	&	i\\
+		-i	&	0
+	\end{pmatrix}
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix} = -i 
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix}
+	=  -i\vert 1 \rangle \quad & \quad Y\vert 1 \rangle = 
+	\begin{pmatrix}
+		0	&	i\\
+		-i	&	0
+	\end{pmatrix}
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix} = i 
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix}
+	= 
+	i\vert 0  \rangle\\
+	Z\vert 0 \rangle = 
+	\begin{pmatrix}
+		1	&	0\\
+		0	&	-1
+	\end{pmatrix}
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix} = 
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix}
+	= 
+	\vert 0 \rangle \quad & \quad Z\vert 1 \rangle =
+	\begin{pmatrix}
+		1	&	0\\
+		0	&	-1
+	\end{pmatrix}
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix} = - 
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix}
+	= 
+	 -\vert 1 \rangle
+\end{align*}
+One particularly interesting quantum operator is the \textit{Walsh-Hadamard} operator, or simply \textit{Hadamard} operator. Recall that a single qubit can be in a linear superposition of states $\vert 0 \rangle$ and $\vert 1 \rangle$. The Hadamard operator puts a qubit from one of the initial states $\vert 0 \rangle$ and $\vert 1 \rangle$ into a linear superposition of these states with equal complex amplitudes. This means that they have an equal probability of occurring as the qubit's classical state. The operation of Hadamard gate into a single qubit is as follows
+\[
+	H\vert 0 \rangle = \sqrt{\frac{1}{2}} \vert 0 \rangle + \sqrt{\frac{1}{2}}\vert 1 \rangle, \quad \quad H\vert 1 \rangle = \sqrt{\frac{1}{2}} \vert 0 \rangle - \sqrt{\frac{1}{2}}\vert 1 \rangle
+\]
+In matrix representation the Hadamard gate operates on a single qubit such that
+\begin{align*}
+	H\vert 0 \rangle &=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1 & 1\\
+		1 & -1
+	\end{pmatrix}
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix}\\
+	&=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1 \cdot 1 + 1 \cdot 0\\
+		1 \cdot 1 + (-1 \cdot 0) 
+	\end{pmatrix}\\
+	&=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1\\
+		1
+	\end{pmatrix}\\
+	&=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix}
+	+
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix}\\
+	&= 
+	\sqrt{\frac{1}{2}} \vert 0 \rangle + \sqrt{\frac{1}{2}}\vert 1 \rangle
+\end{align*}
+\begin{align*}
+	H\vert 1 \rangle &=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1 & 1\\
+		1 & -1
+	\end{pmatrix}
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix}\\
+	&=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1 \cdot 0 + 1 \cdot 1\\
+		1 \cdot 0 + (-1 \cdot 1)
+	\end{pmatrix}\\
+	&=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1\\
+		-1
+	\end{pmatrix}\\
+	&=
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		1\\
+		0
+	\end{pmatrix}
+	-
+	\sqrt{\frac{1}{2}}
+	\begin{pmatrix}
+		0\\
+		1
+	\end{pmatrix}\\
+	&= 
+	\sqrt{\frac{1}{2}} \vert 0 \rangle - \sqrt{\frac{1}{2}}\vert 1 \rangle
+\end{align*}
+The Hadamard operator does not have an analogue in the classical setting since a single classical two-state system used in computation cannot be in a linear superposition of the states 0 and 1.
+
+The effect of a single unitary operator on a quantum register composed of more than two qubits can be decomposed into a sequential or parallel application of component unitary operators on one or two component qubits of the register. An \textit{n}-qubit register can be put into a linear superposition of all its possible states by acting a Hadamard operator into it. The operation of the Hadamard operator on the register can be decomposed into the parallel application of \textit{n} Hadamard operators acting on the individual qubits of the register.
+\begin{align*}
+H^{\otimes n} \vert 0 \rangle^{\otimes n} &= \bigotimes_{j=0}^{n - 1} H\vert 0 \rangle\\
+&= \otimes_{j=0}^{n-1} \frac{\vert 0 \rangle + \vert 1 \rangle}{\sqrt{2}}\\
+&= \sqrt{\frac{1}{2^{n}}} \sum_{i=0}^{2^{n}-1} \left( \bigotimes_{j=0}^{n-1} \vert 2^{j} \times i_{j} \rangle \right)\\
+&= \sqrt{\frac{1}{2^{n}}} \sum_{i=0}^{2^{n}-1} \vert i \rangle
+\end{align*}
+On the other hand, a random number generation operator \textit{R} can be implemented by decomposing it into the sequential application of Hadamard operator and Measurement operator as follows
+\begin{align*}
+R \vert 0 \rangle^{\otimes n} &= M^{\otimes n}H^{\otimes n} \vert 0 \rangle^{\otimes n}\\
+&= M^{\otimes n} \left( \sqrt{\frac{1}{2^{n}}} \sum_{i=0}^{2^{n}-1} \vert i \rangle \right)\\
+&= \sqrt{\frac{1}{2^{n}}} \sum_{i=0}^{2^{n}-1}M^{\otimes n}  \vert i \rangle\\
+&= i \in \{0, 1, \ldots, 2^{n} - 1 \}
+\end{align*}
+where the probability of occurrence of any particular \textit{i} is equal to the other values within the set $\{0,1,\ldots,2^{n}-1\}, \frac{1}{2^{n}}$. The \textit{R} operator is implemented with the parallel application of the $H^{\otimes n}$ operator followed by the parallel application of the $M^{\otimes n}$ operator on the \textit{n} qubits of the register. The task of designing efficient quantum algorithms is the challenge of finding effective and efficient decomposition of multi-qubit unitary operators into 1-qubit and 2-qubit unitary operators.
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Quantum circuits %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Quantum circuit model}
+The same with classical circuit diagrams the \textit{quantum circuit} model provides a graphical way of presenting a quantum operation on a quantum register. A quantum operator is represented as a \textit{gate} in a quantum circuit which connects to at least one qubit as input and is connected to the same number of qubits as output via quantum wire. Quantum gates in a quantum circuit do not necessarily represent a physical silicon chip. Depending on the specific target quantum physical phenomenon to be used for the implementation of a quantum operation a quantum gate may correspond to the manipulation of magnetic field if the state of qubits are encoded as the quantum mechanical spin of particles. A quantum gate may also correspond to the manipulation of excitation state of an ion via the variation in exposure of the ion to a beam of particles. The wires in a quantum circuit then also do not necessarily correspond to physical wires as with the pathways in a classical silicon chip.
+
+\subsubsection{Quantum gates}
+Each 1-qubit, 2-qubit and \textit{n}-qubit operators have their quantum gate counterparts with same number of corresponding input and output qubits. Since a single quantum operator acting on \textit{n} qubits of a register can be represented as a unitary $2^{n} \times 2^{n}$-dimension matrix acting on a $2^{n}$ state vector corresponding to the state of the input qubits, its corresponding quantum gate can be represented as the same. The serial application of unitary quantum operators to qubits of a quantum register can be represented as the matrix-vector multiplication of the dot product of the operators' corresponding unitary matrices and the tensor product of the corresponding state vector of the qubits of the register. This series of quantum operations into a quantum register is represented by a series of the counterpart quantum gates of the unitary quantum operators. Computation in the quantum circuit model corresponds to the left to right execution of the quantum gates at each time step in the circuit. Figure~\ref{fig:serial-quantum-gates} shows an example of a series of quantum gates applied to a single qubit of a quantum register.
+\begin{figure}[ht]
+\centering
+\begin{minipage}[b]{0.8\linewidth}
+\[
+\Qcircuit @C=1em @R=1em{
+& \lstick{\vert q_0 \rangle} & \gate{X} & \gate{Y} & \gate{Z} & \qw & \vert q_1 \rangle
+}
+\]
+\end{minipage}
+\caption{A series of 1-qubit quantum gates acting on the qubits of a quantum register. The quantum gates correspond to Pauli-X, -Y and -Z operators.}
+\label{fig:serial-quantum-gate}
+\end{figure}
+The series of quantum operations represented in Figure~\ref{fig:serial-quantum-gates} is equivalent to the computation
+\begin{align*}
+Z(Y(X\vert q_0 \rangle)) &= \vert q_1 \rangle
+\end{align*}
+and the matrix-vector operation
+\begin{align*}
+\begin{pmatrix}
+1 & 0\\
+0 & -1
+\end{pmatrix}
+\begin{pmatrix}
+0 & -i\\
+i & 0
+\end{pmatrix}
+\begin{pmatrix}
+0 & 1\\
+1 & 0
+\end{pmatrix}
+\begin{pmatrix}
+\alpha\\
+\beta
+\end{pmatrix}
+&=
+\begin{pmatrix}
+1 & 0\\
+0 & -1
+\end{pmatrix}
+\begin{pmatrix}
+0 & -i\\
+i & 0
+\end{pmatrix}
+\begin{pmatrix}
+\beta\\
+\alpha
+\end{pmatrix}\\
+&=
+\begin{pmatrix}
+1 & 0\\
+0 & -1
+\end{pmatrix}
+\begin{pmatrix}
+-\alpha i\\
+\beta i
+\end{pmatrix}\\
+&=
+\begin{pmatrix}
+-\alpha i\\
+-\beta i
+\end{pmatrix}\\
+&= -i
+\begin{pmatrix}
+\alpha\\
+\beta
+\end{pmatrix}\\
+&= -i\vert q_0 \rangle\\
+&= \vert q_1 \rangle
+\end{align*}
+On the other hand, parallel application of quantum operators on the qubits of a quantum register correspond to the matrix-vector operation between the tensor product of the matrices of the quantum operators and the tensor product of the state vector representation of the qubits of the register. In the quantum circuit model this is represented as the operation of the individual quantum gates into their respective input qubits in a single time slice. Figure~\ref{fig:parallel-quantum-gates} depicts a parallel execution of quantum gates into the qubits of a quantum register.
+\begin{figure}[ht]
+\centering
+\begin{minipage}[b]{0.8\linewidth}
+\[
+\Qcircuit @C=1em @R=1em{
+& \lstick{\vert q_0 \rangle} & \gate{X} & \qw\\
+& \lstick{\vert q_1 \rangle} & \gate{Y} & \qw\\
+& \lstick{\vert q_2 \rangle} & \gate{Z} & \qw
+}
+\]
+\end{minipage}
+\caption{A parallel execution of quantum gates Pauli-X, -Y and -Z into individual qubits of a quantum register. The operation of the quantum gates occurs in a single time slice.}
+\label{fig:parallel-quantum-gates}
+\end{figure} 
+The parallel computation shown in Figure~\ref{fig:parallel-quantum-gates} is equivalent to the quantum operation
+\begin{align*}
+\left(X \otimes Y \otimes Z\right)\left(\vert q_0 \rangle \otimes \vert q_1 \rangle \otimes \vert q_2 \rangle\right) &= \left(X\vert q_0 \rangle\right) \otimes \left(Y\vert q_1 \rangle\right) \otimes \left(Z\vert q_2 \rangle\right)
+\end{align*}
+and the matrix-vector operation
+\begin{align*}
+& \left(
+\begin{pmatrix}
+0 & 1\\
+1 & 0
+\end{pmatrix}
+\otimes
+\begin{pmatrix}
+0 & -i\\
+i & 0
+\end{pmatrix}
+\otimes
+\begin{pmatrix}
+1 & 0\\
+0 & -1
+\end{pmatrix}
+\right)
+\left(
+\begin{pmatrix}
+\alpha_0\\
+\beta_0
+\end{pmatrix}
+\otimes
+\begin{pmatrix}
+\alpha_1\\
+\beta_1
+\end{pmatrix}
+\otimes
+\begin{pmatrix}
+\alpha_2\\
+\beta_2
+\end{pmatrix}
+\right)\\
+%&=
+%\left(
+%\begin{pmatrix}
+%0 & 1\\
+%1 & 0
+%\end{pmatrix}
+%\otimes
+%\begin{pmatrix}
+%0
+%\begin{pmatrix}
+%1 & 0\\
+%0 & -1
+%\end{pmatrix}
+% & -i
+% \begin{pmatrix}
+%1 & 0\\
+%0 & -1
+%\end{pmatrix}\\
+%i 
+%\begin{pmatrix}
+%1 & 0\\
+%0 & -1
+%\end{pmatrix}
+%& 0
+%\begin{pmatrix}
+%1 & 0\\
+%0 & -1
+%\end{pmatrix}
+%\end{pmatrix}
+%\right)
+%\left(
+%\begin{pmatrix}
+%\alpha_0\\
+%\beta_0
+%\end{pmatrix}
+%\otimes
+%\begin{pmatrix}
+%\alpha_1
+%\begin{pmatrix}
+%\alpha_2\\
+%\beta_2
+%\end{pmatrix}\\
+%\beta_1
+%\begin{pmatrix}
+%\alpha_2\\
+%\beta_2
+%\end{pmatrix}
+%\end{pmatrix}
+%\right)
+%\\
+%&=
+%\left(
+%\begin{pmatrix}
+%0 & 1\\
+%1 & 0
+%\end{pmatrix}
+%\otimes
+%\begin{pmatrix}
+%0 & 0 & -i & 0\\
+%0 & 0 & 0 & i\\
+%i & 0 & 0 & 0\\
+%0 & -i & 0 & 0
+%\end{pmatrix}
+%\right)
+%\left( 
+%\begin{pmatrix}
+%\alpha_0\\
+%\beta_0
+%\end{pmatrix}
+%\otimes
+%\begin{pmatrix}
+%\alpha_1\alpha_2\\
+%\alpha_1\beta_2\\
+%\beta_1\alpha_2\\
+%\beta_1\beta_2
+%\end{pmatrix}
+%\right)\\
+%&=
+%\begin{pmatrix}
+%0
+%\begin{pmatrix}
+%0 & 0 & -i & 0\\
+%0 & 0 & 0 & i\\
+%i & 0 & 0 & 0\\
+%0 & -i & 0 & 0
+%\end{pmatrix}
+% & 1
+% \begin{pmatrix}
+%0 & 0 & -i & 0\\
+%0 & 0 & 0 & i\\
+%i & 0 & 0 & 0\\
+%0 & -i & 0 & 0
+%\end{pmatrix}\\
+%1
+%\begin{pmatrix}
+%0 & 0 & -i & 0\\
+%0 & 0 & 0 & i\\
+%i & 0 & 0 & 0\\
+%0 & -i & 0 & 0
+%\end{pmatrix} 
+%& 0
+%\begin{pmatrix}
+%0 & 0 & -i & 0\\
+%0 & 0 & 0 & i\\
+%i & 0 & 0 & 0\\
+%0 & -i & 0 & 0
+%\end{pmatrix}
+%\end{pmatrix}
+%\begin{pmatrix}
+%\alpha_0
+%\begin{pmatrix}
+%\alpha_1\alpha_2\\
+%\alpha_1\beta_2\\
+%\beta_1\alpha_2\\
+%\beta_1\beta_2
+%\end{pmatrix}\\
+%\beta_0
+%\begin{pmatrix}
+%\alpha_1\alpha_2\\
+%\alpha_1\beta_2\\
+%\beta_1\alpha_2\\
+%\beta_1\beta_2
+%\end{pmatrix}
+%\end{pmatrix}\\
+&=
+\begin{pmatrix}
+0 & 0 & 0 & 0 & 0 & 0 & -i & 0\\
+0 & 0 & 0 & 0 & 0 & 0 & 0 & i\\
+0 & 0 & 0 & 0 & i & 0 & 0 & 0\\
+0 & 0 & 0 & 0 & 0 & -i & 0 & 0\\
+0 & 0 & -i & 0 & 0 & 0 & 0 & 0\\
+0 & 0 & 0 & i & 0 & 0 & 0 & 0\\
+i & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & -i & 0 & 0 & 0 & 0 & 0 & 0
+\end{pmatrix}
+\begin{pmatrix}
+\alpha_0\alpha_1\alpha_2\\
+\alpha_0\alpha_1\beta_2\\
+\alpha_0\beta_1\alpha_2\\
+\alpha_0\beta_1\beta_2\\
+\beta_0\alpha_1\alpha_2\\
+\beta_0\alpha_1\beta_2\\
+\beta_0\beta_1\alpha_2\\
+\beta_0\beta_1\beta_2
+\end{pmatrix}\\
+&= i
+\begin{pmatrix}
+-\beta_0\beta_1\alpha_2\\
+\beta_0\beta_1\beta_2\\
+\beta_0\alpha_1\alpha_2\\
+-\beta_0\alpha_1\beta_2\\
+- \alpha_0\beta_1\alpha_2\\
+\alpha_0\beta_1\beta_2\\
+\alpha_0\alpha_1\alpha_2\\
+-\alpha_0\alpha_1\beta_2
+\end{pmatrix}
+\end{align*}
+When the same quantum gate is operated on two or more qubits of a register the quantum gates can be compactly represented as a single gate with the original input qubits connected to it via quantum wire, as depicted in Figure~\ref{fig:parallel-quantum-gate-block}.
+\begin{figure}[ht]
+\centering
+\begin{minipage}[b]{0.8\linewidth}
+\[
+\Qcircuit @C=1em @R=1em{
+\lstick{\vert q_0 \rangle} & \multigate{2}{X} & \qw\\
+\lstick{\vert q_1 \rangle} & \ghost{X} & \qw\\
+\lstick{\vert q_2 \rangle} & \ghost{X} & \qw
+}
+\]
+\end{minipage}
+\caption{A parallel execution of the quantum gate Pauli-X into the individual qubits of a quantum register. The operation of the quantum gates occurs in a single time slice. The operation of the quantum gates on the register is denoted in quantum operator notation as $X^{\otimes 3} \vert q_0 q_1 q_2 \rangle$.}
+\label{fig:parallel-quantum-gate-block}
+\end{figure} 
+The tensor product operator $\otimes$ provides a means for generalizing 1-qubit quantum operators acting on \textit{n} qubits of a register into an \textit{n}-qubit quantum operator as shown in Figure~\ref{fig:parallel-quantum-gate-block}.
+
+A qubit gets into a classical state from a quantum state when an \textit{observation} operation is applied into it. This observation operation on qubits corresponds to any disturbance in the quantum physical system represented by qubits and is represented in the quantum circuit model as parallel operation of \textit{measurement gates}. A measurement gate is denoted with a block with an \textit{M} character inscribed inside it. The input wire to a measurement gate is a quantum wire and its output wire is a classical wire. An illustration of the measurement gate is shown in Figure~\ref{fig:M-gate}.
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \lstick{\vert q_0 \rangle} & \qw & \gate{M} & \cw & \ \ \ \ 0 \text{ or } 1
+			}		
+		\]
+	\end{minipage}
+	\caption{Measurement gate. The measurement gate puts a qubit from an unknown quantum state into a definite classical state of either 0 or 1. The classical state to which the qubit will settle into will depend on the complex amplitude of the quantum states $\vert 0 \rangle$ and $\vert 1 \rangle$.}
+	\label{fig:M-gate}
+\end{figure}
+
+
+%Quantum gates and quantum circuits are analogous to their classical counterparts. Quantum gates also abstract information processing just like classical gates. The information processing performed by quantum gates on input qubits are unitary operations though and so gates and operators are interchangeable in this context. Recall that we can represent quantum operators using unitary matrices. A quantum gate can then be represented as a $2^n$ degree matrix to be applied to its \textit{n} inputs and which will also produce \textit{n} outputs. The Pauli operators \textit{X}, \textit{Y} and \textit{Z} are then also valid single-qubit quantum gates.
+%
+%The action of a quantum gate can be illustrated using a circuit diagram. The gate is represented with a block with its notation inscribed inside it. The input to the gate is represented with a wire going into the block and its output is represented with a wire going outside the block. Quantum wires may not necessarily represent physical wires like in classical circuits. They may correspond to atoms traveling through laser or atoms trapped in a cavity changing states as they are exposed to fields. The physical implementation of a quantum wire will depend on the technology chosen to implement a quantum computer. As example, a circuit diagram for the Pauli \textit{X}, \textit{Y} and \textit{Z} operators are shown in Figures~\ref{fig:PauliX-gate}, \ref{fig:PauliY-gate} and \ref{fig:PauliZ-gate}.
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{0.8\linewidth}
+%		\[
+%			\Qcircuit @C=1em @R=1em {
+%				& \lstick{\vert 0 \rangle} & \gate{X} & \qw & \vert 1 \rangle\\
+%				& \lstick{\vert 1 \rangle} & \gate{X} & \qw & \vert 0 \rangle
+%			}		
+%		\]
+%	\end{minipage}
+%	\caption{Pauli-X gate. Flips the state of a qubit, $\vert 0 \rangle \rightarrow \vert 1 \rangle$ and $\vert 1 \rangle \rightarrow \vert 0 \rangle$.}
+%	\label{fig:PauliX-gate}
+%\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{0.8\linewidth}
+%		\[
+%			\Qcircuit @C=1em @R=1em {
+%				& \lstick{\vert 0 \rangle} & \gate{Y} & \qw & i\vert 1 \rangle\\
+%				& \lstick{\vert 1 \rangle} & \gate{Y} & \qw & \ \ -i\vert 0 \rangle
+%			}		
+%		\]
+%	\end{minipage}
+%	\caption{Pauli-Y gate. Flips the state of a qubit and additionally adds an $i$ multiplicative factor with negative sign for state $\vert 1 \rangle$, $\vert 0 \rangle \rightarrow i\vert 1 \rangle$ and $\vert 1 \rangle \rightarrow -i\vert 0 \rangle$.}
+%	\label{fig:PauliY-gate}
+%\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{0.8\linewidth}
+%		\[
+%			\Qcircuit @C=1em @R=1em {
+%				& \lstick{\vert 0 \rangle} & \gate{Z} & \qw & \vert 0 \rangle\\
+%				& \lstick{\vert 1 \rangle} & \gate{Z} & \qw & \ \ -\vert 1 \rangle
+%			}		
+%		\]
+%	\end{minipage}
+%	\caption{Pauli-Z gate. Inverts the amplitude of state $\vert 1 \rangle$, $\vert 0 \rangle \rightarrow \vert 0 \rangle$ and $\vert 1 \rangle \rightarrow -\vert 1 \rangle$.}
+%	\label{fig:PauliZ-gate}
+%\end{figure}
+
+%One particularly interesting gate is the \textit{Walsh-Hadamard gate}, or simply \textit{Hadamard gate}. Recall that a single qubit can be in a linear superposition of states $\vert 0 \rangle$ and $\vert 1 \rangle$. The Hadamard gate puts a qubit into a linear superposition of these states with equal complex amplitudes. This means that they have equal probability of occurring as the qubit's classical state. The operation of Hadamard gate into a single qubit is as follows
+%\[
+%	H\vert 0 \rangle = \sqrt{\frac{1}{2}} \vert 0 \rangle + \sqrt{\frac{1}{2}}\vert 1 \rangle, \quad \quad H\vert 1 \rangle = \sqrt{\frac{1}{2}} \vert 0 \rangle - \sqrt{\frac{1}{2}}\vert 1 \rangle
+%\]
+%In matrix representation the Hadamard gate operates on a single qubit as follows
+%\begin{equation*}
+%	H\vert 0 \rangle =
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		1 & 1\\
+%		1 & -1
+%	\end{pmatrix}
+%	\begin{pmatrix}
+%		1\\
+%		0
+%	\end{pmatrix}
+%	=
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		1\\
+%		0
+%	\end{pmatrix}
+%	+
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		0\\
+%		1
+%	\end{pmatrix}
+%	= 
+%	\sqrt{\frac{1}{2}} \vert 0 \rangle + \sqrt{\frac{1}{2}}\vert 1 \rangle
+%\end{equation*}
+%\begin{equation*}
+%	H\vert 1 \rangle =
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		1 & 1\\
+%		1 & -1
+%	\end{pmatrix}
+%	\begin{pmatrix}
+%		0\\
+%		1
+%	\end{pmatrix}
+%	=
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		1\\
+%		0
+%	\end{pmatrix}
+%	-
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		0\\
+%		1
+%	\end{pmatrix}
+%	= 
+%	\sqrt{\frac{1}{2}} \vert 0 \rangle - \sqrt{\frac{1}{2}}\vert 1 \rangle
+%\end{equation*}
+%
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{0.8\linewidth}
+%		\[
+%			\Qcircuit @C=1em @R=1em {
+%				& \lstick{\vert 0 \rangle} & \gate{H} & \qw & \rstick{\frac{1}{\sqrt{2}} \vert 0 \rangle + \frac{1}{\sqrt{2}} \vert 1 \rangle}\\
+%				& \lstick{\vert 1 \rangle} & \gate{H} & \qw & \rstick{\frac{1}{\sqrt{2}} \vert 0 \rangle - \frac{1}{\sqrt{2}} \vert 1 \rangle}
+%			}		
+%		\]
+%	\end{minipage}
+%	\caption{Single-qubit Hadamard gate. The Hadamard gate puts a qubit into a uniform superposition of states $\vert 0 \rangle$ and $\vert 1 \rangle$.}
+%	\label{fig:single-qubit-H-gate}
+%\end{figure}
+
+%A single-qubit gate is generalized into a multi-qubit gate by performing the operation into each qubit of the register. In operator representation, a multi-qubit Hadamard gate is applied as follows
+%\[
+%	H^{\otimes n}\vert q_1 \ldots q_n \rangle = \left( H \otimes \ldots \otimes H \right) \left( \vert q_1 \rangle \otimes \ldots \otimes \vert q_n \rangle \right)
+%\]
+%where $\otimes$ is the tensor product operator. In matrix representation, a multi-qubit Hadamard operator corresponds to the resulting tensor product of the individual Hadamard matrices. For a 2-qubit Hadamard operator, its matrix representation is the matrix
+%\[
+%	H^{\otimes 2} = H \otimes H = 
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		1	&	1\\
+%		1	&	-1
+%	\end{pmatrix}
+%	\otimes
+%	\sqrt{\frac{1}{2}}
+%	\begin{pmatrix}
+%		1	&	1\\
+%		1	&	-1
+%	\end{pmatrix}
+%	=
+%	\frac{1}{2}
+%	\begin{pmatrix}
+%		1	&	1	&	1	&	1\\
+%		1	&	-1	&	1	&	-1\\
+%		1	&	1	&	-1	&	-1\\
+%		1	&	-1	&	-1	&	1
+%	\end{pmatrix}
+%\]
+%A multi-qubit gate is represented as a block with multiple inputs and same number of outputs. The gate symbol is also inscribed inside its block. An example of a multi-qubit Hadamard gate is shown in Figure~\ref{fig:multi-qubit-H-gate}.
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{0.8\linewidth}
+%		\[
+%			\Qcircuit @C=1em @R=1em {
+%				& \lstick{\vert 0 \rangle} 	& \multigate{3}{H} 	& \qw 		& \\
+%				& \lstick{\vert 0 \rangle} 	& \ghost{H} 				& \qw 		& \rstick{\ \ \sqrt{\frac{1}{2^n}} \sum_{i=0}^{2^n-1} \vert i \rangle}\\
+%				&	\vdots							& 								&	\vdots	& \\
+%				& \lstick{\vert 0 \rangle} 	& \ghost{H} 				& \qw 		& \ \gategroup{1}{5}{4}{5}{.9em}{\}}
+%			}		
+%		\]
+%	\end{minipage}
+%	\caption{Multiple-qubit Hadamard gate. The Hadamard gate is applied to individual input qubits and the resulting state is the tensor product of the resulting individual superposition states.}
+%	\label{fig:multi-qubit-H-gate}
+%\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Controlled quantum gates %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsubsection{Controlled quantum gates}
+The concept of controlled quantum gates correspond to control structures in algorithms. The inputs of a controlled quantum gate is composed of one or more control qubits and target qubits. The operation corresponding to the controlled quantum gate is applied to the target qubits if the control condition is satisfied by the states of the control qubits. A basic controlled quantum gate has one input control qubit and one input target qubit. A controlled Pauli-\textit{X} gate is shown in Figure~\ref{fig:1CNOT-gate} and Figure~\ref{fig:0CNOT-gate}.
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=2em {
+				& \lstick{\vert c \rangle} & \ctrl{1} & \qw & \rstick{\vert c \rangle}\\
+				& \lstick{\vert t \rangle} & \gate{X} & \qw & 
+				\rstick{\begin{cases}
+					\vert t \rangle, & \text{if } c=0\\
+					X \vert t \rangle, & otherwise
+				\end{cases}}
+			}		
+		\]
+	\end{minipage}
+	\caption{1-controlled $C^{1}X$ gate or CNOT gate. The gate X is applied to the target qubit in state $\vert t \rangle$ if the control qubit $\vert c \rangle$ is in state $\vert 1 \rangle$. The state of the control qubit $\vert c \rangle$ is kept unchanged.}
+	\label{fig:1CNOT-gate}
+\end{figure}
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=2em {
+				& \lstick{\vert c \rangle} & \ctrlo{1} & \qw & \rstick{\vert c \rangle}\\
+				& \lstick{\vert t \rangle} & \gate{X} & \qw & 
+				\rstick{\begin{cases}
+					\vert t \rangle, & \text{if } c=1\\
+					X \vert t \rangle, & otherwise
+				\end{cases}}
+			}		
+		\]
+	\end{minipage}
+	\caption{0-controlled Pauli X gate. The gate is applied to the target qubit in state $\vert t \rangle$ if the control qubit is in state $\vert 0 \rangle$. The state of the control qubit is kept unchanged.}
+	\label{fig:0CNOT-gate}
+\end{figure}
+In Figure~\ref{fig:1CNOT-gate}, the Pauli-\textit{X} operation is applied to the target qubit $\vert t \rangle$ if the control qubit $\vert c \rangle$ is in state $\vert 1 \rangle$ and so it is called a 1-\textit{controlled} Pauli-\textit{X} gate. On the other hand, in Figure~\ref{fig:0CNOT-gate} the Pauli-\textit{X} operation is applied to the target qubit if the control qubit $\vert c \rangle$ is in state $\vert 0 \rangle$. We call this controlled operator as a 0-\textit{controlled} Pauli-\textit{X} gate. The controlled Pauli-\textit{X} gate is also called as \textit{controlled NOT gate}, or \textit{CNOT}, since the Pauli-\textit{X} operator's effect is analogous to the effect of the classical \textit{NOT} operator. To determine the matrix representation of a quantum gate we look into its effect on its input qubits. Let us consider the \textit{CNOT} gate and its effect on its input qubits. Given the first qubit as control and the second qubit as target, the effect of the \textit{CNOT} gate is as follows,
+\[
+	CNOT\vert 00 \rangle \xmapsto[]{} \vert 00 \rangle, \quad\quad CNOT\vert 01 \rangle \xmapsto[]{} \vert 01 \rangle, \quad\quad CNOT\vert 10 \rangle \xmapsto[]{} \vert 11 \rangle, \quad\quad CNOT\vert 11 \rangle \xmapsto[]{} \vert 10 \rangle
+\]
+Given the mapping of \textit{CNOT} gate's input qubits to its output qubits we construct \textit{CNOT} gate's matrix representation as the matrix
+\[
+	CNOT=
+	\kbordermatrix{
+				& 00 & 01 & 10 & 11\\
+		00	&	1	&	0	&	0	&	0\\
+		01	&	0	&	1	&	0	&	0\\
+		10	&	0	&	0	&	0	&	1\\
+		11	&	0	&	0	&	1	&	0\\
+	}
+\]
+The row and column indices of the matrix for the \textit{CNOT} gate corresponds to the state of the the input control state $\vert c \rangle$ and the input target state $\vert t \rangle$ of the gate, respectively. The generation of a multi-qubit controlled quantum gates' matrix representation is a generalization of the matrix generation for controlled 1-qubit quantum gates. The matrix representation of a quantum gate should always be multiplied with a scalar normalization factor to satisfy the unity requirement of the summation of the modulo square of the input qubit states' complex amplitudes.
+
+The controlled operation of a controlled quantum gate with $k$ control qubits, where $k > 1$, is applied to its target qubits when $\wedge_{i=1}^{k} t_i = 1$ if the controlled quantum gate is a 1-controlled quantum gate and $\wedge_{i=1}^{k} \neg t_i = 1$ when it is a 0-controlled quantum gate. We denote a controlled quantum operator with \textit{k} control qubits as
+\[
+C^{k}< operator >
+\]
+where \textit{operator} is any unitary quantum operator and $k > 1$. A 1-controlled quantum operator is represented in the quantum circuit model as a 1-controlled quantum gate with \textit{k} input control qubits connected by quantum wire. If $k = 1$ we simply denote the controlled quantum operator as $C< operator >$. The corresponding quantum gate for a 1-controlled Pauli-\textit{X} quantum operator is as shown in Figure~\ref{fig:1CNOT-gate}. A 1-controlled Pauli-\textit{X} operator with \textit{k} control qubits is denoted as $C^{k}NOT$ and its corresponding controlled quantum gate is shown in Figure\ref{fig:CkNOT-gate}.
+
+\todo{Add figure of $C^{k}NOT$ gate. Use label fig:CkNOT-gate.}
+
+\subsection{Decomposition of controlled quantum gates}
+Decomposition of gates with more than two input qubits into gates having only one or two input qubits provides researchers a universal set of gates which they can use in composing more complex circuits for implementing algorithms. In the study of A. Barenco, C. Bennett, R. Cleve, D. DiVincenzo, N. Margolus, P. Shor, T. Sleator, J. Smolin and H. Weinfurter \cite{Barenco1995} they were able to prove the decomposition of arbitrary \textit{n}-qubit controlled $2\times 2$ quantum gates into a quantum circuit composed of unitary 1-qubit gates and \textit{CNOT} gates. In their paper they denoted unitary 1-qubit gates and the \textit{CNOT} gates as \textit{basic gates} which performs \textit{basic operations}. Barenco et al. used a set of rotation gates as building blocks for the decomposition of arbitrary unitary gates. These rotation gates are defined as
+\begin{align*}
+R_y(\theta)=
+\begin{pmatrix}
+cos(\frac{\theta}{2}) & sin(\frac{\theta}{2})\\
+-sin(\frac{\theta}{2}) & cos(\frac{\theta}{2})
+\end{pmatrix}
+\qquad
+R_z(\alpha)=
+\begin{pmatrix}
+e^{i\frac{\alpha}{2}} & 0\\
+0 & -e^{i\frac{\alpha}{2}}
+\end{pmatrix}
+\qquad
+\Phi(\delta)=
+\begin{pmatrix}
+e^{i\delta} & 0\\
+0 & e^{i\delta}
+\end{pmatrix}
+\end{align*}
+where $R_y(\theta)$ is a rotation by an angle of $\theta$ along the \textit{y} axis of the state space of the system, $R_z(\alpha)$ is a rotation along the \textit{z} axis of the same space and $\Phi(\delta)$ is a phase shift with respect to $\delta$. Barenco et al. proved the linearity of the growth rate on the number of gates required in the decomposition of a controlled quantum gate $C^{n-1}U$ with respect to the number of qubits \textit{n} through the following series of lemmas and corollaries using these 1-qubit rotation gates and \textit{CNOT} gates.
+
+\note{Need to define basic operations used in the succeeding corollaries and lemmas.}
+\begin{lemma}[\cite{Barenco1995}] % Lemma 4.1
+Every unitary $2\times 2$ matrix can be expressed as
+\begin{align*}
+\begin{pmatrix}
+e^{i\delta} & 0\\
+0 & e^{i\delta}
+\end{pmatrix}
+\begin{pmatrix}
+e^{i\frac{\alpha}{2}} & 0\\
+0 & e^{-i\frac{\alpha}{2}}
+\end{pmatrix}
+\begin{pmatrix}
+cos\left(\frac{\theta}{2}\right) & sin\left(\frac{\theta}{2}\right)\\
+-sin\left(\frac{\theta}{2}\right) & cos\left(\frac{\theta}{2}\right)
+\end{pmatrix}
+\begin{pmatrix}
+e^{i\frac{\beta}{2}} & 0\\
+0 & e^{-i\frac{\beta}{2}}
+\end{pmatrix},
+\end{align*}
+where $\delta, \alpha, \theta,$ and $\beta$ are real valued. Moreover, any special unitary $2 \times 2$ matrix (i.e., with unity determinant) can be expressed as
+\begin{align*}
+\begin{pmatrix}
+e^{i\frac{\alpha}{2}} & 0\\
+0 & e^{-i\frac{\alpha}{2}}
+\end{pmatrix}
+\begin{pmatrix}
+cos\left(\frac{\theta}{2}\right) & sin\left(\frac{\theta}{2}\right)\\
+-sin\left(\frac{\theta}{2}\right) & cos\left(\frac{\theta}{2}\right)
+\end{pmatrix}
+\begin{pmatrix}
+e^{i\frac{\beta}{2}} & 0\\
+0 & e^{-i\frac{\beta}{2}}
+\end{pmatrix}.
+\end{align*}
+\end{lemma}
+
+\begin{lemma}[\cite{Barenco1995}]\label{env:lem43} %Lemma 4.3
+For any special unitary matrix W [$W \in SU(2)$], there exist matrices A, B, and C $\in SU(2)$ such that $ABC=I$ and $AXBXC=W$.
+\end{lemma}
+By setting $A=R_z\left(\alpha\right)R_y\left(\frac{\theta}{2}\right)$, $B=R_y\left(\frac{-\theta}{2}\right)R_z\left(\frac{-\left(\alpha + \beta\right)}{2}\right)$, and $C=R_z\left(\frac{\beta - \alpha}{2}\right)$, the relations $ABC=I$ and $AXBXC=W$ in Lemma \ref{env:lem43} are satisfied.
+
+\begin{lemma}[\cite{Barenco1995}]\label{env:lemma51} % Lemma 5.1
+For any unitary $2\times 2$ unitary matrix W, a $C^{1}W$ gate can be simulated by a network of the form
+%\begin{figure}[H]
+	\begin{center}
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=2em {
+				& \ctrl{1} & \qw\\
+				& \gate{W} & \qw
+			}
+			\qquad = \qquad
+			\Qcircuit @C=1em @R=2em {
+				& \qw        & \ctrl{1} & \qw        & \ctrl{1} & \qw        & \qw\\
+				& \gate{A} & \targ    & \gate{B} & \targ     & \gate{C} & \qw
+			}	
+		\]
+	\end{minipage}
+	\end{center}
+%	\caption{}
+%	\label{fig:cor53}
+%\end{figure}
+where A, B, and C $\in SU(2)$ if and only if $W \in SU(2)$.
+\end{lemma}
+
+\begin{lemma}[\cite{Barenco1995}] \label{env:lem52} % Lemma 5.2
+For any $\delta$ and $S=\Phi(\delta)$, a $C^{1}S$ gat e can be simulated by a network of the form
+%\begin{figure}[H]
+	\begin{center}
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=2em {
+				& \ctrl{1} & \qw\\
+				& \gate{S} & \qw
+			}
+			\qquad = \qquad
+			\Qcircuit @C=1em @R=2em {
+				& \gate{E} & \qw\\
+				& \qw        & \qw
+			}	
+		\]
+	\end{minipage}
+	\end{center}
+%	\caption{$C^{1}S$ decomposition.}
+%	\label{fig:lem52}
+%\end{figure}
+where E is unitary.
+\end{lemma}
+By letting $E=R_z\left(-\delta\right)\Phi\left(\frac{\delta}{2}\right)$, the equivalence $C^{1}S = E \cdot I$ in Lemma \ref{env:lem52} is satisfied.
+
+\begin{corollary}[\cite{Barenco1995}] \label{env:corollary53}% Corollary 5.3
+For any unitary $2\times 2$ matrix U, a $C^{1}U$ gate can be simulated by at most six basic gates: four one-bit gates and two XOR gates ($CNOT$).
+\end{corollary}
+From Lemma~\ref{env:lemma51} and Lemma~\ref{env:lem52}, the simulation of an arbitrary $C^{1}U$ gate where \textit{U} is a unitary 1-qubit gate can be achieved with the decomposition shown in Figure~\ref{fig:cor53}
+\begin{figure}[H]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=2em {
+				& \ctrl{1} & \qw\\
+				& \gate{U} & \qw
+			}
+			\qquad = \qquad
+			\Qcircuit @C=1em @R=2em {
+				& \qw        & \ctrl{1} & \qw        & \ctrl{1} & \gate{E} & \qw\\
+				& \gate{A} & \targ    & \gate{B} & \targ     & \gate{C} & \qw
+			}	
+		\]
+	\end{minipage}
+	\caption{$C^{1}U$ decomposition. $A, B, C \in SU(2)$, $A\oplus B\oplus C \in SU(2)$, and $A\cdot B\cdot C = I$. $U=A\cdot I \oplus B\cdot I \oplus C \cdot E$.}
+	\label{fig:cor53}
+\end{figure}
+where 
+\begin{align*}
+A = R_z(\alpha)R_y\left(\frac{\theta}{2}\right)
+\qquad
+B = R_y\left(\frac{-\theta}{2}\right)R_z\left(\frac{-(\alpha+\beta)}{2}\right)
+\qquad
+C = R_z\left(\frac{\beta - \alpha}{2} \right)
+\qquad
+E = R_z(-\delta)\Phi\left(\frac{\delta}{2}\right)
+\end{align*}
+and the $2\times 2$ matrices corresponding to A, B, and C are special unitary matrices, i.e. their determinant is $+1$.
+
+\begin{lemma}[\cite{Barenco1995}] \label{env:lemma61}% Lemma 6.1
+For any unitary $2\times 2$ unitary matrix U, a $C^{2}U$ gate can be simulated by a network of the form
+\begin{center}
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1.5em @R=2em {
+				& \ctrl{1}   & \qw & \ \ & \qw        & \ctrl{1} & \qw                        & \ctrl{1} & \ctrl{2}  & \qw\\
+				& \ctrl{1}   & \qw & \lstick{=}   & \ctrl{1}   & \targ    & \ctrl{1}                   & \targ    & \qw         & \qw\\
+				& \gate{U} & \qw & \ \ & \gate{V} & \qw      & \gate{V^{\dagger}} & \qw      & \gate{V} & \qw
+			}	
+		\]
+	\end{minipage}
+\end{center}
+where V is unitary.
+\end{lemma}
+Setting $V^{2}=U$ lets the circuit compute for the operation of U on the bottom-most qubit when the two top-most qubits are both in state $\vert 1 \rangle$ and $VV^{\dagger}=I$ otherwise. 
+
+\begin{corollary}[\cite{Barenco1995}] \label{env:corollary62} % Corollary 6.2
+For any unitary $2\times 2$ matrix U, a $C^{2}U$ gate can be simulated by at most fourteen basic gates: eight one-bit gates and six XOR gates $C^{1}NOT$.
+\end{corollary}
+Corollary~\ref{env:corollary62} follows from Lemma~\ref{env:lemma61} and Corollary~\ref{env:corollary53}.
+
+\begin{lemma}[\cite{Barenco1995}]\label{env:lemma72} % Lemma 7.2
+If $n \geq 5$ and $m \in \{3, \cdots, \left[\frac{n}{2}\right]\}$, then a $C^{m}NOT$ gate can be simulated by a network of $4(m-2)$ $C^{2}NOT$ gates that is of the form
+\begin{center}
+\begin{minipage}[b]{0.8\linewidth}
+\[
+\Qcircuit @C=1.5em @R=2em {
+	& \lstick{1} & \ctrl{1} & \qw   &               & \qw          & \qw      & \qw      & \ctrl{1} & \qw      & \qw       & \qw       & \qw      & \qw      & \ctrl{1} & \qw      & \qw       & \qw\\
+	& \lstick{2} & \ctrl{1} & \qw  &                & \qw          & \qw      & \qw      & \ctrl{4} & \qw       & \qw      & \qw       & \qw      & \qw       & \ctrl{4} & \qw      & \qw      & \qw\\
+	& \lstick{3} & \ctrl{1} & \qw  &                & \qw          & \qw      & \ctrl{3} & \qw      & \ctrl{3} & \qw       & \qw       & \qw      & \ctrl{3} & \qw      & \ctrl{3} & \qw      & \qw\\
+	& \lstick{4} & \ctrl{1} & \qw  &                & \qw          & \ctrl{3} & \qw      & \qw      & \qw      & \ctrl{3}  & \qw       & \ctrl{3} & \qw      & \qw      & \qw      & \ctrl{3} & \qw\\
+	& \lstick{5} & \ctrl{4} & \qw  & \lstick{=} & \ctrl{3} & \qw          & \qw      & \qw      & \qw       & \qw       & \ctrl{3} & \qw       & \qw      & \qw      & \qw      & \qw      & \qw\\
+	& \lstick{6} & \qw       & \qw &                & \qw          & \qw       & \ctrl{1} & \targ    & \ctrl{1} & \qw       & \qw      & \qw        & \ctrl{1}& \targ    & \ctrl{1} & \qw      & \qw\\
+	& \lstick{7} & \qw       & \qw &                & \qw          & \ctrl{1}  & \targ    & \qw      & \targ     & \ctrl{1} & \qw      & \ctrl{1}   & \targ   & \qw      & \targ     & \ctrl{1} & \qw\\
+	& \lstick{8} & \qw       & \qw &                & \ctrl{1}     & \targ     & \qw      & \qw      & \qw       & \targ     & \ctrl{1} & \targ     & \qw     & \qw      & \qw       & \targ     & \qw\\
+	& \lstick{9} & \targ     & \qw &                & \targ         & \qw       & \qw      & \qw     & \qw       & \qw       & \targ     & \qw       & \qw     & \qw      & \qw       & \qw      & \qw\\
+	&                &            &        &                 & 1               & 2          & 3          & 4         & 5           & 6           & 7          & 8           & 9         & 10       & 11         & 12              & 
+}
+\]
+\end{minipage}
+\end{center}
+(illustrated for $n=9$ and $m=5$).
+\end{lemma}
+The input qubits 6 to 9 in Lemma~\ref{env:lemma72} are scratch bits for storing the intermediate results in the evaluation of the states of control qubits 1 to 5. This decomposition does not assume any initial particular initial state of the scratch bits. This is made possible by the $C^{2}NOT$ operations in steps 1 to 3. Steps 4 to 7 is the evaluation of the $C^{m}NOT$ operator. Steps 8 to 12 resets the scratch bits to their initial states.
+
+\begin{lemma}[\cite{Barenco1995}]\label{env:lemma73} % Lemma 7.3
+For any $n \geq 5$ and $m \in \{2,\cdots,n-3\}$, a $C^{n-2}NOT$ gate can be simulated by a network consisting of two $C^{m}NOT$ gates and two $C^{n-m-1}NOT$ gates, which is of the form
+\begin{center}
+\begin{minipage}[b]{0.8\linewidth}
+\[
+\Qcircuit @C=1.5em @R=2em {
+\lstick{1} & \ctrl{1} & \qw &                & \ctrl{1}  & \qw      & \ctrl{1} & \qw      & \qw\\
+\lstick{2} & \ctrl{1} & \qw &                & \ctrl{1}  & \qw      & \ctrl{1} & \qw      & \qw\\
+\lstick{3} & \ctrl{1} & \qw &                & \ctrl{1}  & \qw      & \ctrl{1} & \qw      & \qw\\
+\lstick{4} & \ctrl{1} & \qw &                & \ctrl{1}  & \qw      & \ctrl{1} & \qw      & \qw\\
+\lstick{5} & \ctrl{1} & \qw & \lstick{=} & \ctrl{3}  & \qw      & \ctrl{3} & \qw      & \qw\\
+\lstick{6} & \ctrl{1} & \qw &                & \qw       & \ctrl{1} & \qw      & \ctrl{1} & \qw\\
+\lstick{7} & \ctrl{2} & \qw &                & \qw       & \ctrl{1} & \qw      & \ctrl{1} & \qw\\
+\lstick{8} & \qw      & \qw &                & \targ     & \ctrl{1} & \targ     & \ctrl{1} & \qw\\
+\lstick{9} & \targ    & \qw &                & \qw       & \targ     & \qw      & \targ     & \qw
+}
+\]
+\end{minipage}
+\end{center}
+(illustrated for $n=9$ and $m=5$).
+\end{lemma}
+Simulation of controlled NOT gates based on Lemma~\ref{env:lemma73} is possible due to the decomposition of controlled NOT gates based on Lemma~\ref{env:lemma72} in which scratch bits are not required to be initialized to the state $\vert 0 \rangle$ prior to computation in the network.
+
+\begin{corollary}[\cite{Barenco1995}] \label{env:corollary74}% Corollary 7.4
+On an n-bit network (where $n \geq 7$), a $C^{n-2}NOT$ gate can be simulated by $8(n-5)$ $C^{2}NOT$ gates (three-bit Toffoli gates), as well as 48n-212 basic operations.
+\end{corollary}
+The computation of the gate complexity in Corollary~\ref{env:corollary74} follows from the decomposition in Lemma~\ref{env:lemma72} in combination with the decomposition in Lemma~\ref{env:lemma73}. Decomposition of $C^{2}NOT$ gates follows from the decomposition in Corollary~\ref{env:corollary62}.
+
+\begin{lemma}[\cite{Barenco1995}] \label{env:lemma75}% Lemma 7.5
+For any unitary $2\times 2$ matrix U, a $C^{n-1}U$ gate can be simulated by a network of the form
+\begin{center}
+\begin{minipage}[b]{0.8\linewidth}
+\[
+\Qcircuit @C=1.5em @R=2em {
+\lstick{1} & \ctrl{1} & \qw &                & \qw        & \ctrl{1} & \qw                         & \ctrl{1} & \qw        & \qw\\
+\lstick{2} & \ctrl{1} & \qw &                & \qw        & \ctrl{1} & \qw                         & \ctrl{1} & \qw        & \qw\\
+\lstick{3} & \ctrl{1} & \qw &                & \qw        & \ctrl{1} & \qw                         & \ctrl{1} & \qw        & \qw\\
+\lstick{4} & \ctrl{1} & \qw &                & \qw        & \ctrl{1} & \qw                         & \ctrl{1} & \qw        & \qw\\
+\lstick{5} & \ctrl{1} & \qw & \lstick{=} & \qw        & \ctrl{1} & \qw                         & \ctrl{1} & \qw        & \qw\\
+\lstick{6} & \ctrl{1} & \qw &                & \qw        & \ctrl{1} & \qw                         & \ctrl{1} & \qw        & \qw\\
+\lstick{7} & \ctrl{1} & \qw &               & \qw         & \ctrl{1} & \qw                         & \ctrl{1} & \qw        & \qw\\
+\lstick{8} & \ctrl{1} & \qw &               & \ctrl{1}    & \targ    & \ctrl{1}                    & \targ    & \ctrl{1}   & \qw\\
+\lstick{9} & \gate{U}    & \qw &                & \gate{V} & \qw       & \gate{V^{\dagger}} & \qw      & \gate{V} & \qw
+}
+\]
+\end{minipage}
+\end{center}
+(illustrated for n=9), where V is unitary.
+\end{lemma}
+From Lemma~\ref{env:lemma61}, U is set to $V^{2}$ in Lemma~\ref{env:lemma75}
+
+\begin{corollary}[\cite{Barenco1995}] \label{env:corollary76} % Corollary 7.6
+For any unitary U, a $C^{n-1}U$ gate can be simulated in terms of $\Theta(n^{2})$ basic operations.
+\end{corollary}
+The gate complexity in Corollay
+
+\section{Quantum memory}
+% Quantum random access memory
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Quantum algorithms %%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Grover's quantum unstructured search algorithm}
+Grover's quantum search algorithm for unstructured search spaces is one of earliest discovered quantum algorithms \cite{Grover1997}. An unstructured search space in this context corresponds to a set of indexed elements which are arranged in no particular order. For example, a search space is composed of $\textit{N}$ elements corresponding to enlisted students in a particular course. This list of students is ordered according to the student's names arranged in alphabetical order. Aside from the names of the students, each element in the list also comes with the student's unique student number. Given this search space, we can search for a particular student given his or her name by randomly choosing an index \textit{x} from the set of indices $\{0,1,\ldots,N-1\}$ and checking if the name of the student in index \textit{x} corresponds to the name of the student we are searching for. If the name of the student in index \textit{x} do not correspond to the student we are searching for, we determine if the name of the student we are searching for alphabetically precedes or succeeds the name of the student in index \textit{x}. We then randomly choose another index from the preceding set of indices $\{0,1,\ldots,x-1\}$ or succeeding set of indices $\{x+1,x+2,\ldots,N-1\}$, whichever applies. Using this search algorithm, we will find the index of the student we are searching for in $\mathcal{O}\left(\log N\right)$ tries. This algorithm is time efficient since we can find a solution index in number of tries logarithmic to the size of the search space, \textit{N}, or polynomial to the number of bits necessary to encode the index of each element of the search space, $\log N$. On the other hand, if we are given a unique student number as input and we would like to search for the index \textit{t} of the student in the list with the given student number, our algorithm will output the target index \textit{t} in time complexity in $\mathcal{O}(N/2)$ in average and $\mathcal{O}(N)$ in the worst case. This is due to the fact that when we randomly choose an index \textit{x} from the set of indices $\{0,1,\ldots,N-1\}$, identify if the corresponding student in this index has the same student number as our input student number and knowing that the student numbers do not match, we do not gain additional information about the possible index of the student we are searching for since the search space is not ordered according the students' unique student numbers. Searching for the index of particular student in the students list given his or her student number is an unstructured search problem.
+
+The quantum algorithm relevant to this study is L. Grover's quantum search algorithm \cite{Grover1996}. Grover's quantum algorithm is an unstructured database search algorithm for identifying a single element \textit{x} on an unstructured search space of some size \textit{N} for identifying some element. The elements of the search space are indexed from $0,\ldots,N-1$. Let $i_x$ denote the index of the element being searched for. An oracle function $f:\{0,\ldots,N-1\} \rightarrow \{0,1\}$ qualifies each index $i=0,\ldots,N-1$ as either the index of the element being searched for or otherwise. $f(\cdot)$ is given by
+\[
+	f(i)=
+	\begin{cases}
+		1, & \mathrm{if}\ i=i_x\\
+		0, & \mathrm{otherwise}.
+	\end{cases}
+\]
+Grover's algorithm is composed of several sub-routines: \textit{initialization}, \textit{solution} \textit{marking}, \textit{amplitude amplification} and \textit{measurement}. Grover's algorithm outputs a single index in $\{0,1,\ldots,N-1\}$ in time complexity $O\left( \sqrt{N} \right)$. Further analysis by M. Boyer et al. \cite{Hoyer1998} showed that for \textit{t} solutions Grover's algorithm returns a single index among the \textit{t} solutions in time complexity $O\left( \sqrt{\frac{N}{t}} \right)$. In the succeeding sections we briefly describe each sub-routine of Grover's algorithm and we compute the probability of success of arriving with a solution after execution of the algorithm.
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Solution marking %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Initialization}
+\label{sec:grover-initialization}
+Given the state $\vert \mathbf{0} \rangle^{\otimes n}$ of an \textit{n}-qubit \textit{index} register the initialization sub-routine puts the state of the register into a uniform superposition of the $2^n$ possible states. This transformation is effected by applying a Hadamard operation on each of the register's qubits. This operation is expressed as
+\begin{equation}
+	\begin{split}
+		\vert \gamma \rangle &= H^{\otimes n}\vert \mathbf{0} \rangle^{\otimes n}\\
+		&= \sqrt{\frac{1}{2^n}} \sum_{i=0}^{2^n-1} \vert i \rangle
+	\end{split}
+\end{equation}
+where $\vert \gamma \rangle$ corresponds to the superposition state of the index register.
+
+\subsection*{Solution marking}
+Given the uniform superposition state $\vert \gamma \rangle$ of the index register the solution marking sub-routine, which we denote here as $U_f$, marks the solution index $i_{x}$ with a shift in the phase of its amplitude, i.e. $U_f\vert i_{x} \rangle \rightarrow -\vert i_{x} \rangle$. A function $f(\cdot)$ serves as an \textit{oracle} for the solution-marking sub-routine which identifies a given index \textit{i} as either an index of a solution element or an index of a non-solution element. Given an index of a solution element the oracle function \textit{f} outputs a 1, and a 0 otherwise. The effect of the solution marking sub-routine on the state $\vert \gamma \rangle$ is
+\begin{align}
+	\begin{split}
+		U_f\vert \gamma \rangle &= U_f\left( \sqrt{\frac{1}{2^n}} \sum_{i=0}^{2^n-1} \vert i \rangle \right)\\
+		&= \sqrt{\frac{1}{2^n}} \sum_{i=0}^{2^n-1} U_f\vert i \rangle\\
+		&= \sqrt{\frac{1}{2^n}} \sum_{i=0}^{2^n-1} (-1)^{f(i)}\vert i \rangle\\
+		&= \left(\sqrt{\frac{1}{2^{n} - 1}} \sum_{i=0, i\neq i_{x}}^{2^n-1} \vert i \rangle \right) - \sqrt{\frac{1}{2^n}} \vert i_{x} \rangle\\
+		&= \vert \gamma \rangle - 2\sqrt{\frac{1}{2^n}} \vert i_{x} \rangle\\
+		\vert \gamma^{\prime} \rangle &= \vert \gamma \rangle - 2\langle i_{x} \vert \gamma \rangle \vert i_{x} \rangle\\
+	\end{split}
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Amplitude amplification %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection*{Amplitude amplification} 
+Given superposition state $\vert \gamma^{\prime} \rangle$ of the index register the effect of the amplitude amplification sub-routine is an increase in the amplitude of the marked state $\vert i_{x} \rangle$ and a decrease in the amplitude of the non-marked states $\vert i \rangle$ in the solution marking step. The amplitude amplification operator can be interpreted as an \textit{inversion-about-the-mean} operator. It inverts the amplitude of the states in $\vert \gamma^{\prime} \rangle$ against the average of the amplitudes $\alpha_{i}$. In Grover's quantum search algorithm \cite{Grover1996} this inversion-about-the-mean operator is denoted as 
+\begin{equation}
+	D=2\vert \gamma \rangle\langle \gamma \vert - I
+\end{equation}
+where \textit{I} is the identity operator and $\vert \gamma \rangle = H^{\otimes n}\vert 0 \rangle^{\otimes n}$. Denoting the average of the amplitudes in $\vert \gamma^{\prime} \rangle$ as $\langle \alpha \rangle$, the effect of \textit{D} on the amplitudes in $\vert \gamma^{\prime} \rangle$ is $2\langle \alpha \rangle - \alpha_i$. Since $U_f$ identifies the index of the solution represented by the state $\vert i_{x} \rangle$ by inverting its amplitude $\alpha_{i_{x}}$, the effect of \textit{D} on $\vert i_{x} \rangle$ is an increase in its amplitude $\alpha_{i_{x}}$. On the other hand, the effect of \textit{D} on the non-solution states $\vert i \rangle$ is a decrease in their amplitude $\alpha_i$. The effect of amplitude amplification sub-routine on state such as $\vert \gamma^{\prime} \rangle$ is
+\begin{equation}
+	\begin{split}
+		D\vert \gamma^{\prime} \rangle &= D\left(\vert \gamma \rangle - 2\langle i_{x} \vert \gamma \rangle \vert i_{x} \rangle\right)\\
+		&= D\vert \gamma \rangle - 2\langle i_{x} \vert \gamma \rangle D\vert i_{x} \rangle\\
+		&= \left(2\vert \gamma \rangle\langle \gamma \vert - I\right)\vert \gamma \rangle - 2\langle i_{x} \vert \gamma \rangle \left(2\vert \gamma \rangle\langle \gamma \vert - I\right) \vert i_{x} \rangle\\
+		&= \left(2\vert \gamma \rangle\langle \gamma \vert \gamma \rangle - \vert \gamma \rangle\right)- 2\langle i_{x} \vert \gamma \rangle \left(2\vert \gamma \rangle\langle \gamma \vert i_{x} \rangle - \vert i_{x} \rangle\right)\\
+		&= \left(2\vert \gamma \rangle - \vert \gamma \rangle\right) - \left( 4 \left\vert \langle i_{x} \vert \gamma \rangle\right\vert^{2}\vert \gamma \rangle - 2\langle i_{x} \vert \gamma \rangle \vert i_{x} \rangle\right)\\
+		&= \vert \gamma \rangle - 4\left\vert \langle i_{x} \vert \gamma \rangle\right\vert^{2}\vert \gamma \rangle + 2\langle i_{x} \vert \gamma \rangle \vert i_{x} \rangle\\
+		&= \left(1 - 4\left\vert \langle i_{x} \vert \gamma \rangle\right\vert^{2} \right) \vert \gamma \rangle + 2\langle i_{x} \vert \gamma \rangle \vert i_{x} \rangle\\
+	\end{split}
+\end{equation}
+
+The solution marking and amplitude amplification sub-routine executed in sequence, $G=DU_f$, is called \textit{Grover operator}. \textit{G} is executed repeatedly \textit{k} times prior to measurement of the state of the index register. \textit{k} is proportional to $\sqrt{N}$. This number of repetition of the Grover operator on the index register optimizes the amplitude $\langle i_{x} \vert \gamma \rangle$ of the state $\vert i_{x} \rangle$. The effect of the Grover operator on the state of the index register can be written as the matrix-vector operation \cite{C5Williams2011}
+\begin{align}
+G
+\begin{pmatrix}
+\vert \gamma \rangle\\
+\vert i_{x} \rangle
+\end{pmatrix}
+&=
+\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1
+\end{pmatrix}
+\begin{pmatrix}
+\vert \gamma \rangle\\
+\vert i_{x} \rangle
+\end{pmatrix}
+\end{align}
+\textit{k} iterations of the Grover operator will result to the matrix-vector operation
+\begin{align}
+G^{k}
+\begin{pmatrix}
+\vert \gamma \rangle\\
+\vert i_{x} \rangle
+\end{pmatrix}
+&=
+\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1
+\end{pmatrix}^{k}
+\begin{pmatrix}
+\vert \gamma \rangle\\
+\vert i_{x} \rangle
+\end{pmatrix}
+\end{align}
+The amplitude of the unknown target index state $\vert i_{x} \rangle$ after \textit{k} iterations will be 
+\begin{align}
+\langle i_{x} \vert G^{k} \vert \gamma \rangle &=
+\frac{1}{2} 
+\left(
+\left(\lambda_0^k - \lambda_1^k \right)\sqrt{\left(\sqrt{\frac{1}{N}}\right)^2 - 1} + \left(\lambda_0^k + \lambda_1^k\right) \sqrt{\frac{1}{N}}
+\right)\\
+&=
+\frac{1}{2} 
+\left(
+\left(\lambda_0^k - \lambda_1^k \right)\sqrt{\frac{1}{N} - 1} + \left(\lambda_0^k + \lambda_1^k\right) \sqrt{\frac{1}{N}}
+\right)
+\end{align}
+where
+\begin{align}
+\lambda_0 &= 1 - \frac{2}{N} - \frac{2}{N}\sqrt{1-N^2}\\
+\lambda_1 &= 1 - \frac{2}{N} + \frac{2}{N}\sqrt{1-N^2}
+\end{align}
+The increase and decrease in the amplitude of each superpositioned state as the \textit{G} operator is applied to $\vert \gamma \rangle$ is periodic. The setting $k = \left\lfloor \frac{\pi}{4} \sqrt{N} \right\rfloor$ results to the optimal amplitude of state $\vert i_{x} \rangle$. Iterating the \textit{G} operator lesser or more than this setting brings down the probability of getting the unknown target state $\vert i_{x} \rangle$ closer to 0 and that of the other states closer to 1 \cite{Grover1996}. For the detailed computation of the amplitude of the unknown target state $\vert i_{x} \rangle$ the reader is referred to Appendix \ref{app:amplitude}.
+
+\subsection*{Measurement}
+After \textit{k} iterations of the Grover operator a measurement operator \textit{M} is applied to the index register. The algorithm outputs the unknown target index $i_{x}$ with probability of success equal to
+\begin{align}
+\left\vert \frac{1}{2} 
+\left(
+\left(\lambda_0^k - \lambda_1^k \right)\sqrt{\frac{1}{N} - 1} + \left(\lambda_0^k + \lambda_1^k\right) \sqrt{\frac{1}{N}}
+\right) \right\vert^2
+\end{align}
+where
+\begin{align}
+\lambda_0 &= 1 - \frac{2}{N} - \frac{2}{N}\sqrt{1-N^2}\\
+\lambda_1 &= 1 - \frac{2}{N} + \frac{2}{N}\sqrt{1-N^2}
+\end{align}
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Quantum algorithms for string matching %%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Related studies}
+Several quantum algorithms for string matching were created using Grover's quantum search algorithm. Some of these are Hollenberg's quantum algorithm for optimal alignment problem,  \cite{Hollenberg2000}, Ramesh and Vinay's quantum algorithm for a variant of exact string matching problem\cite{Ramesh2003} and Mateus and Omar's quantum algorithm for a variant of approximate string matching problem\cite{Mateus2006}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Hollenberg's algorithm %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Hollenberg's algorithm}
+Hollenberg's algorithm uses the multiple-solution variant of Grover's algorithm as sub-routine for approximate string matching. His algorithm is designed to be applied into protein sequence comparison, called \textit{optimal alignment problem}. He considered the cases in which the database may or may not contain single match, or several approximate matches to the input sample protein sequence. The algorithm has three consecutive phases: \textit{initialization}, \textit{coding of distances}, and \textit{searching}.
+
+In the initialization phase, two registers are put into a superposition of states which represent all subsequences entangled with states corresponding to their indices in the sequence. Comparison of the subsequences against the sample sequence is performed by executing an oracle function $F(.)$ which identifies matches in a subsequence. This operation is applied to the linear combination of states representing the subsequences. In Hollenberg's algorithm, this step is assumed to be of $O(1)$ time step. In the encoding phase, a unitary operation is applied to the state of the subsequence register which encodes the Hamming distance of each corresponding subsequence to the linear combination of states. Lastly, in the search phase, the states encoding the lowest Hamming distance is determined from the linear combination of states of the subsequence register by applying the multiple-solution Grover's algorithm iteratively until such state is found. Once such a state is found, a measurement is performed on the state of the index register to get the index of the subsequence represented by the state. A sub-loop can be added to their algorithm to find other solution subsequences.
+
+Hollenberg's algorithm finds an optimal alignment in $O(rk\sqrt{N})$ time steps with probability greater than $\frac{1}{2}$, where \textit{r} is a confidence index and \textit{k} is the lowest Hamming distance. Note that this time complexity does not include the time steps  necessary for (1) executing the oracle function $F(\cdot)$ for computing the mismatches between the subsequences and the sample sequence and (2) the time steps necessary for the oracle function of the multiple-solution Grover's algorithm for computing the Hamming distance of each subsequence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Ramesh and Vinay's algorithm %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Ramesh and Vinay's algorithm}
+Ramesh and Vinay's algorithm requires analysis of periodicity of strings to gain insight on possible approaches to a variant of the exact matching problem in which only a single solution substring is to be determined. It employs partitioning of the text into blocks of length $\frac{M}{2}$. It uses Grover's algorithm with a probabilistic oracle which returns a 1 if a block \textit{i} has an occurrence of the pattern with probability at least $\frac{3}{4}$, and 0 otherwise. The probabilistic oracle is used in two phases of the algorithm: (1) a \textit{sampling} phase and (2) a \textit{verification} phase. It is assumed that a \textit{deterministic sample} \cite{Vishkin1990} has already been computed prior to the sampling phase.
+
+In the sampling phase, Grover's algorithm is used for each block with a deterministic oracle that evaluates to 1 with probability at least $\frac{3}{4}$ if the deterministic sample of the pattern's instance matches the text. The deterministic sampling phase requires $O(\sqrt{M}\log(M))$ time. In the verification phase, the matching instance of the pattern is verified using Grover's algorithm with another deterministic oracle. This phase performs in $O(\sqrt{M})$ with success and failure probability greater than $\frac{3}{4}$. The main Grover's algorithm then performs a search for all the blocks which contain a match. This phase requires $O(\sqrt{\frac{N}{M}}\log(\frac{N}{M}))$ time steps. The pre-computation of the deterministic sample requires $O(\sqrt{M}\log^2(M))$ time steps as shown in \cite{Ramesh2003}. Thus, searching with the probabilistic oracle requires a total of $O(\sqrt{N}\log(\frac{N}{M})\log(M) + \sqrt{M}\log^2(M))$ with probability greater than $\frac{3}{4}$.
+
+For a comparison-based algorithm for string matching it is necessary to know each element of the database and their corresponding indices. It is also necessary to build a query function for the specific pattern to be searched for. Hollenberg's algorithm performs this pre-computation by encoding all the subsequences in the linear combination state of the first register entangled to their corresponding indices in the state of the second register. Ramesh and Vinay's algorithm however do not explicitly discuss this preliminary phase in their work. One particular work which gave attention to this necessary step is that of Mateus and Omar's algorithm for the closest substring problem.
+
+%%%%%%%%%%%%%%%%%%%%%%%%% Mateus and Omar's algorithm %%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mateus and Omar's algorithm}
+Mateus and Omar's algorithm requires construction of specific query operator $U_\sigma$ for each symbol $\sigma$ of the pattern's alphabet $\Sigma$. The query operators enable search for any pattern in the string as long as the alphabet of the text and pattern is the same. This also makes search for any pattern independent of the size of the pattern itself. Using permutation operator for implementation of each query operator they were able to show that a query operator in quantum circuit formal model can be constructed using $O(N\log^2(N))$ quantum gates.
+
+This is done for all symbols in the pattern alphabet which then results to $O(\vert \Sigma \vert N\log^2(N))$ compile time. Their algorithm in total performs in $O(M\log^3(N) + N^{\frac{3}{2}}\log^2(N) \log(M))$ where the $M\log^3(N)$ is attributed to the initialization of the linear combination state representing all the substrings and the $N^{\frac{3}{2}}\log^2(N)\log(M)$ is for the Grover search for a match.
+
+\subsection{Quantum algorithm 1}
+In a previous paper \cite{Aborot2013}, the author was able to come up with a quantum algorithm which makes use of Grover's algorithm with a deterministic oracle as main sub-routine for string matching. The algorithm performs in $O(\log_2(\vert \Sigma \vert)M\sqrt{N})$ time complexity. The algorithm is a direct adaptation of Grover's quantum search algorithm into the exact string matching problem. 
+
+A quantum register is put into a superposition state representing all starting indices of \textit{M}-length substrings in the text T. The marking of the solution index is carried out using a unitary operator with an oracle function which identifies an exact match of the pattern with a shift in the sign of the amplitude of the corresponding state. Assuming that $\Sigma=\{0,1\}$, the oracle function performs the comparison of each symbol in the pattern with each corresponding symbol in a substring of the text using the logical XOR ($\oplus$) and NOT ($\neg$) operation. A truth table for the oracle is shown in Table~\ref{tab:oracle}.
+\begin{table}
+	\centering
+		\begin{tabular}{| P{1cm} | P{1.5cm} | P{3cm} | P{4cm} |}
+			\hline
+			$\vert \text{P}[j] \rangle$	& $\vert \text{T}[i+j] \rangle$ & $\vert \text{P}[j] \rangle \oplus \vert \text{T}[i+j] \rangle$ & $\neg \left( \vert \text{P}[j] \rangle \oplus \vert \text{T}[i+j] \rangle \right)$ \\
+			\hline\hline
+			$\vert 0 \rangle$		&	$\vert 0 \rangle$		&	$\vert 0 \rangle$												& $\vert 1 \rangle$\\
+			\hline
+			$\vert 0 \rangle$		&	$\vert 1 \rangle$		&	$\vert 1 \rangle$												& $\vert 0 \rangle$\\
+			\hline
+			$\vert 1 \rangle$		&	$\vert 0 \rangle$		&	$\vert 1 \rangle$												& $\vert 0 \rangle$\\
+			\hline
+			$\vert 1 \rangle$		&	$\vert 1 \rangle$		&	$\vert 0 \rangle$												& $\vert 1 \rangle$\\
+			\hline
+		\end{tabular}		
+	\caption{Quantum algorithm 1 oracle truth table}
+	\label{tab:oracle}
+\end{table}
+The unitary operator for marking the solution index will act linearly on the superposition state of the register. The circuit complexity for the oracle will require \textit{M} gates for the XOR operation and \textit{M} gates for the NOT operation. An exact match will require that the logical AND of the result for all symbols compared between the pattern and a substring of the text to be equal to 1. The effect of the oracle function on each substring of the text can be expressed as the closed equation
+\begin{equation} 
+	f(i) = \land_{j=0}^{M-1} \neg\left( \vert P[j] \rangle \oplus \vert T[i+j] \rangle \right)
+\end{equation}
+In addition to the 2\textit{M} gates for XOR and NOT operations, the circuit for the oracle function will require an additional $M-1$ $\land$ gates. The oracle function will have linear circuit complexity with respect to the size of the pattern, \textit{M}. In cases in which $\vert \Sigma \vert > 2$, we represent the symbols in $\Sigma$ as binary strings and so the circuit complexity of the oracle function will be in $O\left( \log_2(\vert \Sigma \vert) M \right)$. Since the algorithm is a direct adaptation of Grover's quantum search algorithm, the marking and amplitude amplification steps will be executed in $O\left( \sqrt{N} \right)$ iterations. The time complexity for the whole algorithm is then in $O\left( \log_2(\vert \Sigma \vert) M \sqrt{N} \right)$.
+
+\begin{figure}
+	\begin{center}
+		\begin{tabular}{| p{3cm} | p{4cm} | p{5cm} |}
+			\hline
+			\textbf{Algorithm}	 & \textbf{Time Complexity} & \multicolumn{1}{c|}{\textbf{Description}} \\
+			\hline
+			Hollenberg, 2000 & $\Om(rk\sqrt{N})$ & approximate string matching in application to optimal alignment problem in bioinformatics \\
+			\hline
+			Ramesh and Vinay, 2003 & $\Om(\sqrt{N}\log(\frac{N}{M})\log(M) + \sqrt{M}\log^2(M))$  & exact string matching; considers periodicity of pattern; uses deterministic sampling approach\\
+			\hline
+			Mateus and Omar, 2006 & $\Om(\vert \Sigma \vert N\log^2(N) + N^{\frac{3}{2}}\log^2(N)\log(M))$ & approximate string matching; requires construction of query operator per alphabet symbol\\
+			\hline
+			Aborot, Adorna, de Jesus, 2013 & $\Om(\log_2(\vert \Sigma \vert)M\sqrt{N})$ & exact string matching; assumes single time step oracle function\\
+			\hline
+		\end{tabular}		
+	\end{center}
+	\caption{Quantum Algorithms for String Matching Problem}
+	\label{qalgos}
+\end{figure}
+
+The quantum algorithms summarized in Figure \ref{qalgos} are based mainly on Grover's quantum search algorithm and perform direct character to character comparison between the pattern and the substrings of the text. These algorithms correspond to classical algorithms which perform using the same character-to-character comparison approach. There are classical algorithms though which perform comparison using arithmetic operations. Some of these algorithms makes use of the Fast Fourier Transform for computation of the number of matches. Fischer and Paterson \cite{Fischer1974} showed how the problem of string matching can be viewed as the task of polynomial multiplication. The product of two polynomials can then be computed using Discrete Fourier Transform (DFT). Using Fast Fourier Transform for computing DFT they were able to show that string matching can be performed classically in $O(N\log_2(N))$ time steps. Their work then became the start of researches on classical algorithms which employ Fourier Transform for variants of the string matching problem \cite{Schoenmeyr2005,Fredriksson2009,Baba2010}.
+
+This study presents a quantum algorithm for string matching which makes use of Fourier Transform for evaluating each substring of the text. It also presents a simple quantum verification algorithm for minimizing the size of the database to decrease the time needed for searching the solution. A simulation of these algorithms are also implemented using Python scripting language for illustration purposes.

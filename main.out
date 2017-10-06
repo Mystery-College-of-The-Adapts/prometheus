@@ -1,0 +1,29 @@
+\BOOKMARK [0][-]{chapter*.4}{Acknowledgements}{}% 1
+\BOOKMARK [0][-]{chapter*.5}{Abstract}{}% 2
+\BOOKMARK [0][-]{chapter*.7}{List of Figures}{}% 3
+\BOOKMARK [0][-]{chapter*.8}{List of Tables}{}% 4
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}% 5
+\BOOKMARK [-1][-]{part.1}{I Preliminaries}{}% 6
+\BOOKMARK [0][-]{chapter.2}{String matching}{part.1}% 7
+\BOOKMARK [0][-]{chapter.3}{Quantum computing}{part.1}% 8
+\BOOKMARK [-1][-]{part.2}{II Body of Work}{}% 9
+\BOOKMARK [0][-]{chapter.4}{An oracle design for Grover's quantum search algorithm for exact string matching}{part.2}% 10
+\BOOKMARK [1][-]{section.4.1}{Problem}{chapter.4}% 11
+\BOOKMARK [1][-]{section.4.2}{Idea}{chapter.4}% 12
+\BOOKMARK [1][-]{section.4.3}{Contributions}{chapter.4}% 13
+\BOOKMARK [1][-]{section.4.4}{Notation}{chapter.4}% 14
+\BOOKMARK [1][-]{section.4.5}{Quantum registers}{chapter.4}% 15
+\BOOKMARK [1][-]{section.4.6}{Oracle operator Ug}{chapter.4}% 16
+\BOOKMARK [1][-]{section.4.7}{Correctness}{chapter.4}% 17
+\BOOKMARK [1][-]{section.4.8}{Complexity}{chapter.4}% 18
+\BOOKMARK [2][-]{subsection.4.8.1}{Time}{section.4.8}% 19
+\BOOKMARK [2][-]{subsection.4.8.2}{Space}{section.4.8}% 20
+\BOOKMARK [2][-]{subsection.4.8.3}{Gate}{section.4.8}% 21
+\BOOKMARK [1][-]{section.4.9}{Simulation}{chapter.4}% 22
+\BOOKMARK [2][-]{subsection.4.9.1}{Increasing N}{section.4.9}% 23
+\BOOKMARK [2][-]{subsection.4.9.2}{Increasing M}{section.4.9}% 24
+\BOOKMARK [2][-]{subsection.4.9.3}{Increasing "026A30C "026A30C }{section.4.9}% 25
+\BOOKMARK [0][-]{chapter.5}{Convolution-based algorithm for approximate string matching}{part.2}% 26
+\BOOKMARK [0][-]{chapter.6}{Filtering-based algorithm for approximate string matching}{part.2}% 27
+\BOOKMARK [-1][-]{part.3}{III Final Remarks}{}% 28
+\BOOKMARK [0][-]{chapter.7}{Conclusions}{part.3}% 29

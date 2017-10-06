@@ -1,2 +1,798 @@
-\section{Oracle Chapter}
-ORACLE CHAPTER.
+%1. Introduction (1 page)
+%    a. problem
+%    b. contributions
+%2. The problem (1 page)
+%3. My idea (2 pages)
+%4. The details of my idea (5 pages)
+%    1. Notation
+%    2. Quantum registers
+%    3. Oracle Operator Ug
+%    4. Correctness
+%    5. Complexity
+%        1. Time
+%        2. Space
+%        3. Gate
+%    6. Simulation
+%        1. Increasing N
+%        2. Increasing M
+%        3. Increasing |E|
+%5. Related work (1-2 pages)
+%6. Conclusions and Future Works (.5 pages)
+
+%%%%%%%%%%%%%%%%%% Introduction (1 page)
+
+\section{Problem}
+%    - Describe the problem. Use a specific example to describe it.
+people's contact  arranged or indexed in no particular order and we want to search for a specific person from the set. We cannot instantaneously identify the index of the name of the person from the space since the elements of the space are not sorted in any way. Assuming the existence of a so called $\textit{oracle}$, Grover's quantum algorithm will return the index of the name of the person we are searching for using $\mathcal{O}\left(\sqrt{N}\right)$ queries to the oracle. The oracle is an abstract construct which returns either a \textit{Yes} (1) or \textit{No} (0) answer when given input. In our example, the oracle in Grover's quantum search algorithm is given as input an index from the set $\{0, 1, \ldots, N-1\}$. The oracle gives a \textit{Yes} answer if the element of the space at the input index is the name of the person we are searching for. Otherwise, it outputs a \textit{No} answer.
+
+The use of the concept of an oracle in Grover's quantum search algorithm provides the means for analyzing the number of iterations of the Grover iterate operator \textit{G} by encapsulating the actual process of identifying the solution index $i_x$ into a black-box structure. This black-box structure is assumed to have a constant time complexity $O(1)$ and that it always returns the correct output $f(\beta(i_x)) \in \{0,1\}$ when provided with the binary input $\beta(i_x) \in \{0,1\}^{\log(N)}$.
+
+%    - Discuss why it is an interesting problem
+
+\section{Idea}
+%    - Introduce my idea
+
+\section{Contributions}
+% Contributions (half page) in bulleted list
+%    - Contributions should be refutable
+%    - List my contributions
+%    - For each contribution in the list, forward reference to the sections which provides evidence
+In this chapter we provide a unitary operator which provides the details of the oracle in Grover's quantum search algorithm. This unitary operator provides oracle work specific to the exact string matching problem described in the previous chapter. In this chapter provide the following contributions.
+\begin{itemize}
+	\item We describe in detail a unitary operator $U_{g}$ which given the binary representation of an index $i$, $\beta(i) \in \{0,1\}^{\log(N)}$, in T as input identifies if index $i$ is a starting position of the pattern P in T, $g(\beta(i)) \in {0,1}$.
+	\item We prove that the unitary operator $U_{g}$ marks an input index $i$ in T if and only if $H\left(T[i:i+M-1],P\right) = 0$.
+	\item We show that we can use Grover's quantum search algorithm for the exact string matching problem by replacing the oracle with the unitary operator $U_{g}$ and that the solution index is identified in time complexity $O\left(\sqrt{N}\left(\log(\vert\Sigma\vert) + M\right)\right)$ with probability $\approx$ 1.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%% The Problem (1 page)
+
+%%%%%%%%%%%%%%%%%% My Idea (1 page)
+
+%%%%%%%%%%%%%%%%%% Details of My Idea (1 page)
+
+%%%%%%%%%%%%%%%%%%  (1 page)
+
+
+
+
+
+
+
+
+
+
+
+
+
+% Notation
+\section{Notation}
+We use the following notations in the succeeding sections of this chapter.
+\begin{itemize}
+	\item T = T[0],T[1],$\ldots$,T[N-1] - a text of length N where $\text{T}[i] \in \Sigma$ for $0 \leq i \leq N-1$
+	\item T[i],T[i+1],$\ldots$,T[i+M-1] - an M-length substring of T starting at index $i$; we also use the equivalent shorthand notation $\text{T}[i:i+M-1]$
+	\item $\text{T}_{s} = \{\text{T}[i:i+M-1]\ \ \vert\ \ 0 \leq i \leq N-M+1 \}$ - the set of all M-length substrings of T
+	\item P = P[0],P[1],$\ldots$,P[M-1] - a pattern of length M where $\text{P}[i] \in \Sigma$ for $0 \leq i \leq M-1$
+\end{itemize}
+
+% Define the substring register, pattern register and scratch register which will be required in the solution marking step.
+\section{Quantum registers}
+Given the superposition state of the index register which encodes each index in T,
+\begin{align*}
+	\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle
+\end{align*}
+and a \textit{substring register} initialized in the state
+\begin{align*}
+	\vert 0 \rangle^{\otimes M\lceil \log(\vert \Sigma \vert) \rceil}
+\end{align*}
+ we encode each M-length substring of T into a superposition state of the substring register,
+\begin{align*}
+	\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert \text{T}[i:i+M-1] \rangle &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle\right)
+\end{align*}
+where
+\begin{align*}
+	\beta(\cdot): \Sigma \rightarrow \{0,1\}^{\lceil\log(\vert\Sigma\vert)\rceil}
+\end{align*}
+is a function which maps a symbol in $\Sigma$ into a unique binary sequence of length $\lceil \log(\vert\Sigma\vert) \rceil$. This step assumes the existence of a \textit{quantum random access memory} which keeps a copy of all M-length substrings in T. One model of such quantum memory is the \textit{qRAM} \cite{Giovanetti2008, Giovannetti2008a}. A qRAM facilitates the memory access operation
+\begin{align*}
+	\sum_{j} \alpha_{j} \vert j \rangle_{a} \vert 0 \rangle_{d} \rightarrow \sum_{j} \alpha_{j} \vert j \rangle_{a} \vert D_{j} \rangle_{d}
+\end{align*}
+where $\vert D_{j} \rangle_{d}$ is the state which encodes the data stored in the qRAM's data register. This data is indexed with the state $\vert j \rangle_{a}$ of the qRAM's address register. If the state of a qRAM's address register is a superposition state $\sum_{j} \alpha_{j} \vert j \rangle_{a} \vert 0 \rangle_{d}$, it puts its data register into a superposition of states which encode the data indexed by the superposition state of its address register, $\sum_{j} \alpha_{j} \vert j \rangle_{a} \vert D_{j} \rangle_{d}$.
+
+Likewise, we encode P into a \text{pattern register} of size $M\lceil \log(\vert\Sigma\vert)\rceil$. The state of the index register, substring register and pattern register is then the superposition state
+\begin{align*}
+	\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert \text{T}[i:i+M-1] \rangle \vert \text{P} \rangle &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle\right) \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil\log(\vert\Sigma\vert)\rceil} \vert \beta(\text{P}[j])_{k} \rangle\right)
+\end{align*}
+
+We also prepare a \textit{scratch register} with size $M(\lceil\log(\vert\Sigma\vert)\rceil + 1)$ in the state 
+\[
+	\vert 0 \rangle^{\otimes M(\lceil\log(\vert\Sigma\vert)\rceil + 1)}
+\]
+and an \textit{output register} in the state $\vert 0 \rangle$. The initial states of the registers prior to the consultation to the oracle will be the superposition state
+\begin{align}\label{eqn:reg_init_states}
+	\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle\right) \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil\log(\vert\Sigma\vert)\rceil} \vert \beta(\text{P}[j])_{k} \rangle\right) \left( \vert 0 \rangle^{\otimes M(\lceil\log(\vert\Sigma\vert)\rceil + 1)} \right) \otimes \vert 0 \rangle
+\end{align}
+
+Figure~\ref{fig:registers} shows an arrangement of the registers superimposed against an empty quantum circuit which we will fill up with unitary operators in the succeeding section.
+
+\section{Oracle operator $U_{g}$}
+% Define the operator U_f' as an oracle for Grover's quantum search algorithm.
+We replace the oracle in Grover's quantum search algorithm with a deterministic unitary operator which we denote as $U_{g}$. We define operator $U_{g}$ with the functional definition
+\begin{align*}
+	U_{g}\vert x \rangle = \sum_{x \in \{\text{T}_{s}\}} (-1)^{g(x)} \vert x \rangle
+\end{align*} 
+where
+\begin{align*}
+	g(x) =
+	\begin{cases}
+		1 & x = \beta(\text{P})\\
+		0 & \text{otherwise}
+	\end{cases}
+\end{align*}
+We describe the operation of $U_{g}$ as a quantum circuit composed of 2-qubit and 1-qubit quantum gates acting on the registers. Figure~\ref{fig:Grover-2-qubit-symbols-comparator} is a quantum circuit for operator $U_{g}$ when $\vert \Sigma \vert = 2$. The circuit compares a pair of symbols $\text{T}[i+j]$ and $\text{P}[j]$ in T and P. 
+\begin{figure}
+	\centering
+	\begin{minipage}[b]{\linewidth}
+		\[
+			\Qcircuit @C=.75em @R=1.25em {
+				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}	& \ctrl{2}	&	\qw		& \qw 			& \qw		& \qw 			& \qw			& 	\qw		&	\ctrl{2} 	& \qw	& \quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}\\
+				& \lstick{\vert \Sigma^\phi_1(\text{P}[j]) \rangle} 	&	\qw		& \ctrl{1}	& \qw			& \qw		& \qw  			& \qw			&	\ctrl{1}	& \qw 			& \qw	& \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[j]) \rangle}\\
+				& \lstick{\vert 0 \rangle} 				& \targ 		& \targ 		& \gate{X} 	& \ctrl{1}	& \qw			& \gate{X}		& \targ 		& \targ			& \qw	& \vert 0 \rangle\\
+				& \lstick{\vert 1 \rangle}				& \qw		& \qw		& \qw			& \targ		& \gate{Z}		& \qw			& \qw		& \qw			& \qw	& 
+				\quad\quad\quad\quad\quad\quad\quad\quad\quad{
+					\begin{cases}
+						-\vert 1 \rangle, \text{T}[i+j] = \text{P}[j] \\
+						\vert 1 \rangle, \text{T}[i+j] \neq \text{P}[j]
+					\end{cases}
+				}
+			}	
+		\]
+		\caption{A 2-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text{T}[i+j]$ and $\text{P}[j]$ assuming $\vert \Sigma \vert=2$ for example purposes. The top qubit is initialized in state $\vert \Sigma^\phi(\text{T}[i+j]) \rangle$ and the next qubit is initialized in state $\vert \Sigma^\phi(\text{P}[j]) \rangle$. The bottom two qubits serve as ancillary bits for keeping the results of comparison and are initialized in state $\vert 1 \rangle$. The bottommost qubit serves as a binary indicator and is put into state $\vert 1 \rangle$ if symbols $\text{T}[i+j]$ and $\text{P}[j]$ do not match and $-\vert 1 \rangle$ otherwise. The circuit can be extended to accommodate larger $\vert \Sigma \vert$ by adding qubits to the substring, pattern and ancillary register.}
+		\label{fig:Grover-2-qubit-symbols-comparator}
+	\end{minipage}
+\end{figure}
+Figure~\ref{fig:Grover-4-qubit-symbols-comparator} is a quantum circuit for $U_{g}$ for the case $\vert \Sigma \vert = 4$. Each symbol in $\Sigma$ is represented by 2 qubits. The circuit compares each pair of qubits of the pair of symbols $\text{T}[i+j]$ and $\text{P}[j]$ in T and P.
+\begin{figure}
+	\centering
+	\begin{minipage}[b]{\linewidth}
+		\[
+			\Qcircuit @C=.75em @R=1.25em {
+				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw 			& \qw 		  & \qw			& \qw 		& 	\qw			&	\ctrl{4} 	& \qw & \quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}\\
+				& \lstick{\vert \Sigma^\phi_2(T[i+j]) \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  		& \qw 		  & \qw			& \ctrl{4}	&	\qw			& \qw			& \qw &\quad\quad\quad\quad\quad{\vert \Sigma^\phi_2(T[i+j]) \rangle}\\
+				& \lstick{\vert \Sigma^\phi_1(\text{P}[j]) \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  		& \qw 		  & \qw			& \qw		&	\ctrl{2}	& \qw 			& \qw & \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[j]) \rangle}\\
+				& \lstick{\vert \Sigma^\phi_2(\text{P}[j]) \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  		& \qw 		  & \ctrl{2} 	& \qw		& \qw 		  	& \qw			& \qw & \quad\quad\quad{\vert \Sigma^\phi_2(\text{P}[j]) \rangle}\\
+				& \lstick{\vert 0 \rangle} 							& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \ctrl{1} & \qw  		& \gate{X} & \qw			& \qw		& \targ 		& \targ			& \qw & \vert 0 \rangle\\
+				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \ctrl{1} & \qw  		& \gate{X} & \targ 		& \targ		& \qw			& \qw			& \qw & \vert 0 \rangle\\
+				& \lstick{\vert 1 \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \targ		 & \gate{Z}  & \qw 		  & \qw			& \qw		& \qw			& \qw			& \qw & 
+				\quad\quad\quad\quad\quad\quad\quad\quad\quad{
+					\begin{cases}
+						-\vert 1 \rangle, \text{T}[i+j] = \text{P}[j] \\
+						\vert 1 \rangle, \text{T}[i+j] \neq \text{P}[j]
+					\end{cases}
+				}
+			}	
+		\]
+		\caption{A 4-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text{T}[i+j]$ and $\text{P}[j]$ assuming $\vert \Sigma \vert=4$ for example purposes. The top two qubits are initialized in state $\vert \Sigma^\phi(\text{T}[i+j]) \rangle$ and the next two qubits are initialized in state $\vert \Sigma^\phi(\text{P}[j]) \rangle$. The bottom three qubits serve as ancillary qubits for holding the results of comparison and are initialized in state $\vert 1 \rangle$. The bottommost qubit serves as a binary indicator and is put into state $\vert 1 \rangle$ if the symbols do not match and into state $-\vert 1 \rangle$ otherwise.}
+		\label{fig:Grover-4-qubit-symbols-comparator}
+	\end{minipage}
+\end{figure}
+
+Figure~\ref{fig:u_g-general} shows a quantum circuit for operator $U_g$ for arbitrary alphabet size $\vert \Sigma \vert$. The circuit compares all pairs of bits representing each pair of symbols in T and P. 
+
+The unitary operators in the quantum circuit in Figure~\ref{fig:u_g-general} can be grouped into the following groups of operators
+\begin{enumerate}
+	\item $M(\lceil\log(\vert\Sigma\vert)\rceil)$ CNOT operators acting on the substring and scratch register
+	\item $M(\lceil\log(\vert\Sigma\vert)\rceil)$ CNOT operators acting on the pattern and scratch register
+	\item $M(\lceil\log(\vert\Sigma\vert)\rceil)$ Pauli-X operators acting on the scratch register
+	\item \textit{M} multiple-control $C^{\log(\vert\Sigma\vert)}NOT$ operators acting on the scratch register
+	\item One multiple-control $C^{M}NOT$ operator acting on the scratch register
+	\item One Pauli-Z operator acting on the output register
+	\item a mirror of the group of operators in the left half of the quantum circuit for resetting the states of the registers
+\end{enumerate}
+
+The first set of CNOT operators operate on the substring and scratch register. The control of these CNOT operators will be the $M(\lceil\log(\vert\Sigma\vert)\rceil)$ qubits of the substring register and their target will be the $M(\lceil\log(\vert\Sigma\vert)\rceil)$ qubits of the scratch register. The entangled state of the index, substring and scratch register from Equation \ref{eqn:reg_init_states} (where the state of the pattern and output register are not shown for brevity) can be written as
+\begin{align}\label{eqn:set_1_operators}
+	\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle\right) \left( \vert 0 \rangle^{\otimes M(\lceil\log(\vert\Sigma\vert)\rceil + 1)} \right)
+\end{align}
+and the operation of the first set of CNOT operators is defined such that
+\begin{align*}
+	\quad & \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle\right) \left( \vert 0 \rangle^{\otimes M(\lceil\log(\vert\Sigma\vert)\rceil + 1)} \right)\\
+	\quad & \rightarrow \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle\right)\left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert 0 \oplus \beta(\text{T}[i+j])_k \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)\\
+	\quad &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle\right)\left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)\\
+\end{align*}
+
+The second set of CNOT operators operate on the pattern and scratch register. The control of these operators will be the $M(\lceil\log(\vert\Sigma\vert)\rceil)$ qubits of the pattern register and their target will be the $M(\lceil\log(\vert\Sigma\vert)\rceil)$ qubits of the scratch register. Likely, their entangled state (where the state of the substring and output register are not shown for brevity) can be written as
+\begin{align}\label{eqn:set_2_operators}
+	\quad & \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil\log(\vert\Sigma\vert)\rceil} \vert \beta(\text{P}[j])_{k} \rangle\right) \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)
+\end{align}
+and the operation of the second set of CNOT operators as
+\begin{align*}
+	\quad & \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil\log(\vert\Sigma\vert)\rceil} \vert \beta(\text{P}[j])_{k} \rangle\right) \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)\\
+	\quad & \rightarrow \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil\log(\vert\Sigma\vert)\rceil} \vert \beta(\text{P}[j])_{k} \rangle\right) \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)
+\end{align*}
+
+The third set of operators will be the $M\lceil\log(\vert\Sigma\vert)\rceil$ Pauli-X operators which will operate on the scratch register alone. These operators will flip the state of the $M\lceil\log(\vert\Sigma\vert)\rceil$ qubits of the scratch register. Their operation on the scratch register can be written as
+\begin{align*}
+	\quad & \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)\\
+	\quad & \rightarrow \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)
+\end{align*}
+
+The next set of operators are multiple-control $M$ $C^{\lceil\log(\vert\Sigma\vert)\rceil}NOT$ operators which will operate on the scratch register. The control qubits of these operators will be the $(j(\lceil\log(\Sigma)\rceil + 1) + k)$-th qubits of the scratch register, for $0 \leq j < M, 0 \leq k < \lceil\log(\Sigma)\rceil$. The targets of these operators will be the $(j(\lceil\log(\Sigma)\rceil + 1) + \lceil\log(\Sigma)\rceil)$-th qubits of the scratch register, for $0 \leq j < M$. Operation of these operators on the scratch register can be written as
+\begin{align*}
+	\quad & \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \rangle \right) \otimes \vert 0 \rangle^{\otimes M} \right)\\
+	\quad & \rightarrow \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \rangle \right)\right.\\
+	\quad & \quad\quad\quad\quad \left.\otimes_{j=0}^{M-1} \vert 0 \oplus \left( \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right) \rangle \right)\\
+	\quad & = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \rangle \right)\right.\\
+	\quad & \quad\quad\quad\quad \left.\otimes_{j=0}^{M-1} \vert \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \rangle \right)	
+\end{align*}
+
+The succeeding operator is a single multiple-control $C^{M}NOT$ operator which will operate on the scratch register and the output register. The control of this operator will be the $(j(\lceil\log(\Sigma)\rceil + 1) + \lceil\log(\Sigma)\rceil)$-th qubits of the scratch register and its target will be the single qubit of the output register. Given the current state of the scratch register, this operator will transform the state of the output register such that
+\begin{align*}
+	\quad &\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \rangle \right)\right.\\
+	\quad & \quad\quad\quad\quad \left.\otimes_{j=0}^{M-1} \left\vert \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right\rangle \right)  \vert 0 \rangle \\
+	\quad &\rightarrow \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \vert \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \rangle \right) \right.\\
+	\quad & \quad\quad\quad\quad \left.\otimes_{j=0}^{M-1} \left\vert \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right\rangle \right)\\
+	\quad & \quad\quad\quad\quad \left\vert 0 \oplus \left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right) \right\rangle\\
+	\quad &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \left(\otimes_{j=0}^{M-1}\otimes_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \left\vert \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right\rangle \right) \right.\\
+	\quad & \quad\quad\quad\quad \left. \otimes_{j=0}^{M-1} \left\vert \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right\rangle \right)\\
+	\quad & \quad\quad\quad\quad \otimes \left\vert \left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right) \right\rangle
+\end{align*}
+where the state of the preceeding $M\log(\vert\Sigma\vert)$ qubits of the scratch register are omitted for brevity.
+
+Lastly, a single Pauli-Z operator will operate on the output register. The operation of the Z operator on the output register can be written as
+\begin{align}
+	\quad & \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left\vert \left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right) \right\rangle\\
+	\quad & \rightarrow \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle (-1)^{\left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right)} \left\vert \left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right) \right\rangle\\
+\end{align}
+We can write the state of the index register in this step as
+\begin{align}\label{eqn:index_reg_marked}
+	\quad & \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} (-1)^{\left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right)} \vert i \rangle
+\end{align}
+where the states of the substring, pattern, scratch and output registers are not shown.
+
+\section{Correctness}
+% Write lemma for correctness of operator U_g, i.e. U_g effectively marks exact matches of P in T and U_g does not mark non-exact matches of P in T.
+\begin{lemma}
+Let $\Sigma$ be an alphabet, $\text{T} \in \Sigma^{N}$, $\text{P} \in \Sigma^{M}$ and suppose 
+\begin{equation*}
+H(\text{T}[i_{x}:i_{x} + M-1], \text{P}) = 0
+\end{equation*}
+for $0 \leq i_{x} < N$. Then
+\begin{equation*}
+U_{g} \left(\alpha_{i_{x}}\vert i_{x} \rangle \right) \rightarrow -\alpha_{i_{x}}\vert i_{x} \rangle
+\end{equation*}
+and
+\begin{equation*}
+U_{g} \left(\alpha_{i}\vert i \rangle \right) \rightarrow \alpha_{i}\vert i \rangle
+\end{equation*}
+for $0 \leq i,i_{x} < N, i \neq i_{x}$.
+\end{lemma}
+
+\begin{proof}
+% Premise
+Let $\Sigma$ be an alphabet, $\text{T} \in \Sigma^{N}$, $\text{P} \in \Sigma^{M}$ and suppose 
+\begin{equation}\label{eqn:t_p_equal}
+H(\text{T}[i_{x}:i_{x} + M-1], \text{P}) = 0
+\end{equation}
+for $0 \leq i_{x} < N$.\
+Given the initial superposition state of an index register,
+\begin{equation*}
+\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle
+\end{equation*}
+which encodes the indices in T, the operation of the operator $U_{g}$ on the index register will transform its state such that
+\begin{equation*}
+U_{g}: U_{g}\left(\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \right) \rightarrow \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} (-1)^{\left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right)} \vert i \rangle
+\end{equation*}
+Equation~\ref{eqn:t_p_equal} implies that
+\begin{equation}\label{eqn:bit-equal}
+\beta(\text{T}[i_{x}+j])_k = \beta(\text{P}[j])_{k},\ \ \forall\ 0 \leq j < M,\ 0 \leq k < \lceil \log(\vert\Sigma\vert) \rceil
+\end{equation}
+Equation~\ref{eqn:bit-equal} implies that
+\begin{equation}\label{eqn:bit-oplus}
+\beta(\text{T}[i_{x}+j])_k \oplus \beta(\text{P}[j])_{k} = 0,\ \ \forall\ 0 \leq j < M,\ 0 \leq k < \lceil \log(\vert\Sigma\vert) \rceil
+\end{equation}
+Equation~\ref{eqn:bit-oplus} implies that
+\begin{equation}\label{eqn:phase-shift}
+\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i_{x}+j])_k \oplus \beta(\text{P}[j])_{k} \right) = 1
+\end{equation}
+Equation~\ref{eqn:phase-shift} implies that
+\begin{equation}
+(-1)^{\left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i_{x}+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right)} = -1
+\end{equation}
+Following the same argumentation, the premise
+\begin{equation}
+H(\text{T}[i:i + M-1], \text{P}) \neq 0
+\end{equation}
+for $0 \leq i < N, i \neq i_{x}$ will imply
+\begin{equation}
+(-1)^{\left(\wedge_{j=0}^{M-1} \wedge_{k=0}^{\lceil \log(\vert\Sigma\vert) \rceil-1} \neg\left( \beta(\text{T}[i_{x}+j])_k \oplus \beta(\text{P}[j])_{k} \right) \right)} = 1
+\end{equation}\
+Then,
+\begin{equation*}
+U_{g} \left(\alpha_{i_{x}}\vert i_{x} \rangle \right) \rightarrow -\alpha_{i_{x}}\vert i_{x} \rangle
+\end{equation*}
+and
+\begin{equation*}
+U_{g} \left(\alpha_{i}\vert i \rangle \right) \rightarrow \alpha_{i}\vert i \rangle
+\end{equation*}
+for $0 \leq i, i_{x} < N, i \neq i_{x}$.
+\end{proof}
+
+% Write lemma for complexity of U_g, i.e. time, space and gate complexity.
+% Write proof for lemma on complexity.
+
+% Write lemma for existence of Grover's quantum search algorithm for exact string matching problem.
+% Write proof for lemma on existence.
+
+\section{Complexity}
+% Describe the time, gate and space complexity of the operator U_f'.
+\subsection{Time}
+We compute the time complexity of operator $U_{g}$ with respect to its corresponding quantum circuit. The first group of $M\lceil\log(\vert\Sigma\vert)\rceil$ CNOT operators which act on the qubits of the substring and scratch register will execute in a single time step since the target qubits of the operators in the scratch register are mutually exclusive. Likewise, the second group of $M\lceil\log(\vert\Sigma\vert)\rceil$ CNOT operators which act on the qubits of the pattern and scratch register will execute on mutually exclusive qubits of the scratch register and so will require a single time step for execution, $O(1)$.
+
+A singe $C^{k}NOT$ operator can be decomposed into a sequence of $5k-4$ 2-qubit unitary operators \cite{Chuang2000} with time complexity $O\left(k\right)$. The third group of $M$ $C^{\lceil\log(\vert\Sigma\vert)\rceil}NOT$ operators can then be decomposed into $M$ $5\lceil\log(\vert\Sigma\vert)\rceil - 4$ 2-qubit unitary operators. Since the target of these multiple-control operators are mutually exclusive, their operation can be carried out in parallel and thus will have time complexity in $O(\log(\vert\Sigma\vert))$. Likewise, the succeeding $C^{M}NOT$ operator can be decomposed into $5M - 4$ 2-qubit unitary operators and thus will have time complexity in $O(M)$.
+
+Lastly, the operation of the Pauli-$Z$ operator on the output register will be executed in single time step, $O(1)$. The total time complexity of the $U_{g}$ operator will then be in 
+\begin{align*}
+O(\log(\vert\Sigma\vert)) + O(M) \in O(\log(\vert\Sigma\vert) + M)
+\end{align*}
+
+\subsection{Space}
+In the operation of operator $U_{g}$, we introduce the auxiliary registers substring, pattern, scratch and output register in addition to the index register. The index register is composed of $\lceil\log(\vert\Sigma\vert)\rceil$ qubits for representing indices $i$ in T. The substring and pattern register will require $M\lceil\log(\vert\Sigma\vert)\rceil$ qubits each for encoding the substrings in $\text{T}_{s}$ and the pattern P. The scratch register will have the size of $M\lceil\log(\vert\Sigma\vert)\rceil + M$ for encoding the results of comparison of each symbol in P and each symbol in the substrings in $\text{T}_{s}$. Lastly, the output register will only have a single qubit for encoding the final result of the comparisons. The total space complexity of the operation of $U_{g}$ will then be
+\begin{equation*}
+	O(\log(\vert\Sigma\vert)) + O(M\log(\vert\Sigma\vert)) + O(M\log(\vert\Sigma\vert) + M) \in O(M\log(\vert\Sigma\vert))
+\end{equation*}
+
+\subsection{Gate}
+In the left half of the quantum circuit for operator $U_{g}$ in Figure~\ref{fig:u_g-general}, the first and second set of operators will be composed of $2M\lceil\log(\vert\Sigma\vert)\rceil$ CNOT operators. The third set of operators composed of $M$ $C^{\lceil\log(\vert\Sigma\vert)\rceil}NOT$ can be decomposed into $5M\lceil\log(\vert\Sigma\vert)\rceil-4M$ 2-qubit unitary operators \cite{Chuang2000}. Likewise, the next operator, $C^{M}NOT$, can be decomposed into $5M-4$ 2-qubit unitary operators. Lastly, the quantum circuit will include only a single Pauli-$Z$ operator to operate on the output register. All the operators in the left half of the quantum circuit for $U_{g}$, except the $Z$ operator, will have their counterpart in the right half of the quantum circuit for resetting the scratch register into its initial state. Thus, the quantum circuit for operator $U_{g}$ will have a gate complexity of  
+\begin{equation*}
+	2(7M\lceil\log(\vert\Sigma\vert)\rceil + M - 4) + 1 \in O(M\lceil\log(\vert\Sigma\vert)\rceil) 
+\end{equation*}
+2-qubit unitary operators.
+
+\begin{lemma}
+Let $\Sigma$ be an alphabet, $\text{T} \in \Sigma^{N}$ and $\text{P} \in \Sigma^{M}$. Suppose
+\begin{equation*}
+H\left(\text{T}[i_{x}:i_{x}+ M-1], \text{P}\right) = 0
+\end{equation*}
+for $0 \leq i_{x} < N$. Furthermore, suppose the oracle in Grover's quantum search algorithm is replaced with operator $U_{g}$. Then Grover's quantum search algorithm outputs index $i_{x}$ in time complexity $O\left(\sqrt{N}\left( \log(\vert\Sigma\vert) + M\right)\right)$ with probability $\left\vert \frac{1}{2}\left( \left( \lambda_{0}^{k} - \lambda_{1}^{k} \right) \sqrt{\frac{1}{N}-1} + \left( \lambda_{0}^{k} + \lambda_{1}^{k} \right) \frac{1}{\sqrt{N}} \right) \right\vert^2$ where 
+\begin{align*}
+k &= \left\lfloor\frac{\pi}{4}\sqrt{N}\right\rfloor\\
+\lambda_0 &= 1 - \frac{2}{N} - \frac{2}{N}\sqrt{1-N^2}\\
+\lambda_1 &= 1 - \frac{2}{N} + \frac{2}{N}\sqrt{1-N^2}
+\end{align*}
+\end{lemma}
+\begin{proof}
+Let $\Sigma$ be an alphabet, $\text{T} \in \Sigma^{N}$ and $\text{P} \in \Sigma^{M}$. Suppose
+\begin{equation*}
+H\left(\text{T}[i_{x}:i_{x}+ M-1], \text{P}\right) = 0
+\end{equation*}
+for $0 \leq i_{x} < N$. Furthermore, suppose the oracle in Grover's quantum search algorithm is replaced with operator $U_{g}$. Operator $U_{g}$ will be called $\frac{\pi}{4}\sqrt{N} \in O\left(\sqrt{N}\right)$ times to optimize the amplification of the probability of occurrence of the marked state $\vert i_{x}\rangle$. Each call to operator $U_{g}$ will take
+\begin{equation*}
+O\left(\log(\vert\Sigma\vert) + M\right)
+\end{equation*}
+time complexity. Then Grover's quantum search algorithm outputs index $i_{x}$ in time complexity $O\left(\sqrt{N}\left( \log(\vert\Sigma\vert) + M\right)\right)$ with probability $\left\vert \frac{1}{2}\left( \left( \lambda_{0}^{k} - \lambda_{1}^{k} \right) \sqrt{\frac{1}{N}-1} + \left( \lambda_{0}^{k} + \lambda_{1}^{k} \right) \frac{1}{\sqrt{N}} \right) \right\vert^2$ where 
+\begin{align*}
+k &= \left\lfloor\frac{\pi}{4}\sqrt{N}\right\rfloor \\
+\lambda_0 &= 1 - \frac{2}{N} - \frac{2}{N}\sqrt{1-N^2}\\
+\lambda_1 &= 1 - \frac{2}{N} + \frac{2}{N}\sqrt{1-N^2}
+\end{align*}
+\end{proof}
+% Provide simulation data supporting the theoretical time complexity of the operator U_f'. 
+\section{Simulation}
+\subsection{Increasing N}
+
+\subsection{Increasing M}
+
+\subsection{Increasing $\vert\Sigma\vert$}
+
+% Provide simulation data showing that an instance of Grover's quantum search algorithm which uses the operator U_f' as oracle computes for the solution indices in time complexity bounded by the time complexity of Grover's quantum search algorithm.
+
+%In this chapter we present our work in \cite{Aborot2013} which is a quantum algorithm for the exact string matching problem based on the amplitude amplification technique used in Grover's quantum search algorithm. A boolean function is specified as an oracle for identifying the index of an exact copy of P in T. Additional results absent in our published work are also presented in this chapter which provides more detail into the quantum circuit design of the algorithm and its circuit complexity.
+%
+%\section{Grover's quantum algorithm}%----------------------------------------------------------------------------------------------------
+%\subsection{Preliminaries} %--------------------------------------------------------------
+%Grover's quantum algorithm is a database search algorithm for identifying a single element \textit{x} on an unstructured search space of some size \textit{N} for identifying some element. The elements of the search space are indexed from $0,\ldots,N-1$. Let $i_x$ denote the index of the element being searched for. An oracle function $f:\{0,\ldots,N-1\} \rightarrow \{0,1\}$ qualifies each index $i=0,\ldots,N-1$ as either the index of the element being searched for or otherwise. $f(\cdot)$ is given by
+%\[
+%	f(i)=
+%	\begin{cases}
+%		1, & \mathrm{if}\ i=i_x\\
+%		0, & \mathrm{otherwise}.
+%	\end{cases}
+%\]
+%The indices of the search space is encoded into a superposition state
+%\begin{align}\label{eqn:psi-sup}
+%	\vert \psi_{\mathrm{sup}} \rangle &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left(\frac{\vert 0 \rangle - \vert 1 \rangle}{\sqrt{2}}\right)\\
+%	                                                    &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \frac{\vert i \rangle\vert 0 \rangle - \vert i \rangle\vert 1 \rangle}{\sqrt{2}}
+%\end{align}
+%A unitary operator $U_f$ applies function $f(\cdot)$ into each superpositioned state in $\vert \psi_{\mathrm{sup}} \rangle$ as given by
+%\begin{align}
+%	\vert \psi_f \rangle &= U_f\vert \psi_{\mathrm{sup}} \rangle\\
+%	                              &= U_f\left( \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \frac{\vert i \rangle \vert 0 \rangle - \vert i \rangle\vert 1 \rangle}{\sqrt{2}} \right)\\
+%	                              &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \frac{U_f\vert i \rangle\vert 0 \rangle - U_f\vert i \rangle\vert 1 \rangle}{\sqrt{2}}\\
+%	                              &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \frac{\vert i \rangle\vert 0 \oplus f(i) \rangle - \vert i \rangle\vert 1 \oplus f(i) \rangle}{\sqrt{2}}\\
+%	                              &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} (-1)^{f(i)}\vert i \rangle\vert - \rangle
+%\end{align}
+%Operator $U_f$ effectively marks the solution index as $-\vert i_x \rangle$ and the other indices as $\vert i \rangle, i \neq i_x$.
+%
+%An \textit{inversion about the mean} operator $W = 2\vert \psi_f \rangle\langle \psi_f \vert - I$ then amplifies the amplitude of the index $\vert i_k \rangle$ above the average amplitude and decreases the amplitude of the other indices $\vert i \rangle, i \neq i_x$, below the average amplitude. A single application of \textit{W} to state $\vert \psi_f \rangle$ will result to the state
+%\[
+%	\vert \psi_{\mathrm{W}} \rangle = \frac{2^{n-2} - 1}{2^{n-1}}\vert \psi_f \rangle + \frac{2}{\sqrt{2^n}}\vert i_x \rangle.
+%\]
+%Repeated application of the sequence of operation $G=WU_f$ will amplify the amplitude of $\vert i_x \rangle$ to $\approx 1$. The number of iterations \textit{m} of \textit{G} is bounded above as
+%\[
+%	\Om\left( \frac{\pi}{4}\sqrt{N} \right)
+%\]
+%iterations to maximize the amplitude of $\vert i_x \rangle$. We denote this operation as
+%\[
+%	\vert \psi_{\mathrm{G}} \rangle = G^m\vert \psi_f \rangle.
+%\]
+%Measurement of the first register in state $\vert \psi_{\mathrm{G}} \rangle$ will output the classical value $i_k$ with probability $\approx$ 1.
+%
+%\begin{algorithm}
+%	\begin{algorithmic}[1]
+%		\REQUIRE{\textit{n}-qubit index register in state $\vert \mathbf{0} \rangle$ and 1-qubit ancillary register in state $\vert 1 \rangle$}
+%		\ENSURE{solution index $i_x$}
+%		\STATE $\vert \psi_{\mathrm{sup}} \rangle = H\left(\vert \mathbf{0} \rangle\vert 1 \rangle \right)$
+%		\FOR{1 to $\left\lfloor \frac{\pi}{4}\sqrt{N} \right\rfloor$}
+%			\STATE $\vert \psi_{f^\prime} \rangle = U_{f^\prime} \vert \psi_{\mathrm{sup}} \rangle$
+%			\STATE $\vert \psi_{\mathrm{W}} \rangle = W\vert \psi_{f^\prime} \rangle$
+%		\ENDFOR
+%		\STATE $i_x = M\vert \psi_{\mathrm{W}} \rangle$
+%		\RETURN $i_x$
+%	\end{algorithmic}
+%	\caption{Grover's quantum search algorithm. The solution index $i_x$ is returned as output with probability $\approx 1$.}
+%	\label{alg:Grovers-algorithm}
+%\end{algorithm}
+%
+%\subsection{In application to exact string matching}   %-------------------------------------------------------------------
+%Function $f(\cdot)$ in Grover's algorithm is an oracle function. Grover's algorithm is not concerned with the inner workings and computational complexity of \textit{f} since it focuses on lowering the number of calls to the oracle (advice complexity), which in the quantum setting is only one. In the classical setting, the number of calls to the oracle will be bounded above by \textit{N}.
+%
+%In application to string matching, we can interpret the operation of the oracle function \textit{f} as a comparison of P and \textit{M}-length substrings of T. We let $f^\prime(\cdot)$ be the redefined version of $f(\cdot)$ given by
+%\[
+%	f^{\prime}(i)=
+%	\begin{cases}
+%		1, & \mathrm{if}\ H\left( \mathrm{P}, \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1d] \right) = 0\\
+%		0, & \mathrm{otherwise}.
+%	\end{cases}
+%\]
+%A unitary operator $U_{f^\prime}$ will then effectively qualify the index $i_x$ of an exact match of P in T. We discuss the details of each step of the quantum algorithm for exact string matching in the succeeding sections.
+%
+%
+%\section{Operators}  %----------------------------------------------------------------------------------------------------------------------------------
+%
+%\subsection{Hadamard operator $H$} %------------------------------------------------------
+%Given text $\mathrm{T} \in \Sigma^N$ and pattern $\mathrm{P} \in \Sigma^{M}$, we allocate a $\log_2 N-qubit$ register for encoding the indices of T and a 1-qubit ancillary register. The qubits in both registers will be initialized in the state
+%\[
+%	\vert \psi_{\mathrm{init}} \rangle = \vert \mathbf{0} \rangle\vert 1 \rangle.
+%\]
+%A Hadamard operator $H$ is applied to the qubits to put them into the uniform superposition
+%\begin{align*}
+%	\vert \psi_{\mathrm{sup}} \rangle &= H\vert \psi_{\mathrm{init}} \rangle\\
+%	                                                    &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle\vert - \rangle\\
+%	                                                    &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \left( \frac{\vert 0 \rangle - \vert 1 \rangle}{\sqrt{2}} \right)\\
+%	                                                    &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \frac{\vert i \rangle\vert 0 \rangle - \vert i \rangle\vert 1 \rangle}{\sqrt{2}}
+%\end{align*}
+%The Hadamard operator is counted as an elementary operator and its operations on the qubits of the registers can be executed in parallel. Thus the application of \textit{H} into the registers counts only as a single step in the computation. A quantum circuit representation of the Hadamard operation on the registers is illustrated in Figure~\ref{fig:Grover-hadamard}.
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{0.8\linewidth}
+%		\[
+%			\Qcircuit @C=.7em @R=1em {
+%				& \lstick{\vert 0 \rangle} & \gate{H} & \qw    & \quad \\
+%				& \lstick{\vert 0 \rangle} & \gate{H} & \qw    & \rstick{\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle}\\
+%				& \quad                          & \vdots     & \quad & \quad \\
+%				& \lstick{\vert 0 \rangle} & \gate{H} & \qw     & \quad\gategroup{1}{4}{4}{4}{.7em}{\}}\\
+%				& \lstick{\vert 1 \rangle} & \gate{H} & \qw     & \vert - \rangle
+%			}	
+%		\]
+%	\end{minipage}
+%	\caption{A quantum circuit for producing superposition state $\vert \psi_{\mathrm{sup}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle\vert - \rangle $.}
+%	\label{fig:Grover-hadamard}
+%\end{figure}
+%
+%\subsection{Oracle operator $U_{f^{\prime}}$}\label{subsec:U-f-prime} %-----------------------------------------------------------------------
+%We give a construction of the unitary operator $U_{f^\prime}$ which implements function $f^{\prime}(\cdot)$. We assume that we have access to a quantum register which encodes the binary sequence representation of P into its state as given by
+%\[
+%	\vert \mathrm{P} \rangle = \vert \Sigma^{\phi}(\mathrm{P}[0]),\ldots,\Sigma^{\phi}(\mathrm{P}[M-1])) \rangle
+%\]
+%where $\Sigma^{\phi}(\cdot): \Sigma \rightarrow \{0,1\}^{\log_2 \vert \Sigma \vert}$ is a one-to-one onto mapping between each symbol $\sigma \in \Sigma$ and $\log_2 \vert \Sigma \vert$ binary strings. We also assume that we have access to a quantum register which encodes each \textit{M}-length subsequence of T into its state as given by
+%\[
+%	\vert \mathrm{T}[i],\ldots, \mathrm{T}[i+M-1] \rangle = \vert \Sigma^{\phi}(\mathrm{T}[i]),\ldots,\Sigma^{\phi}(\mathrm{P}[i+M-1])) \rangle
+%\]
+%for all $i=\{0,\ldots,N-1\}$. One model for quantum data access which could facilitate access to quantum state encoding of P and substrings of P is the Quantum Random Access Memory (QRAM) model of a computer memory \cite{Giovanetti2008,Giovanetti2008a}. Given an input $n$-qubit address into an address register, $\vert i \rangle$, a QRAM provides the indexed data, $\vert D_i \rangle$, by activating $\Om(n)$ gates of a binary tree structured quantum circuit. Since the address register is a quantum register, the input $n$-qubit address can be in a superposition state such as state $\vert \psi_{\mathrm{sup}} \rangle = \frac{1}{\sqrt{2^n}} \sum_{i=0}^{2^n - 1} \vert i \rangle$. If the address in the address register is a superposition state, a QRAM returns a superposition state of the data, $\sum_{i=0}^{2^n -1} \vert D_i \rangle$, indexed by each of the superpositioned states in $\vert \psi_{\mathrm{sup}} \rangle$. In application to the exact string matching problem, the data to be returned by a QRAM will have space complexity $\Om\left( M\log_2 \vert \Sigma \vert \right)$.
+%
+%Operator $U_{f^\prime}$ acts on input states $\vert \mathrm{P} \rangle$ and $\vert \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1] \rangle$ comparing each corresponding qubits of the registers. This comparison is facilitated by applying \textit{CNOT} operation to each qubit where qubits in $\vert \mathrm{P} \rangle$ state serve as control to corresponding qubits in $\vert \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1] \rangle$. An $M$-qubit ancillary register is used as a scratch space for recording the result of each comparison. A cascading \textit{CNOT} operation is applied to the result of each comparison to finalize the operation of $U_{f^\prime}$. The ancilla register in state $\vert - \rangle$ is put into state $-\vert - \rangle$ if the P and $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ is an exact match. Figure~\ref{fig:Grover-2-qubit-symbols-comparator} and \ref{fig:Grover-4-qubit-symbols-comparator} illustrates the quantum circuit for comparing symbols of an alphabet for cases $\vert \Sigma \vert = 2, \vert \Sigma \vert = 4$. Figure~\ref{fig:Grover-symbol-comparator-parallel} illustrates a parallel implementation of a $2M\log_2 \vert \Sigma \vert$-qubit symbol comparator circuit where $\vert \Sigma \vert = 4$.
+%
+%\begin{lemma}\label{fig:parallel-symbol-comparator}
+%There exists a quantum circuit which compares two \textit{M}-length sequences with circuit complexity in
+%\[
+%	\Om\left( M\log_2 \vert \Sigma \vert + M \right),
+%\]
+%time complexity in
+%\[
+%	\Om\left( \log_2 \vert \Sigma \vert \right),
+%\]
+%and space complexity in
+%\[
+%	\Om\left( M\log_2 \vert \Sigma \vert + M \right).
+%\]
+%\end{lemma}
+%\begin{proof}
+%From our calculation of the gate, time and space complexity of our construction of a parallel implementation of the quantum circuit for a $2\log_2 \vert \Sigma \vert$-qubit symbol comparator in Figure~\ref{fig:Grover-2-qubit-symbols-comparator}, the gate complexity of the quantum circuit will be
+%\[
+%	M\left( 2\left( 3\log_2\vert \Sigma \vert \right) + 1 \right) + 1 \in \Om\left( M\log_2 \vert \Sigma \vert + M \right),
+%\]
+%its time complexity,
+%\[
+%	2\left( \log_2 \vert \Sigma \vert + 3 \right) + 1 \in  \Om\left( \log_2 \vert \Sigma \vert \right)
+%\]
+%and its space complexity 
+%\[
+%	\Om\left( M\log_2 \vert \Sigma \vert + M \right)
+%\]
+%as illustrated in Figure~\ref{fig:Grover-symbol-comparator-parallel}.
+%\end{proof}
+%
+%\begin{figure}
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}	& \ctrl{2}	&	\qw		& \qw 			& \qw		& \qw 			& \qw			& 	\qw		&	\ctrl{2} 	& \qw	& \quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[j]) \rangle} 	&	\qw		& \ctrl{1}	& \qw			& \qw		& \qw  			& \qw			&	\ctrl{1}	& \qw 			& \qw	& \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[j]) \rangle}\\
+%				& \lstick{\vert 0 \rangle} 				& \targ 		& \targ 		& \gate{X} 	& \ctrl{1}	& \qw			& \gate{X}		& \targ 		& \targ			& \qw	& \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}				& \qw		& \qw		& \qw			& \targ		& \gate{Z}		& \qw			& \qw		& \qw			& \qw	& 
+%				\quad\quad\quad\quad\quad\quad\quad\quad\quad{
+%					\begin{cases}
+%						-\vert 1 \rangle, \text{T}[i+j] = \text{P}[j] \\
+%						\vert 1 \rangle, \text{T}[i+j] \neq \text{P}[j]
+%					\end{cases}
+%				}
+%			}	
+%		\]
+%		\caption{A 2-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text{T}[i+j]$ and $\text{P}[j]$ assuming $\vert \Sigma \vert=2$ for example purposes. The top qubit is initialized in state $\vert \Sigma^\phi(\text{T}[i+j]) \rangle$ and the next qubit is initialized in state $\vert \Sigma^\phi(\text{P}[j]) \rangle$. The bottom two qubits serve as ancillary bits for keeping the results of comparison and are initialized in state $\vert 0 \rangle$. The bottommost qubit serves as a binary indicator and is put into state $\vert 1 \rangle$ if symbols $\text{T}[i+j]$ and $\text{P}[j]$ do not match and $\vert 0 \rangle$ otherwise. The circuit can be extended to accommodate larger $\vert \Sigma \vert$ by adding qubits to the substring, pattern and ancillary register.}
+%		\label{fig:Grover-2-qubit-symbols-comparator}
+%	\end{minipage}
+%\end{figure}
+%\begin{figure}
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw 			& \qw 		  & \qw			& \qw 		& 	\qw			&	\ctrl{4} 	& \qw & \quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(T[i+j]) \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  		& \qw 		  & \qw			& \ctrl{4}	&	\qw			& \qw			& \qw &\quad\quad\quad\quad\quad{\vert \Sigma^\phi_2(T[i+j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[j]) \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  		& \qw 		  & \qw			& \qw		&	\ctrl{2}	& \qw 			& \qw & \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(\text{P}[j]) \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  		& \qw 		  & \ctrl{2} 	& \qw		& \qw 		  	& \qw			& \qw & \quad\quad\quad{\vert \Sigma^\phi_2(\text{P}[j]) \rangle}\\
+%				& \lstick{\vert 0 \rangle} 							& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \ctrlo{1} & \qw  		& \gate{X} & \qw			& \qw		& \targ 		& \targ			& \qw & \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \ctrlo{1} & \qw  		& \gate{X} & \targ 		& \targ		& \qw			& \qw			& \qw & \vert 0 \rangle\\
+%				& \lstick{\vert 1 \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \targ		 & \gate{X}  & \qw 		  & \qw			& \qw		& \qw			& \qw			& \qw & 
+%				\quad\quad\quad\quad\quad\quad\quad\quad\quad{
+%					\begin{cases}
+%						\vert 0 \rangle, \text{T}[i+j] = \text{P}[j] \\
+%						\vert 1 \rangle, \text{T}[i+j] \neq \text{P}[j]
+%					\end{cases}
+%				}
+%			}	
+%		\]
+%		\caption{A 4-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text{T}[i+j]$ and $\text{P}[j]$ assuming $\vert \Sigma \vert=4$ for example purposes. The top two qubits are initialized in state $\vert \Sigma^\phi(\text{T}[i+j]) \rangle$ and the next two qubits are initialized in state $\vert \Sigma^\phi(\text{P}[j]) \rangle$. The bottom three qubits serve as ancillary qubits for holding the results of comparison and are initialized in state $\vert 0 \rangle$. The bottommost qubit serves as a binary indicator and is put into state $\vert 1 \rangle$ if the symbols do not match and into state $\vert 0 \rangle$ otherwise.}
+%		\label{fig:Grover-4-qubit-symbols-comparator}
+%	\end{minipage}
+%\end{figure}
+%%We have shown comparison of a symbol with another symbol. In order to be able to compare an \textit{M}-length substring of T with P we can perform the symbol comparison in a parallel manner. In Figure~\ref{fig:symbol-comparator-parallel} we show a quantum circuit for comparing a substring of T with P using the quantum circuit in Figure~\ref{fig:1-qubit-symbols-comparator}, assuming $\vert \Sigma \vert = 2$.
+%\begin{figure}
+%	\centering
+%	\footnotesize
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i]) \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw 			& \qw 		  	& \qw			& \qw 			& 	\qw			&	\qw			& \ctrl{4} 	& \qw & \qw 		& \quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(\text{T}[i]) \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			& \ctrl{4}		&	\qw			& \qw			& \qw 		& \qw & \quad\quad\quad{\vert \Sigma^\phi_2(\text{T}[i]) \rangle}\\	
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[0]) \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			&	\qw			& \ctrl{2}		& \qw 			& \qw & \qw  		& \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[0]) \rangle}\\				
+%				& \lstick{\vert \Sigma^\phi_2(\text{P}[0]) \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \ctrl{2} 	& \qw			& \qw 		  	& \qw			& \qw & \qw  		& \quad\quad\quad{\vert \Sigma^\phi_2(\text{P}[0]) \rangle}\\				
+%				& \lstick{\vert 0 \rangle} 							& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \ctrlo{1} & \qw  		& \qw			& \gate{X} 	& \qw			& \qw			& \targ 		& \targ			& \qw & \qw 		& \vert 0 \rangle\\				
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \ctrlo{8} & \qw  		& \qw			& \gate{X} 	& \targ 		& \targ			& \qw			& \qw			& \qw & \qw 		& \vert 0 \rangle\\				
+%				& \quad														& \quad		& \quad	& \quad		& \quad		& \quad		& \quad	& \quad		& \vdots		& \quad		& \quad		& \quad		& \quad		& \quad 		& \quad	 & \quad & \quad\\		
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+M-1]) \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw 			& \qw 		  	& \qw			& \qw 			& 	\qw			& \qw			&	\ctrl{4} 	& \qw & \qw  		& \quad\quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+M-1]) \rangle}\\			
+%				& \lstick{\vert \Sigma^\phi_2(\text{T}[i+M-1]) \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			& \ctrl{4}		&	\qw			& \qw			& \qw & \qw 		& \quad\quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_2(\text{T}[i+M-1]) \rangle}\\				
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[M-1]) \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			& \qw			&	\ctrl{2}	& \qw 			& \qw & \qw 		& \quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[M-1]) \rangle}\\				
+%				& \lstick{\vert \Sigma^\phi_2(\text{P}[M-1]) \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \ctrl{2} 	& \qw			& \qw 		  	& \qw			& \qw 	& \qw 	& \quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_2(\text{P}[M-1]) \rangle}\\			
+%				& \lstick{\vert 0 \rangle} 							& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \qw		& \ctrlo{1} 	& \qw  			& \gate{X} 	& \qw			& \qw			& \targ 		& \targ			& \qw 	& \qw 	& \vert 0 \rangle\\				
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \qw		& \ctrlo{3} 	& \qw  			& \gate{X} 	& \targ 		& \targ			& \qw			& \qw			& \qw 	& \qw 	& \vert 0 \rangle\\				
+%				& \lstick{\vert 1 \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \targ		 & \qw			& \gate{X}  	& \qw 		  	& \qw			& \qw			& \qw			& \qw			&   \ctrlo{2}	& \qw 	& \quad\quad\quad\quad\quad\quad\quad{\begin{cases}
+%				\vert 0 \rangle, & \mathrm{P}[0]=\mathrm{T}[i]\\
+%				\vert 1 \rangle, & \mathrm{otherwise}
+%			\end{cases}} \\			
+%				& \quad														& \quad		& \quad	& \quad		& \quad		& \quad		& \quad	& \quad 			& \vdots		& \quad		& \quad		& \quad		& \quad		& \quad		& \quad	 & \quad 	& \quad \\		
+%				& \lstick{\vert 1 \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \qw		& \targ		 	& \gate{X}  	& \qw 		  	& \qw			& \qw			& \qw			& \qw			&   \ctrlo{2}	& \qw & \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad{\begin{cases}
+%				\vert 0 \rangle, & \mathrm{P}[M-1]=\mathrm{T}[i+M-1]\\
+%				\vert 1 \rangle, & \mathrm{otherwise}
+%			\end{cases}} \\			
+%			& \quad														& \quad		& \quad	& \quad		& \quad		& \quad		& \quad	& \quad 			& \quad		& \quad		& \quad		& \quad		& \quad		& \quad		& \quad	 & \quad 	& \quad \\	
+%			& \lstick{\vert - \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \qw		& \qw		 	& \qw  	& \qw 		  	& \qw			& \qw			& \qw			& \qw			& \targ   		& \qw & \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad{\begin{cases}
+%				-\vert - \rangle,&\mathrm{P}=\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]\\
+%				\vert - \rangle,&\mathrm{otherwise}
+%			\end{cases}}
+%			}	
+%		\]
+%		\caption{A parallel 4-qubit symbol comparator circuit with ancillary qubits. It compares symbols in $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ to their corresponding symbols in P in parallel manner. The ancillary qubits serve as binary indicator for identifying a match and a mismatch. The last qubit is the ancillary register in state $\vert \psi_{\mathrm{sup}} \rangle$. To compare P and an \textit{M}-length substring of T, a parallel implementation of a $2\log_2 \vert \Sigma \vert$-qubit symbol comparator will require $\left( M\left( 2\left( 2\log_2 \vert \Sigma \vert + \log_2\vert \Sigma \vert \right) + 1 \right) + 1 \right) - \left(2M + 1\right)$ elementary gates and $2M\ CNOT$ gates with $\log_2 \vert \Sigma \vert$ control qubits and 1 $CNOT$ gate with \textit{M} control qubits. The depth of the circuit will be $2\left( \log_2 \vert \Sigma \vert + 3 \right) + 1 \in \Om\left( \log_2 \vert \Sigma \vert \right)$. The circuit will also require \textit{M} ancillary qubits for storing each result of the \textit{M} symbol comparison circuits and the ancillary qubit in state $\vert - \rangle$ for storing the result total result of the comparison of P and \textit{M}-length substring of T. The parallel circuit will have a total space complexity in $\Om\left( M\log_2 \vert \Sigma \vert + M \right)$.}
+%		\label{fig:Grover-symbol-comparator-parallel}
+%	\end{minipage}
+%\end{figure}
+%
+%A higher level schematic of the operation of $U_{f^\prime}$ on input state $\vert \psi_{\mathrm{sup}} \rangle$ is illustrated in Figure~\ref{fig:Grover-U_f_prime}.
+%\begin{figure}
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \quad                                                                                 & \multigate{5}{U_{f^\prime}}   & \qw & \quad\\
+%				& \quad                                                                                 & \ghost{U_{f^\prime}}             & \qw & \quad\\
+%				& \lstick{\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle\quad} & \ghost{U_{f^\prime}}              & \qw & \rstick{\frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle}\\
+%				& \quad                                                                                 & \ghost{U_{f^\prime}}             & \qw & \quad\\
+%				& \quad                                                                                 & \ghost{U_{f^\prime}}             & \qw & \quad\gategroup{1}{2}{5}{2}{.7em}{\{}\gategroup{1}{4}{5}{4}{.7em}{\}}\\
+%				& \lstick{\vert - \rangle}                                                         & \ghost{U_{f^\prime}}             & \qw & \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad{\begin{cases}
+%				-\vert - \rangle,&\mathrm{if\ P}=\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]\\
+%				\vert - \rangle,&\mathrm{otherwise}
+%			\end{cases}}
+%			}	
+%		\]
+%		\caption{A high level quantum circuit for the operation of $U_{f^\prime}$.}
+%		\label{fig:Grover-U_f_prime}
+%	\end{minipage}
+%\end{figure}
+%
+%\subsection{Amplitude amplification operator $W$}\label{subsec:W}
+%The unitary matrix of operator $W=2\vert \psi_{\mathrm{sup}}\rangle\langle \psi_{\mathrm{sup}} \vert - I$ is an $N\times N$ diagonal matrix defined by
+%\begin{align*}
+%	W[i,i] &= 2\alpha_i\alpha^\ast_i - 1\\
+%	         &= 2\left( \frac{1}{\sqrt{N}}\frac{1}{\sqrt{N}}^\ast \right) -1\\
+%	         &= 2\left( \frac{1}{N} \right) - 1\\
+%	         &= \frac{2}{N}-1
+%\end{align*}
+%for all $i=0,\ldots,N-1$. Works on synthesis of quantum circuits has shown that an arbitrary diagonal unitary matrix can be implemented with $\Om\left( N  \right)$ elementary gates \cite{Bullock2004}. Succeeding studies on approximation of quantum circuits for diagonal unitaries has shown reduction on the gate complexity of the synthesized circuit \cite{Welch2014b, Welch2014c, Welch2015}. A special property of the diagonal matrix for $W$ is that it has only one distinct phase value along its diagonal, $\frac{2}{N} - 1$. Based from a so called \textit{phase context decomposition} method in \cite{Welch2014b,Welch2015}, we can decompose a \textit{k}-parameter diagonal matrix 
+%\[
+%	U=\left( \phi_1,\phi_1,\ldots,\phi_1,\phi_2,\phi_2,\ldots,\phi_2,\ldots,\phi_k,\phi_k,\ldots,\phi_k \right)
+%\]
+%where the distinct \textit{k} parameters are arranged in blocks along the diagonal, into $(k-1)$ 1-parameter diagonal matrices 
+%\[
+%	V\left(\phi_i,l_i\right) = diag(\underbrace{1,1,\ldots,1}_{N-l_i},\underbrace{\phi_i,\phi_i,\ldots,\phi_i}_{l_i}).
+%\]
+%Since, the matrix for $W$ is already a 1-parameter diagonal matrix and $k=1$, the phase context decomposition method will output zero $V(\phi_i,l_i)$ diagonal matrices. The intuition in this implication lies in the circuit synthesis for each diagonal matrix $V(\phi_i,l_i)$. A quantum circuit to implement $V(\phi_i,l_i)$ is shown in Figure~\ref{fig:V}.
+%
+%\begin{figure}
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \ctrl{1} & \qw                   & \ctrl{1} & \qw\\
+%				& \ctrl{1} & \qw                   & \ctrl{1} & \qw\\
+%				& \ctrl{1} & \qw                   & \ctrl{1} & \qw\\
+%				& \ctrl{1} & \qw                   & \ctrl{1} & \qw\\
+%				& \targ    & \gate{P(\phi_i)} & \targ     & \qw
+%			}	
+%		\]
+%		\caption{A quantum circuit for operator $V(\phi_i,l_i)$ where $P(\phi)$ is a rotation gate applied to an ancillary qubit \cite{Welch2014b}.}
+%		\label{fig:V}
+%	\end{minipage}
+%\end{figure}
+%
+%The multi-controlled \textit{NOT} gates in Figure~\ref{fig:V} acts as identifiers to determine when to apply the phase rotation gate $P(\phi_i)$. Since the phase rotation $\phi=\frac{2}{N}-1$ in the matrix of $W$ is to be applied uniformly to all basis states $\vert i \rangle$ in $\vert \psi_{f^\prime} \rangle$, there will be no need for multi-controlled \textit{NOT} gates in the quantum circuit synthesis for the diagonal matrix of $W$. A single-qubit rotation gate $P(\phi)$ can be approximated to a precision $\epsilon$ using Clifford+\textit{T} gate set with an expected \textit{T}-count of
+%\begin{equation}\label{eqn:rotation-gate-T-count}
+%	C_0\log_2\left( \frac{1}{\epsilon} \right) + \Om\left( \log\log\left( \frac{1}{\epsilon} \right)  \right)
+%\end{equation}
+%where parameter $C_0$ is a constant, $1\leq C_0\leq 4$ which depends on the decomposition scheme used for the rotation gate \cite{Bocharov2015}. Thus, the circuit complexity and time complexity for operator $W$ will be bounded by the \textit{T}-count~\ref{eqn:rotation-gate-T-count}. $W$ will operate on the \textit{n}-qubit index register and one ancillary qubit. Since the index register will just be reused from the previous step, we will not be introducing additional registers during operation of $W$.
+%
+%% method using the concept of a \textit{phase sparse} diagonal unitary in \cite{Welch2015}, the gate complexity of a diagonal unitary asymptotically depends on the number of distinct phase values $e^{i\alpha_i}$ of its diagonal matrix. Since the diagonal matrix for $W$ has same phase values $W[i,i]$ along its diagonal, the count of distinct parameters of $W$ is 1 and $1 \ll N$ qualifies the matrix for $W$ as phase sparse diagonal unitary. This results to a gate complexity of $\Om\left( 1 \right)$ for operator $W$. Thus, a single application of operator $G^{\prime}$ will require $\Om\left(\log_2 N + \log_2 \vert \Sigma \vert\right) + \Om\left( 1 \right) \in \Om\left( \log_2 N + \log_2 \vert \Sigma \vert \right)$ time complexity.
+%
+%\subsection{Operator $G^{\prime}$}\label{subsec:G-prime} %-----------------------------------------------------------
+%Let $\vert \psi_{f^\prime} \rangle=U_{f^\prime}\vert \psi_{\mathrm{sup}} \rangle$. Also, let operator $G^{\prime} = WU_{f^\prime}$. As with Grover's quantum search algorithm, we apply operator $G^{\prime}$ repeatedly to maximize the amplitude of state $\vert i_x \rangle$ and minimize that of the other states. We denote the state resulting from application of $G^{\prime}$ to state $\vert \psi_{f^\prime} \rangle$ as the superposition state $\vert \psi_{\mathrm{G}^\prime} \rangle$. We apply $G^{\prime}$ $\left\lfloor \frac{\pi}{4} \sqrt{N} \right\rfloor$ iterations to maximize the amplitude of state $\vert i_x \rangle$ up to $\approx 1$. From our calculation of circuit, time and space complexity from Sections~\ref{subsec:U-f-prime} and \ref{subsec:W}, operator $G^\prime$ will have circuit complexity in
+%\[
+%	C_0\log_2\left( \frac{1}{\epsilon} \right) + \Om\left( M\log_2 \vert \Sigma \vert + M + \log\log\left( \frac{1}{\epsilon} \right)  \right),
+%\]
+%time complexity in 
+%\[
+%	C_0\log_2\left( \frac{1}{\epsilon} \right) + \Om\left( \log_2 \vert \Sigma \vert + \log\log\left( \frac{1}{\epsilon} \right)  \right),
+%\]
+%and space complexity in 
+%\[
+%	\Om\left( M\log_2 \vert \Sigma \vert + M \right).
+%\]
+%
+%\section{Quantum algorithm 1} %---------------------------------------------------------------------------------------------------------------------
+%We define the amplitude amplification-based quantum algorithm for exact string matching in Algorithm~\ref{alg:amplitude-amplification-algorithm} and its quantum circuit in Figure~\ref{fig:Grover-circuit}.
+%
+%\begin{algorithm}
+%	\caption{Amplitude amplification-based quantum algorithm for exact string matching}
+%	\label{alg:amplitude-amplification-algorithm}
+%	\begin{algorithmic}[1]
+%		\REQUIRE{quantum register in state $\vert \psi_{\mathrm{init}} \rangle = \vert \mathbf{0} \rangle\vert 1 \rangle$}
+%		\ENSURE{classical value $i_x$ such that $H\left(\mathrm{P}, \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1] \right) = 0$}
+%		\STATE $\vert \psi_{\mathrm{sup}} \rangle = H\vert \psi_{\mathrm{init}} \rangle$
+%		\FOR{1 to $\left\lfloor \frac{\pi}{4}\sqrt{N} \right\rfloor$}
+%			\STATE $\vert \psi_{f^\prime} \rangle = U_{f^\prime}\vert \psi_{\mathrm{sup}} \rangle$
+%			\STATE $\vert \psi_{\mathrm{W}} \rangle = W\vert \psi_{\mathrm{sup}} \rangle$
+%		\ENDFOR
+%		\STATE $i_x = M\vert \psi_{\mathrm{W}} \rangle$
+%		\RETURN $i_x$
+%	\end{algorithmic}
+%\end{algorithm}
+%
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \lstick{\vert 0 \rangle} \quad & \qw     & \gate{H} & \multigate{5}{U_{f^\prime}} & \multigate{4}{W} & \qw  & \ldots & \quad & \multigate{5}{U_{f^\prime}} & \multigate{4}{W}  & \qw & \meter & \qw & \quad\\
+%				& \lstick{\vert 0 \rangle} \quad & \qw     & \gate{H} & \ghost{U_{f^\prime}}           & \ghost{W}            & \qw  & \ldots & \quad & \ghost{U_{f^\prime}} & \ghost{W}  & \qw & \meter & \qw & \quad\\
+%				& \lstick{\vdots}             \quad & \quad   & \quad     & \ghost{U_{f^\prime}}           & \ghost{W}             & \qw & \ldots & \quad & \ghost{U_{f^\prime}} & \ghost{W}  & \qw & \meter &\qw & \rstick{\alpha_{i_x}\vert i_x \rangle + \sum_{i\neq i_x} \alpha_i \vert i \rangle}\\
+%				& \lstick{\vert 0 \rangle} \quad & \qw     & \gate{H} & \ghost{U_{f^\prime}}           & \ghost{W}             & \qw & \ldots & \quad & \ghost{U_{f^\prime}} & \ghost{W}  & \qw & \meter &\qw & \quad\\
+%				& \lstick{\vert 0 \rangle} \quad & \qw     & \gate{H} & \ghost{U_{f^\prime}}           & \ghost{W}             & \qw & \ldots & \quad & \ghost{U_{f^\prime}} & \ghost{W}  & \qw & \meter &\qw & \quad\gategroup{1}{5}{6}{6}{.7em}{--}\gategroup{1}{10}{6}{11}{.7em}{--}\gategroup{1}{14}{5}{14}{.7em}{\}}\\
+%				& \lstick{\vert 0 \rangle} \quad & \gate{X} & \gate{H} & \ghost{U_{f^\prime}}           & \qw             & \qw & \ldots & \quad & \ghost{U_{f^\prime}} & \qw & \gate{H} &\gate{X} & \qw & \vert 0 \rangle
+%			}	
+%		\]
+%		\caption{A high level circuit for the amplitude amplification-based quantum algorithm for exact string matching. The operator $G^{\prime}=WU_{f^\prime}$ is shown enclosed in a dash-lined box.}
+%		\label{fig:Grover-circuit}
+%	\end{minipage}
+%\end{figure}
+%
+%
+%\section{Asymptotic complexity} %-------------------------------------------------------------------------------------------------------------------
+%From our calculation of the gate, time and space complexity of each step of our amplitude amplification-based quantum algorithm, we summarize the complexity of each step in Table~\ref{tab:Grover-complexity}.
+%
+%\begin{table}[h!]
+%	\centering
+%	\footnotesize
+%	\begin{tabular}{ | c || c | c | c |}
+%		\hline
+%		\quad                  & circuit complexity                                                                                                                 &  time complexity        & space complexity\\
+%		\hline\hline
+%		\textit{H}            & $\Om\left( \log_2 N \right)$                                                                                               & $\Om\left(1\right)$  & $\Om\left( \log_2 N \right)$\\
+%		\hline
+%		$U_{f^\prime}$  &  $\Om\left( N + M\log_2\vert \Sigma \vert + M \right)$                                                        & $\Om\left( \log_2 N + \log_2 \vert \Sigma \vert \right)$  & $\Om\left( NM\log_2\vert \Sigma \vert + M\log_2 \vert \Sigma \vert + M\right)$\\
+%		\hline
+%		\textit{W}          & $C_0\log_2\left( \frac{1}{\epsilon} \right) + \Om\left( \log\log\left( \frac{1}{\epsilon} \right)  \right)$ & $C_0\log_2\left( \frac{1}{\epsilon} \right) + \Om\left( \log\log\left( \frac{1}{\epsilon} \right)  \right)$ & --\\                                                         
+%		\hline
+%		\textit{Meter}     & $\Om\left( \log_2 N \right)$                                                                                                  & $\Om\left( 1 \right)$   & --\\
+%		\hline
+%	\end{tabular}
+%	\caption{The gate, time and space complexity of each step in the amplitude amplification-based quantum algorithm for the exact string matching problem. We included the circuit, time and space complexity of a QRAM in the complexity of operator $U_{f^\prime}$.}
+%	\label{tab:Grover-complexity}
+%\end{table}
+%
+%\begin{theorem}
+%Given a single occurrence of an exact copy of P in T, there exists a quantum algorithm which outputs the starting index of the exact copy of P in T with gate complexity in
+%\[
+%	\Om\left( N + \log_2 N + M\log_2\vert \Sigma \vert + M + 2C_0\log_2\frac{1}{\epsilon} + \log_2\log_2\frac{1}{\epsilon}\right),
+%\]
+%in time complexity 
+%\[
+%	\Om\left( \left\lfloor \frac{\pi}{4}\sqrt{N} \right\rfloor \left( \log_2 N + \log_2 \vert \Sigma \vert + 2C_0\log_2\frac{1}{\epsilon} + \log_2\log_2\frac{1}{\epsilon} \right) \right),
+%\] 
+%and space complexity in
+%\[
+%	\Om\left( NM\log_2\vert \Sigma \vert + M\log_2 \vert \Sigma \vert + M + \log_2 N \right).
+%\]
+%with probability $\approx 1$.
+%\end{theorem}
+%\begin{proof}
+%From our construction of the quantum circuit for $U_{f^\prime}$ operator, $W$ operator and the whole quantum algorithm, we summarize the gate, time and space complexity of each step in the algorithm in Table~\ref{tab:Grover-complexity}.
+%\end{proof}
+%
+%\section{Summary}
+%In this chapter we presented our work in \cite{Aborot2013} which is an amplitude amplification-based quantum algorithm which outputs the index of an exact copy of P in T. Given a superposition of indices $i$ in T, the algorithm applies a linear operator $U_{f^\prime}$ which compares P with each $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$. The solution index in which $\mathrm{P}=\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$, is marked with a negative phase as result of operation of $U_{f^\prime}$. Amplitude amplification is then applied to the superposition of indices to increase the amplitude of the solution index and decrease those of the non-solution indices. The sequence of operation $G^\prime = WU_{f^\prime}$ is applied to the superposition state of indices in $\Om\left( \left\lfloor \frac{\pi}{4} \sqrt{N} \right\rfloor \right)$ iterations. This amplifies the amplitude of the solution index to  $\approx 1$ and decreases those of the non-solution indices to $\approx 0$. Lastly, a measurement operation is applied to the index register to get a classical value corresponding to the solution index. The time complexity of the quantum algorithm is bounded below in $\Omega\left( \left\lfloor \frac{\pi}{4} \sqrt{N} \right\rfloor \right)$.
+%
+%In addition to our results in \cite{Aborot2013}, we have also presented in this chapter new results which added detail to the operation of operators $U_{f^\prime}$ and $W$. We provided a quantum circuit construction for $U_{f^\prime}$ by constructing a parallelizeable symbol comparator module for the oracle function $f^\prime(\cdot)$. We have shown a parallel quantum circuit for the operation of $U_{f^\prime}$ which have circuit complexity in $\Om\left( N + M\log_2\vert \Sigma \vert + M \right)$, time complexity $\Om\left( \log_2 N + \log_2 \vert \Sigma \vert \right)$ and space complexity in $\Om\left( NM\log_2\vert \Sigma \vert + M\log_2 \vert \Sigma \vert + M\right)$. We have specified the QRAM model \cite{Giovannetti2008},\cite{Giovannetti2008a} as a possible memory model for accessing a quantum superposition of states encoding \textit{M}-length substrings of T with circuit complexity in $\Om\left( N \right)$, time complexity in $\Om\left( \log_2 N \right)$ switches and space complexity in $\Om\left( NM\log_2\vert \Sigma \vert \right)$.
+%
+%We also provided deeper analysis of the circuit complexity of a quantum circuit for operator $W$ based on the phase context decomposition method in \cite{Welch2014b,Welch2015} and the phase rotation gate approximation algorithm using the Clifford+\textit{T} gate set in \cite{Bocharov2015}. This gave us a circuit complexity of $W$ in $C_0\log_2\left( \frac{1}{\epsilon} \right) + \Om\left( \log\log\left( \frac{1}{\epsilon} \right)  \right)$ where $1\leq C_0 \leq 4$ is a constant dependent on the phase rotation gate decomposition method used and $\epsilon$ is the approximation parameter for approximating $W$. 
+%
+%Given the more detailed analysis of operators $U_{f^\prime}$ and $W$ in this chapter, we provided a tighter bound on the time complexity of our amplitude amplification-based quantum algorithm for exact string matching. The algorithm outputs the solution index with probability $\approx 1$ with circuit complexity in
+%\[
+%	\Om\left( N + \log_2 N + M\log_2\vert \Sigma \vert + M + 2C_0\log_2\frac{1}{\epsilon} + \log_2\log_2\frac{1}{\epsilon}\right),
+%\]
+%in time complexity 
+%\[
+%	\Om\left( \left\lfloor \frac{\pi}{4}\sqrt{N} \right\rfloor \left( \log_2 N + \log_2 \vert \Sigma \vert + 2C_0\log_2\frac{1}{\epsilon} + \log_2\log_2\frac{1}{\epsilon} \right) \right),
+%\] 
+%and space complexity in
+%\[
+%	\Om\left( NM\log_2\vert \Sigma \vert + M\log_2 \vert \Sigma \vert + M + \log_2 N \right).
+%\]

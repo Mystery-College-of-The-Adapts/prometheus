@@ -1,1 +1,244 @@
-CONCLUSION CHAPTER.
+In this chapter we provide our conclusions for this study. We recall results from the Chapters~\ref{chap:grover}, \ref{chap:convolution} and \ref{chap:filtering} and lastly provide an overall conclusion.
+
+%%%%%%%%%%% Amplitude amplification-based quantum algorithm for exact string matching %%%%%%%%%%%%%%%
+
+In Chapter~\ref{chap:grover} we presented a quantum algorithm for the exact string matching using amplitude amplification method in Grover's quantum search algorithm. Initial results of this work is published in \cite{Aborot2013}. We also added new results to this work in Chapter~\ref{chap:grover}. We assume the availability of a quantum random access memory (qRAM) \cite{Giovannetti2008,Giovannetti2008a} which provides us access to a quantum state encoding $\vert \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1] \rangle$ given address $\vert i \rangle$. In \cite{Aborot2013}, we presented the general outline of the quantum algorithm in which the oracle function $f(\cdot)$ is a black-box. The comparison of P and each subsequence of T is performed as a black-box operation. In this work, we presented details of the inner workings of the oracle function in a new function $f^\prime(\cdot)$. Using $f^\prime$ we constructed a quantum circuit for operator $U_{f^\prime}$ based on the symbol comparator design in \cite{Thapliyal2010}. Using our modular symbol comparator quantum circuit we designed the quantum circuit for operator $U_{f^\prime}$ as a parallel circuit of the comparator modules. We formally state this construction in Lemma~\ref{fig:parallel-symbol-comparator}. We also gave an analysis of the circuit complexity of the quantum circuit for $U_{f^\prime}$. As additional result, we also analyzed the circuit complexity of the amplitude amplification operator $W$ based on the cycle-based decomposition method in \cite{Welch2014b,Welch2014c,Welch2015} and phase rotation gate decomposition method in \cite{Bocharov2015}. We summarize the more detailed circuit, time and space complexity of our amplitude amplification-based quantum algorithm for exact string matching in Table~\ref{tab:conclusion-amplitude-amplification-based-algorithm-complexities}.
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{| r || c |}
+		\hline
+		\quad            & complexity \\
+		\hline\hline
+		circuit           & $\Om\left( N + \log_2 N + M\log_2\vert \Sigma \vert + M + 2C_0\log_2\frac{1}{\epsilon} + \log_2\log_2\frac{1}{\epsilon}\right)$ \\
+		\hline
+		time             & $\Om\left( \left\lfloor \frac{\pi}{4}\sqrt{N} \right\rfloor \left( \log_2 N + \log_2 \vert \Sigma \vert + 2C_0\log_2\frac{1}{\epsilon} + \log_2\log_2\frac{1}{\epsilon} \right) \right)$ \\
+		\hline
+		space           & $\Om\left( NM\log_2\vert \Sigma \vert + M\log_2 \vert \Sigma \vert + M + \log_2 N \right)$\\
+		\hline
+	\end{tabular}
+	\caption{The total circuit, time and space complexity of Algorithm~\ref{alg:amplitude-amplification-algorithm} assuming a single solution index \textit{i} in T. The algorithm outputs a single solution index with probability $\approx 1$.}
+	\label{tab:conclusion-amplitude-amplification-based-algorithm-complexities}
+\end{table}
+
+%%%%%%%%%%% Convolution-based quantum algorithm for approximate string matching %%%%%%%%%%%%%%%%%
+In Chapter~\ref{chap:convolution} we presented a quantum algorithm for approximate string matching using the concept of convolution. We discussed the concept of classical convolution of sequences and its application to string matching. We then presented an outline of the convolution theorem in the quantum setting in Theorem~\ref{thm:quantum-convolution-theorem}. We also redefined a unitary operator $V_{\mathrm{X}}$ from \cite{Curtis2004} which approximates the point-wise multiplication step in the classical convolution theorem. Using the same methods \cite{Bocharov2015} we used for the analysis of circuit complexity in Chapter~\ref{chap:grover}, we provided an analysis of the circuit complexity of operator $V_{\mathrm{X}}$. We calculated that the circuit complexity of operator $V_{\mathrm{X}}$ based from the Clifford+\textit{T} gate set decomposition method in \cite{Bocharov2015} and cycle decomposition method in \cite{Welch2015} to be
+\[
+	(q-1)C_0\log_2 \left( \frac{1}{\epsilon} \right) + \Om\left( \log\log \left(\frac{1}{\epsilon}\right) + (q-1)\log_2 L \right)
+\]
+where $L=N+M-1$, $q-1$ is the count of distinct phase values along the diagonal of the matrix of operator $V_{\mathrm{X}}$, $1 \leq C_0 < 4$ is a constant dependent on the gate decomposition method used and $\epsilon$ is the approximation factor for approximating the quantum circuit for $V_{\mathrm{X}}$. Assuming a low value for $q$, the circuit complexity of operator $V_{\mathrm{X}}$ will be in $\Om\left( q\log_2 L \right)$. To encode T and P into binary indicators with respect to each symbol in $\Sigma$, we used as sub-routine the ESQUID quantum algorithm \cite{Rosenbaum2009} to generate arbitrary quantum superposition states which encoded the binary indicator sequences of T and P. These superposition states will serve as input into our convolution-based quantum algorithm. We define the convolution-based quantum algorithm for approximate string matching in Algorithm~\ref{alg:qca}.
+We summarize the more detailed circuit, time and space complexity of our amplitude amplification-based quantum algorithm for exact string matching in Table~\ref{tab:conclusion-convolution-based-algorithm-complexities}.
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{| r || c |}
+		\hline
+		\quad            & complexity \\
+		\hline\hline
+		circuit           & $\Om\left( \log_2^2 L + q\log_2 L + KM\log_2 \vert \Sigma \vert \right)$\\
+		\hline
+		time             & $\Om\left( K\left(\log_2^2 L + q\log_2 L \right) \right)$\\
+		\hline
+		space           & $\Om\left(\vert \Sigma \vert\log_2 L + KM\log_2 \vert \Sigma \vert \right)$\\
+		\hline
+	\end{tabular}
+	\caption{The total circuit, time and space complexity of Algorithm~\ref{alg:convolution-based-quantum-algorithm} assuming a single solution index \textit{i} in T. We bound the number of iterations \textit{K} from above as $\Om\left(\frac{L\log_2 L + L}{\log_2^2 L + q\log_2 L}\right)$ to keep its time complexity competitive in comparison to its classical counterpart.}
+	\label{tab:conclusion-convolution-based-algorithm-complexities}
+\end{table}
+
+
+%%%%%%%%%%% Filtering-based quantum algorithm for approximate string matching %%%%%%%%%%%%%%%%%%%
+In Chapter~\ref{chap:filtering} we presented another quantum algorithm for approximate string matching using a search space filtering concept in \cite{Amir2004}. The classical algorithm in \cite{Amir2004} lets $\vert \mathrm{P}_{\Sigma} \vert = 2d$ where $\mathrm{P}_{\Sigma}$ is the set of distinct symbols in P called as alphabet of P. A function $\gamma: \mathrm{P}_{\Sigma} \rightarrow \{0,\ldots,M-1\}$ maps the elements of $\mathrm{P}_{\Sigma}$ to their index of first occurrence in P. For each symbol $\mathrm{T}[i], i=0,\ldots,N-1$, $i - \gamma(\mathrm{T}[i])$ is evaluated to mark possible starting indices of approximate copies of P in T. All indices in T with marks $< d$ are discarded (filtered). Only $\frac{N}{q-d}$ indices in T will remain after this filtering step. The remaining indices will then be subjected to a verification process for identifying solution indices. In our quantum algorithm we let $\vert \mathrm{P}_{\Sigma} \vert \geq 2d$. We assume access to a qRAM just like in Chapter~\ref{chap:grover} which returns a symbol encoding state $\vert \mathrm{T}[i] \rangle$ given address state $\vert i \rangle$. We construct operators $U_{\sigma}$ for all $\sigma \in \Sigma$ which facilitates the evaluation of function $\gamma(\cdot)$. We provided circuit construction for $U_{\sigma}$ and calculated its circuit complexity based from multi-control unitary gate decomposition results in \cite{Barenco1995b}. We also provided a quantum circuit construction for facilitating each evaluation $i - \gamma(\mathrm{T}[i])$ using an operator $U_{\mathrm{Sub}}$. The circuit construction for $U_{\mathrm{Sub}}$ is based on quantum adder circuit construction in \cite{Barenco1996}. Unlike in the classical setting, our quantum algorithm do not include a verification phase. Instead, we are assured that with probability $\frac{c_{i_k}}{N}$, the result of our measurement on the quantum register encoding the result of each evaluation $i - \gamma(\mathrm{T}[i])$ will have mismatches $\leq d$. The circuit, time and space complexity of our filtering-based quantum algorithm is summarized in Table~\ref{tab:conclusion-filtering-based-algorithm-complexities}.
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{| r || c |}
+		\hline
+		\quad            & complexity \\
+		\hline\hline
+		circuit           & $\Om\left(N + \log_2 N + \vert \Sigma \vert^2\log_2 M \right)$\\
+		\hline
+		time             & $\Om\left( \log_2 N + \vert \Sigma \vert\log_2 M \right)$\\
+		\hline
+		space           & $\Omega\left( N\log_2\vert \Sigma \vert + \log_2 N + \log_2 \vert \Sigma \vert \right)$\\
+		\hline
+	\end{tabular}
+	\caption{The total circuit, time and space complexity of Algorithm~\ref{alg:quantum-filtering}.}
+	\label{tab:conclusion-filtering-based-algorithm-complexities}
+\end{table}
+
+%%%%%%%%%% Overall conclusion %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The time complexity of our amplitude amplification-based quantum algorithm for exact string matching in Chapter~\ref{chap:grover} is as expected to be bounded below by Grover's quantum search algorithm, $\Om\left( \frac{\pi}{4}\sqrt{N} \right)$, as is also expected with the amplitude amplification-based quantum algorithm for exact string matching in \cite{Ramesh2003}. The quantum algorithm in \cite{Ramesh2003} uses a more clever technique used in classical parallel string matching called deterministic sampling and takes into consideration the periodicity of subsequences of T. Our quantum algorithm in Algorithm~\ref{alg:amplitude-amplification-algorithm} uses a more straight-forward approach in comparing P with the subsequences of T and does not make any specific assumptions about some property of subsequences in T. The algorithm in \cite{Ramesh2003} also relies heavily on deterministic and probabilistic oracles in identifying mismatches. We used a deterministic implementation of our oracle for identifying mismatches. We have also provided quantum circuit construction for the operation of our oracle function and based our time complexity in the elementary gate decomposition of this circuit. One dependency though of our algorithm is available access to a qRAM. The quantum algorithm in \cite{Ramesh2003} has time complexity in $\Om(\sqrt{N}\log(\frac{N}{M})\log(M) + \sqrt{M}\log^2(M))$ and our algorithm has time complexity in $\Om\left( \left\lfloor \frac{\pi}{4}\sqrt{N} \right\rfloor \left( \log_2 N + \log_2 \vert \Sigma \vert + 2C_0\log_2\frac{1}{\epsilon} + \log_2\log_2\frac{1}{\epsilon} \right) \right)$.
+
+Our convolution-based quantum algorithm in Chapter~\ref{chap:convolution} for approximate string matching relies heavily on binary indicator sequence encoding of T and P with respect to at most all symbols in the alphabet. The binary sequence encoding need only be prepared for all distinct symbols present in T and P. We do assume though that the processing of each pair of binary indicator sequences of T and P with respect to symbols in $\Sigma$ are performed in parallel. This requires at most $\vert \Sigma \vert$ parallel execution of the quantum convolution algorithm. Space efficiency will thus put an upper bound on the size of the alphabet when using this algorithm. A good side of this algorithm though is that subsequences in T with higher number of matches with P will also have higher probability of occurring as result of measurement on the state of the registers. The final quantum state of the index register will be an approximation of the normalized classical sequence of match scores between subsequences of T and P.  If there exists an assurance of only a few solution indices in T, then we are assured that with high probability we will get one of the solution indices as result of a single execution of the algorithm. One should also bound the number of iterations \textit{K} of the algorithm to keep its performance competitive with respect to other classical and quantum algorithms for approximate string matching. Our algorithm requires an arbitrary quantum state generating algorithm such as ESQUID \cite{Rosenbaum2009} for preparing the quantum superposition states encoding the binary indicator sequences of T and P. It does not require though any special operator like the symbol operators in \cite{Mateus2006} and the location operators in our second quantum algorithm for approximate string matching. The calculated time complexity of our convolution-based quantum algorithm for approximate string matching is $\Om\left( K\left(\log_2^2 L + q\log_2 L \right) \right)$. The time complexity of the quantum algorithm for approximate string matching in \cite{Hollenberg2000} is in $\Om(rk\sqrt{N})$ while that in \cite{Mateus2006} is in $\Om(M\log^3(N) + N^{\frac{3}{2}}\log^2(N)\log(M))$.
+
+Our filtering-based quantum algorithm for approximate string matching in Chapter~\ref{chap:filtering} requires construction of location operators $U_{\sigma}$ for all $\sigma \in \Sigma$ specific to the input pattern. Given a quantum register in an initial state of $\vert \mathbf{0} \rangle$ an operator $U_{\sigma}$ will encode the location of first occurrence of symbol $\sigma$ in P into the state of the quantum register. This approach will require a pre-processing of the pattern to construct each location operator. If the construction of the operators can be maintained even after the execution of the quantum algorithm then we can use the same set of operators when searching for approximate copies of P in a new input T. The level of reusability of our approach is at the pattern level. The quantum algorithm in \cite{Mateus2006} also requires construction of operators specific to symbols of the alphabet. These operators serve as query operators for identifying a symbol in a specific index in P. Their method promotes a \textit{compile once, run many times} approach to approximate string matching in the quantum setting. The level of reusability of their algorithm is at the symbol level. We also explicitly state our requirement for access to a qRAM for accessing each symbol in T given an its index. The time complexity of our filtering algorithm is in $\Om\left( \log_2 N + \vert \Sigma \vert\log_2 M \right)$ while that in \cite{Mateus2006} is in $\Om(\vert \Sigma \vert N\log^2(N) + N^{\frac{3}{2}}\log^2(N)\log(M))$. In comparison to the classical counterpart of our quantum algorithm, we skip the verification phase. One can perform verification of the resulting indices of our quantum filtering algorithm either in the classical or quantum setting in time at most linear to \textit{M}. 
+
+%In this chapter, conclusions from the results in this dissertation are provided.
+%Results from each chapter of Part \ref{part-body} are briefly recalled, including  conclusions from the results of each chapter.
+%A general conclusion from the results in this dissertation is provided lastly.
+%%Finally, some future research directions are given, which are directly or indirectly of interest to the results in this work.
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\section{Final remarks from Chapter \ref{chap-note-delay}}%\label{final-remarks-sect}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%Chapter \ref{chap-note-delay} presented ``routing simulations'' using the routing modules for sequential, join, and split routing. %, with iteration routing as a consequence of at least one of these. % an alternative construction of a $ \overline{\Pi}$ that simulates a given $\Pi$, %improving the previous work so that we use only one initial spike for both systems. 
+%The halting time of both $\Pi$ (module with delay) and $\overline{\Pi}$ (module without delay) exactly coincide with one another (restriction R1), while the number of spikes in the environment for both systems are equal at halting time (restriction R2).
+%These routing modules and simulations are meant to be used as sub-modules for building larger SNP systems, whether for number or language generating (accepting) purposes, guaranteed by R1 and R2.
+%As such, we preserve spikes so that no spike is lost during the route simulation between the two systems.
+%The trade off of the routing simulation however is that there is an ``explosion'' of neurons in $ \overline{\Pi}$ for every delay in $\Pi,$ i.e. we add $d_i$ neurons in $ \overline{\Pi}$ for every $\sigma_i$ that has a delay.
+%This explosion is expected, which can also be seen in constructions given in \cite{np-snp} for example, where they use either delays (with fewer number of neurons) or without delays (larger number of neurons) for nondeterministic generation of variables.
+%These results are used to provide the main result in the chapter given in Theorem \ref{thm-routing-sim} regarding routing simulations in simple, semi-homogeneous SNP systems.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\section{Final Remarks from Chapter \ref{chap-note-aut}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%In Chapter \ref{chap-note-aut}, SNP modules were further investigated: amendments were made to the constructions for simulating DFA and DFST while reducing the amount of neurons for each module (given by Theorem \ref{thm-snp-dfa-mio} and Theorem \ref{thm-dfst-snp-mio}).
+%The single neuron in an SNP module is enough to simulate a DFA or a DFST, where a rule in the neuron simulates a transition in the simulated finite automata, i.e. given a simulated DFA or DFST with $m$ number of transitions, then the simulating SNP module with neuron $i$ has $|R_i| = m.$
+%$k$-DFAO were also simulated using SNP modules containing two neurons (Theorem \ref{thm-snp-kdfao}).
+%The general idea is that the first neuron simulates the transition function while the second neuron simulates the output function of the $k$-DFAO.
+%Using the SNP module simulations, we were able to generate automatic sequences with SNP modules (Theorem \ref{thm-snp-mod-k-aut}), as well as transfer some robustness properties of $k$-DFAO to the simulating SNP modules (Theorem \ref{thm-snp-mod-reverse}).
+%The constructions in Chapter \ref{chap-note-aut} are also optimal, in the sense that they are the smallest modules in terms of neuron count (one neuron in a module) that can be used to simulate the finite automata that were investigated.
+%The constructions also have some similarities with the construction idea of \cite{neary-boundary}, where a boundary for universality and non-universality in SNP systems with extended rules is $4$ and $3$ neurons, respectively.
+%
+%
+%
+%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\section{Final Remarks from Chapter \ref{chap-snpsp}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Chapter \ref{chap-snpsp} introduced SNPSP systems, which is the general focus of this dissertation. %the main contribution of this thesis 
+%We introduced the structural plasticity feature in the SNP systems framework, providing a partial answer to an open problem in \cite{snprecent} about dynamism only for synapses. 
+%The ``programming'' of the system is dependent on the way neurons (dis)connect to each other using synapses.
+%We proved that SNPSP systems as number generating and accepting devices are universal, for both the saving and nonsaving modes. 
+%The universality results hold even if we impose the following normal form on SNPSP systems: only 5 among the 17 total neurons for all modules\footnote{ADD, SUB, and FIN module neurons in the saving and generative case, since the accepting case requires a lesser number of neurons with plasticity rules.} use plasticity rules, only synapse level nondeterminism exist, neurons without plasticity rules are simple (having only the rule $a \rightarrow a$), and without using forgetting rules or delays. 
+%Additionally, a state known as deadlock can arise during saving mode. 
+%Reaching such a state for an arbitrary SNPSP system in saving mode is undecidable. %In section \ref{subset-sect} we provided a nondeterministic and semi-uniform solution to {\tt Subset Sum}, computing in 3 time steps.
+%
+%The universality proofs of SNPSP systems are ``easier'' in the sense that they require less neurons in each module, while being under a normal form.
+%The reason for this is the use of plasticity rules and their accompanying semantics: SNPSP systems achieve universality by creating or deleting at most $k$ synapses each step, where $k \geq 1$.
+%Interestingly, a seemingly minor change in the semantics of plasticity rule application allows SNPSP systems to maintain universality, although a deadlock can occur.
+%Plasticity rules allow a change in the ``flow'' of spikes, by creating or deleting synapses, thereby redirecting the computation using fewer number (compared to ``standard'' SNP systems as in \cite{snp}) of rules or neurons.
+%The results of succeeding chapters further elaborated the benefits of plasticity rules.
+%
+%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\section{Final remarks from Chapter \ref{chap-snpsp-seq}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%From Chapter \ref{chap-snpsp-seq}, we showed that SNPSP systems (with induced sequentiality) as acceptors are more powerful than as generators, since the former do not need any source of nondeterminism. 
+%%Despite the restrictions of induced sequentiality and our provided, SNPSP systems still maintain their computing power.
+%SNPSP systems maintain Turing universality despite the following restrictions: induced sequentiality, and under a normal form.
+%The normal form is that purely plastic neurons have at most two rules (the maximum in the system), and neurons with standard rules are simple.
+%Acceptors are universal in all four modes, while generators are not universal under $maxps$ and $minps$ modes.
+%Replacing the commonly used $nd_{rule}$ (e.g. in \cite{snp} and \cite{Ibarra-max-min}) with $nd_{syn}$ as a nondeterminism source, we are able to: allow generators in $maxps$ or $minps$ mode to become universal; reduce the rules in each neuron to at most two, while making the modules more compact, i.e. require fewer neurons.
+%
+%
+%Furthermore, our results provide a family of uniform modules, i.e. at the expense of using $nd_{syn}$, our modules can be used in either $maxs$ and $maxps$, or $mins$ and $minps$.
+%%Our results for max spike number are a family of uniform modules in the following sense: all modules can be used in either max-seq or max-pseudo-seq (double check this. At the expense of adding $nd_{syn}$ to systems in $maxs, maxps, mins, minps$, all modules then become uniform).
+%In \cite{Jiang-min-seq}, the problem of constructing a family of uniform ADD, SUB, and FIN modules that can be used in both $mins$ and $minps$ modes was open.
+%Results in this chapter thus provide a positive hint to this open problem. %at least for SNPSP systems under 4 modes of induced sequentiality.
+%
+%
+%
+%
+%
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\section{Conclusions and final remarks from Chapter \ref{chap-snpsp-asyn}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%
+%From Chapter \ref{chap-snpsp-asyn}, we investigated the computability of asynchronous SNPSP systems.
+%In \cite{asyn-snp} it is known that asynchronous SNP systems with extended rules are universal, while the conjecture is that asynchronous SNP systems with standard rules are not \cite{Cavaliere-asyn-decid}.
+%In Theorem  \ref{thm-asyn-bound-slin}, we showed that asynchronous bounded SNPSP systems are not universal where, similar to standard rules, each neuron can only produce at most one spike each step.
+%%We showed this by simulating 
+%In Theorem \ref{thm-asyn-weight-snpsp}, asynchronous WSNPSP systems are shown to be universal.
+%In WSNPSP systems, the synapse weights perform a function similar to extended rules in the sense that  a neuron can produce more than one spike each step.
+%Our results thus provide support to the conjecture about the nonuniversality of asynchronous SNP systems with standard rules.
+%%Also, one boundary between (non)universality for SNPSP systems is the synapse weight, i.e. a synapse weight of 1 
+%
+%\begin{table}%[h]
+%	\centering
+%	\begin{tabular}{|c|c|}
+%	
+%	\hline
+%
+%	 $NRE = N_2SNPSP.$ & Theorem \ref{nre_n2-thm}  \\ \hline
+%%\begin{theorem}\label{nre_n2-thm} $NRE = N_2SNPSP.$ \end{theorem}
+%
+%	 $NRE = N_{acc}SNPSP.$ & Theorem \ref{nre_nacc-thm}  \\ \hline
+%	 
+% 	 $NRE = N_2SNPSP_s.$ & Theorem \ref{univ-saving-thm}  \\ \hline
+%%\begin{theorem}\label{univ-saving-thm} $NRE = N_2SNPSP_s$ \end{theorem}
+% 	 $NRE = N_{2,gen} SNPSP^{maxs}(rule_2,\pm syn_k,nd_{syn}), k \geq 1.$ & Theorem \ref{thm-2gen-maxs-nre}  \\ \hline
+%%\label{thm-2gen-maxs-nre} $NRE = N_{2,gen} SNPSP^{maxs}(rule_2,\pm syn_k,nd_{syn}), k \geq 1.$
+%	%$t_0$ & $ \langle $1/0, 0/0, 0/0, 0$ \rangle $  \\ \hline
+%
+% 	 $NRE = N_{2,gen} SNPSP^{maxs}(rule_2,\pm syn_k),k \geq 2.$ & Theorem \ref{thm-2gen-maxs-nosyn-nre}  \\ \hline	
+%%\label{thm-2gen-maxs-nosyn-nre}$NRE = N_{2,gen} SNPSP^{maxs}(rule_2,\pm syn_k),k \geq 2.$
+%
+% 	 $NRE = N_{acc} SNPSP^{maxs}(rule_2,\pm syn_k), k \geq 1.$ & Theorem \ref{thm-acc-maxs-nre}  \\ \hline
+%%\label{thm-acc-maxs-nre}$NRE = N_{acc} SNPSP^{maxs}(rule_2,\pm syn_k), k \geq 1.$
+%
+% 	 $NRE = N_{2,gen} SNPSP^{maxps}(rule_2,\pm syn_k,nd_{syn}), k \geq 1.$ & Theorem \ref{thm-gen-maxps-nre}  \\ \hline
+%%\label{thm-gen-maxps-nre}$NRE = N_{2,gen} SNPSP^{maxps}(rule_2,\pm syn_k,nd_{syn}), k \geq 1.$
+%
+%
+% 	 $NRE = D_{acc}SNPSP^{maxps}(rule_2,\pm syn_k), k \geq 1.$ & Theorem \ref{thm-acc-maxps-nre}  \\ \hline
+%%\label{thm-acc-maxps-nre}$NRE = D_{acc}SNPSP^{maxps}(rule_2,\pm syn_k), k \geq 1.$
+%
+% 	 $NRE = N_{2,gen}SNPSP^{mins}(rule_2, \pm syn_k), k \geq 2.$ & Theorem \ref{thm-2gen-mins-nre}  \\ \hline
+%%\label{thm-2gen-mins-nre}$NRE = N_{2,gen}SNPSP^{mins}(rule_2, \pm syn_k), k \geq 2.$
+%
+% 	 $NRE = N_{acc}SNPSP^{mins}(rule_2, \pm syn_k), k \geq 2.$ & Theorem \ref{thm-2acc-mins-nre}  \\ \hline
+%%\label{thm-2acc-mins-nre}$NRE = N_{acc}SNPSP^{mins}(rule_2, \pm syn_k), k \geq 2.
+%
+% 	 $NRE = N_{2,gen}SNPSP^{minps}(rule_2, \pm syn_k, nd_{syn}), k \geq 2.$ & Theorem \ref{thm-2gen-minps-nre}  \\ \hline
+%%\label{thm-2gen-minps-nre}$NRE = N_{2,gen}SNPSP^{minps}(rule_2, \pm syn_k, nd_{syn}), k \geq 2.$ 
+%
+% 	 $NRE = N_{acc}SNPSP^{minps}(rule_2, \pm syn_k), k \geq 2.$ & Theorem \ref{thm-2acc-minps-nre}  \\ \hline
+%%\label{thm-2acc-minps-nre}$NRE = N_{acc}SNPSP^{minps}(rule_2, \pm syn_k), k \geq 2.$
+%
+% 	 $SLIN = N_{tot}SNPSP^{asyn}(bound_p,nd_{syn}), p \geq 1.$ & Theorem \ref{thm-asyn-bound-slin}  \\ \hline
+%%\label{thm-asyn-bound-slin}$ SLIN = N_{tot}SNPSP^{asyn}(bound_p,nd_{syn}), p \geq 1.$
+%{\footnotesize $NRE = N_{tot}WSNPSP^{asyn}(rule_{m}, \pm syn_k, weight_l, nd_{syn}),  m \geq 9, k \geq 1, l \geq 3.$ } & Theorem \ref{thm-asyn-weight-snpsp}    \\ \hline
+% 	 
+%%\label{thm-asyn-weight-snpsp}$N_{tot}WSNPSP^{asyn}(rule_{m}, \pm syn_k, weight_l, nd_{syn}) = NRE,  m \geq 9, k \geq 1, l \geq 3.$
+%	\end{tabular}
+%	\caption{Summary of main (non)universality results concerning SNPSP systems in this work.}
+%	\label{table-summary-snpsp-univ}
+%\end{table}
+%
+%
+%From Chapter \ref{chap-apps}, we provided two families of solutions to the $\mathbf{NP}$-complete problem {\tt Subset Sum}.
+%The semi-uniform family of solution halts in a fewer number of steps (Theorem \ref{thm-semiu-fam}), compared to the uniform family of solutions (Theorem \ref{thm-unif-fam}), although both halt in a constant number of steps.
+%Both families do not use rules with delays, and only use $nd_{syn}$ as nondeterminism source.
+%The uniform family uses forgetting rules (unlike the semi-uniform solution) but this technical detail can be removed by using plasticity rules in a way where plasticity rules function as forgetting rules.
+%The use of plasticity rules also decreases the number of neurons in the uniform family by a linear amount, compared to the uniform family for {\tt Subset Sum} given in \cite{np-snp}.
+%This linear decrease in the number of neurons is due to the synapse-level nondeterminism, removing the need for extra neurons with rule-level nondeterminism in \cite{np-snp}.
+%
+%The contributions of this dissertation fall under the computability of SNP systems, starting with the simulation results provided in Chapter \ref{chap-note-delay} and \ref{chap-note-aut}, followed by the introduction of and investigations on SNPSP systems.
+%The neuroscience phenomenon of structural plasticity, taken from biological neurons, has provided inspiration resulting in SNPSP systems.
+%A summary of the main (non)universality results in this work regarding SNPSP systems is provided in Table \ref{table-summary-snpsp-univ}.
+%
+%The ``programming capacity'' offered by plasticity rules in SNPSP systems can provide the ``release'' of common SNP systems features (delays in rules, forgetting rules) while having simplifying sets of restrictions (normal forms).
+%The plasticity feature therefore is a useful and interesting addition to the SNP systems framework, where the feature is a response to the challenge \textbf{D} presented in \cite{snprecent}, regarding SNP systems with dynamism applied only to synapses.
+%Plasticity rules can also help reduce the number of neurons in the system through the use of synapse-level nondeterminism, for example in cases where nondeterministic selection or assignment of variables are necessary, as in Chapter \ref{chap-apps} and in some universality proofs in previous chapters.
+%While the plasticity feature has been identified in this work (mainly along the lines of computability theory) as interesting, much still remains to be investigated, as detailed and emphasized by the succeeding and final chapter.

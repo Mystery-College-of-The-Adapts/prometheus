@@ -1,0 +1,296 @@
+\chapter{Amplitude of unknown target state $\vert i_x \rangle$ after \textit{k} iterations}\label{app:amplitude}
+The operation of the Grover operator $G=DU_f$ on the initial superposition state $\vert \gamma \rangle = H^{\otimes n} \vert 0 \rangle^{\otimes n}$ and the unknown target state $\vert i_x \rangle$ can be expressed as the matrix-vector operation
+\begin{align}
+G
+\begin{pmatrix}
+\vert \gamma \rangle\\
+\vert i_{x} \rangle
+\end{pmatrix}
+&=
+\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1
+\end{pmatrix}
+\begin{pmatrix}
+\vert \gamma \rangle\\
+\vert i_{x} \rangle
+\end{pmatrix}
+\end{align}
+In order to compute for the amplitude of the state $\vert i_x \rangle$ after \textit{k} iterations of the \textit{G} operator we need to first compute for the matrix $G^k$ and then compute for $\langle i_x \vert G^k \vert \gamma \rangle$.
+
+First, we show that the matrix
+\begin{align}
+G &=
+\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1
+\end{pmatrix}
+\end{align}
+is diagonalizable. That is, there exists matrices \textit{P} and \textit{D} such that
+\begin{align}
+G &= PDP^{-1}
+\end{align}
+where \textit{D} is a diagonal matrix with diagonal elements corresponding to the eigenvalues of matrix of \textit{G}, and \textit{P} is an invertible matrix with columns corresponding to the eigenvectors of matrix of \textit{G} associated with its eigenvalues. Given the matrix decomposition $G = PDP^{-1}$ we compute for 
+\begin{align}
+G^{k} &= (PDP^{-1})^{k}\\
+	&= PDP^{-1} \cdot PDP^{-1} \cdot \ldots \cdot PDP^{-1} \nonumber\\
+	&= PD \cdot (P^{-1}P) \cdot D \cdot (P^{-1}P) \cdot \ldots \cdot (P^{-1}P) \cdot DP^{-1} \nonumber\\
+	&= PD \cdot I \cdot D \cdot I \cdot \ldots \cdot I \cdot DP^{-1} \nonumber\\
+	&= PD \cdot D \cdot D \cdot \ldots \cdot DP^{-1} \nonumber\\
+	&= PD^{k}P^{-1}
+\end{align}
+We compute for the diagonal elements of matrix \textit{D} by first computing for the characteristic equation $P_Q(\lambda)$ and computing for its factors corresponding to the eigenvalues of \textit{G}.
+\begin{align}
+P_Q(\lambda) &= det(G - \lambda\cdot I_2)\\
+		&= det\left(
+			\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1
+\end{pmatrix}
+			-
+			\lambda
+			\begin{pmatrix}
+1 & 0\\
+0 & 1
+\end{pmatrix}
+		 \right)\\
+		 &= det\left(
+			\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1
+\end{pmatrix}
+			-
+			\begin{pmatrix}
+\lambda & 0\\
+0 & \lambda
+\end{pmatrix}
+		 \right)\\
+		 &= det\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} - \lambda & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1 - \lambda
+\end{pmatrix}\\
+&= \left( 1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} - \lambda \right)\left( 1 - \lambda \right) - \left( 2\langle i_{x} \vert \gamma \rangle \right)\left( -2\langle i_{x} \vert \gamma \rangle \right)\\
+&= \lambda^2 + (4\left\vert \langle i_{x} \vert \gamma \rangle \right\vert^2 - 2)\lambda + 1
+\end{align}
+Using the quadratic formula we get the following factors of $P_Q(\lambda)$
+\begin{align}
+	\lambda_0 = 1 - 2\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} - 2\langle i_{x} \vert \gamma \rangle\sqrt{\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} - 1}\\
+	\lambda_1 = 1 - 2\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} + 2\langle i_{x} \vert \gamma \rangle\sqrt{\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} - 1}
+\end{align}
+which correspond to the eigenvalues of the matrix of \textit{G}. Given the eigenvalues $\lambda_0$ and $\lambda_1$ we compute for their corresponding eigenvectors. Since eigenvalue $\lambda_0$ is a solution to the equation
+\begin{align}
+GX &= \lambda X
+\end{align}
+we arrive at the equation
+\begin{align}
+GX &= \lambda_0 X\\
+\rightarrow (G - \lambda_0 I_2)X &= 0\\
+\rightarrow
+\left(
+\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1
+\end{pmatrix}
+-
+\lambda_0
+\begin{pmatrix}
+1 & 0\\
+0 & 1
+\end{pmatrix}
+\right)
+\begin{pmatrix}
+x\\
+y
+\end{pmatrix}
+&= 0\\
+\rightarrow
+\begin{pmatrix}
+1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} - \lambda_0 & 2\langle i_{x} \vert \gamma \rangle\\
+-2\langle i_{x} \vert \gamma \rangle & 1 - \lambda_0
+\end{pmatrix}
+\begin{pmatrix}
+x\\
+y
+\end{pmatrix}
+&= 0\\
+\end{align}
+This leads us to the following system of linear equations
+\[
+\begin{cases}
+\left(1-4\left\vert\langle i_{x} \vert \gamma \rangle\right\vert^{2} - \lambda_0\right) x + \left(2\langle i_{x} \vert \gamma \rangle\right) y & = 0\\
+\left(-2\langle i_{x} \vert \gamma \rangle\right)x + \left(1 - \lambda_0\right)y &= 0
+\end{cases}
+\]
+Let $u = \langle i_{x} \vert \gamma \rangle$. Solving for \textit{x} we get
+\begin{align}
+\left(1-4\left\vert u \right\vert^{2} - \lambda_0\right) x + \left(2u\right) y & = 0\\
+\left(1-4\left\vert u \right\vert^{2} - \left(1 - 2\left\vert u \right\vert^{2} - 2u \sqrt{\left\vert u \right\vert^{2} - 1} \right) \right)x + \left(2u\right) y & = 0\\
+\left( -2\left\vert u \right\vert^{2} + 2u \sqrt{\left\vert u \right\vert^{2} - 1}\right)x + \left( 2u \right) y & = 0\\
+x &= \left(\frac{-2u}{-2\left\vert u \right\vert^{2} + 2u \sqrt{\left\vert u \right\vert^{2} - 1}}\right) y\\
+x &= \left(\frac{-2u}{-2u(u - \sqrt{\left\vert u \right\vert^{2} - 1}})\right) y\\
+x &= \left(\frac{1}{u - \sqrt{\left\vert u \right\vert^{2} - 1}}\right)y
+\end{align}
+This gives us the following eigenvector of the matrix of \textit{G} associated with eigenvalue $\lambda_0$,
+\begin{align}
+X &= 
+\begin{pmatrix}
+x\\
+y
+\end{pmatrix}\\
+&= 
+\begin{pmatrix}
+\left(\frac{1}{u - \sqrt{\left\vert u \right\vert^{2} - 1}}\right)y\\
+y
+\end{pmatrix}\\
+&= y
+\begin{pmatrix}
+\frac{1}{u - \sqrt{\left\vert u \right\vert^{2} - 1}}\\
+1
+\end{pmatrix}\\
+\end{align}
+Doing the same for the eigenvalue $\lambda_1$ of the matrix of \textit{G}, we get the eigenvector
+\begin{align}
+X &= y
+\begin{pmatrix}
+\frac{1}{u + \sqrt{\left\vert u \right\vert^{2} - 1}}\\
+1
+\end{pmatrix}
+\end{align}
+Since the eigenvectors $\lambda_0$ and $\lambda_1$ both have equal algebraic and geometric multiplicity of 1 then the matrix of \textit{G} is diagonalizable, i.e. it can be expressed as $G=PDP^{-1}$ for appropriate matrices \textit{P} and \textit{D}. Given the eigenvalues $\lambda_0, \lambda_1$ and their corresponding eigenvectors we can express the matrix of \textit{G} as
+\begin{align}
+G &= PDP^{-1}\\
+&=
+\frac{1}{2}
+\begin{pmatrix}
+\frac{1}{u - \sqrt{\left\vert u \right\vert^{2} - 1}} & \frac{1}{u + \sqrt{\left\vert u \right\vert^{2} - 1}}\\
+1 & 1
+\end{pmatrix}
+\begin{pmatrix}
+1 - 2\vert u \vert^2 - 2u\sqrt{\vert u \vert^2 - 1} & 0 \\
+0 & 1 - 2\vert u \vert^2 + 2u\sqrt{\vert u \vert^2 - 1}
+\end{pmatrix}\\
+& \quad\quad\quad\quad\quad\quad\quad\quad
+\begin{pmatrix}
+\frac{1}{\sqrt{\vert u \vert^2 - 1}} & \frac{-u}{\sqrt{\vert u \vert^2 - 1}} + 1\\
+\frac{-1}{\sqrt{\vert u \vert^2 - 1}} & \frac{u}{\sqrt{\vert u \vert^2 - 1}} + 1 
+\end{pmatrix}\nonumber
+\end{align}
+To compute for $G^{k}$ we use the decomposition of \textit{G}.
+\begin{align}
+G^{k} &= PD^{k}P^{-1}\\
+&=
+\frac{1}{2}
+\begin{pmatrix}
+\frac{1}{u - \sqrt{\left\vert u \right\vert^{2} - 1}} & \frac{1}{u + \sqrt{\left\vert u \right\vert^{2} - 1}}\\
+1 & 1
+\end{pmatrix}
+\begin{pmatrix}
+1 - 2\vert u \vert^2 - 2u\sqrt{\vert u \vert^2 - 1} & 0 \\
+0 & 1 - 2\vert u \vert^2 + 2u\sqrt{\vert u \vert^2 - 1}
+\end{pmatrix}^{k}\\
+& \quad\quad\quad\quad\quad\quad\quad\quad
+\begin{pmatrix}
+\frac{1}{\sqrt{\vert u \vert^2 - 1}} & \frac{-u}{\sqrt{\vert u \vert^2 - 1}} + 1\\
+\frac{-1}{\sqrt{\vert u \vert^2 - 1}} & \frac{u}{\sqrt{\vert u \vert^2 - 1}} + 1 
+\end{pmatrix}\nonumber\\
+&=
+\frac{1}{2}
+\begin{pmatrix}
+\frac{1}{u - \sqrt{\left\vert u \right\vert^{2} - 1}} & \frac{1}{u + \sqrt{\left\vert u \right\vert^{2} - 1}}\\
+1 & 1
+\end{pmatrix}
+\begin{pmatrix}
+\left(1 - 2\vert u \vert^2 - 2u\sqrt{\vert u \vert^2 - 1}\right)^{k} & 0 \\
+0 & \left(1 - 2\vert u \vert^2 + 2u\sqrt{\vert u \vert^2 - 1}\right)^{k}
+\end{pmatrix}\\
+& \quad\quad\quad\quad\quad\quad\quad\quad
+\begin{pmatrix}
+\frac{1}{\sqrt{\vert u \vert^2 - 1}} & \frac{-u}{\sqrt{\vert u \vert^2 - 1}} + 1\\
+\frac{-1}{\sqrt{\vert u \vert^2 - 1}} & \frac{u}{\sqrt{\vert u \vert^2 - 1}} + 1
+\end{pmatrix}\nonumber
+\end{align}
+Evaluating $G^{k}$ will result to the matrix
+\begin{align}
+G^{k} &= \frac{1}{2}
+\begin{pmatrix}
+\frac{u}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \lambda_0^k + \lambda_1^k & \frac{\lambda_1^k - \lambda_0^k}{\sqrt{\vert u \vert^2 - 1}}\\
+\frac{\lambda_0^k - \lambda_1^k}{\sqrt{\vert u \vert^2 - 1}} & \frac{u}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_1^k - \lambda_0^k \right) + \lambda_0^k + \lambda_1^k
+\end{pmatrix}
+\end{align}
+We then compute for the amplitude of the unknown target state $\vert i_{x} \rangle$ by computing for the inner product $\langle i_{x} \vert G^{k} \vert \gamma \rangle$ as follows
+\begin{align}
+\langle i_{x} \vert G^{k} \vert \gamma \rangle &= \langle i_{x}  \vert
+\left( \frac{1}{2} 
+\left(\frac{u}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \lambda_0^k + \lambda_1^k\right) \vert \gamma \rangle + 
+\left(\frac{\lambda_1^k - \lambda_0^k}{\sqrt{\vert u \vert^2 - 1}}\right) \vert i_{x} \rangle
+\right)\\
+&= \frac{1}{2} 
+\left(
+\left(\frac{u}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \lambda_0^k + \lambda_1^k\right) \langle i_{x} \vert \gamma \rangle + 
+\left(\frac{\lambda_1^k - \lambda_0^k}{\sqrt{\vert u \vert^2 - 1}}\right) \langle i_{x} \vert i_{x} \rangle
+\right)\\
+&= \frac{1}{2} 
+\left(
+\left(\frac{u}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \lambda_0^k + \lambda_1^k\right) u + 
+\left(\frac{\lambda_1^k - \lambda_0^k}{\sqrt{\vert u \vert^2 - 1}}\right) 1
+\right)\\
+&= \frac{1}{2} 
+\left(
+\left(\frac{u^2}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \left(\lambda_0^k + \lambda_1^k\right) u \right) + 
+\left(\frac{\lambda_1^k - \lambda_0^k}{\sqrt{\vert u \vert^2 - 1}}\right)
+\right)\\
+&= \frac{1}{2} 
+\left(
+\frac{u^2}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \left(\lambda_0^k + \lambda_1^k\right) u  - 
+\frac{\lambda_0^k - \lambda_1^k}{\sqrt{\vert u \vert^2 - 1}}
+\right)\\
+&= \frac{1}{2} 
+\left(
+\frac{u^2 - 1}{\sqrt{\vert u \vert^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \left(\lambda_0^k + \lambda_1^k\right) u
+\right)
+\end{align}
+Since 
+\[
+u = \langle i_{x} \vert \gamma \rangle = \sqrt{\frac{1}{N}}
+\]
+then
+\[
+\vert u \vert^2 = u^2
+\]
+Then
+\begin{align}
+\langle i_{x} \vert G^{k} \vert \gamma \rangle &=
+\frac{1}{2} 
+\left(
+\frac{u^2 - 1}{\sqrt{u^2 - 1}}\left(\lambda_0^k - \lambda_1^k \right) + \left(\lambda_0^k + \lambda_1^k\right)u
+\right)\\
+&=
+\frac{1}{2} 
+\left(
+\left(\lambda_0^k - \lambda_1^k \right)\sqrt{u^2 - 1} + \left(\lambda_0^k + \lambda_1^k\right)u
+\right)
+\end{align}
+By substitution
+\begin{align}
+u &= \sqrt{\frac{1}{N}}
+\end{align}
+the amplitude of the unknown target state $\vert i_{x} \rangle$ is then
+\begin{align}
+\langle i_{x} \vert G^{k} \vert \gamma \rangle &=
+\frac{1}{2} 
+\left(
+\left(\lambda_0^k - \lambda_1^k \right)\sqrt{\left(\sqrt{\frac{1}{N}}\right)^2 - 1} + \left(\lambda_0^k + \lambda_1^k\right) \sqrt{\frac{1}{N}}
+\right)\\
+&=
+\frac{1}{2} 
+\left(
+\left(\lambda_0^k - \lambda_1^k \right)\sqrt{\frac{1}{N} - 1} + \left(\lambda_0^k + \lambda_1^k\right) \sqrt{\frac{1}{N}}
+\right)
+\end{align}
+where
+\begin{align}
+\lambda_0 &= 1 - \frac{2}{N} - \frac{2}{N}\sqrt{1-N^2}\\
+\lambda_1 &= 1 - \frac{2}{N} + \frac{2}{N}\sqrt{1-N^2}
+\end{align}
+
+

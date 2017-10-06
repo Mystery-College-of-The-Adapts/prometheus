@@ -1,0 +1,139 @@
+In this chapter we present 
+
+In the analysis 
+
+
+
+
+In this chapter, we end the dissertation by providing some future research directions which are directly or indirectly of interest to the results in this work.
+
+
+From Chapter \ref{chap-note-delay} results, it is interesting to realize constructions for non-simple or non-homogeneous SNP systems. %nondeterministic SNP systems i.e. neurons having more than one applicable rule. %, since we only consider deterministic systems in this work. 
+Minimization of the number of neurons (likely, with a trade-off) of a $ \overline{\Pi}$ route simulating a $\Pi$ is also desirable, including providing bounds, e.g. the number of neurons, spikes. 
+
+
+From Chapter \ref{chap-note-aut}, we mention that in \cite{chen2008}, strict inclusions for the types of languages characterized by SNP systems with extended rules having one, two, and three neurons were given. 
+Then in \cite{snpmorph}, it was shown that there is no SNP transducer that can compute nonerasing  and nonlength preserving morphisms: for all $a \in \Sigma$, the former is a morphism $h$ such that $h(a) \neq \lambda$, while the latter is a morphism $h$ where $|h(a)| \geq 2$. 
+It is known (e.g. in \cite{allshall}) that the Thue-Morse morphism is given by $\mu(0) = 01$ and $\mu(1) = 10$. 
+It is interesting to further investigate SNP modules with respect to other classes of sequences, morphisms, and finite transition systems. 
+Another technical note is that in \cite{snpmorph} a time step without a spike entering or leaving the system was considered as a symbol of the alphabet, while in \cite{ibarra-on-snp} (and in this work) it was considered as $\lambda$. 
+
+We also leave as an open problem a more systematic analysis of input/output encoding size and system complexity: in the constructions for Theorems \ref{thm-snp-dfa-mio} to \ref{thm-dfst-snp-mio}, SNP modules consist of only one neuron for each module, compared to three neurons in the constructions of \cite{ibarra-on-snp}. However, the encoding used in our theorems is more involved, i.e. with multiplication and addition of indices (instead of simply addition of indices in \cite{ibarra-on-snp}).
+On the practical side, SNP modules might also be used for computing functions, as well as other tasks involving streams of (multiple) input-output transformations.
+Practical applications might include image modification or recognition, sequence analyses, online algorithms, et al.
+
+Some preliminary work on SNP modules and morphisms was given in \cite{acmc2012}.
+%\modnote{
+From finite sequences, it is interesting to extend SNP modules to infinite sequences.
+In \cite{snp-omega}, extended SNP systems %\footnote{or ESNP systems, in short, are generalizations of SNP systems almost to the point of becoming tissue P systems. ESNP systems are thus generalizations also of (and not to be confused with) SNP systems with extended rules.} 
+were used as acceptors in relation to $\omega$-languages.
+SNP modules could also be a way to ``go beyond Turing'' by way of \textit{interactive computations}, as in {interactive} components or transducers given in \cite{interact-book}.
+While the syntax of SNP modules may prove sufficient for these ``interactive tasks'', a change in the semantics is probably necessary.
+
+
+With the introduction of SNPSP systems in Chapter \ref{chap-snpsp}, we can have the following:
+The deadlock state does not seem to exist in nonsaving mode. Does this mean that saving mode is ``better'' than nonsaving mode? Both modes have the same expressiveness, but perhaps the (non)existence of a deadlock is useful for more practical purposes, e.g.  modeling or analysis of systems. For example, reaching a deadlock can be interpreted as reaching an unwanted state or fault in a network or system. This is an interesting theoretical and practical question. Deadlocks and other state types, as applied to modeling and analysis, have an extensive body of research in many graphical formalisms such as Petri nets \cite{murata}\cite{petri-lect}. Several works have related Petri nets, SNP systems, and other P systems. See for example \cite{cabarle-snp-petri} and references therein. Deadlock can also occur in systems in \cite{paun-astro}, inspiring the undecidability result in the chapter.
+
+
+Other parameter modifications of computational interest abound: what about parallel synapse creation-deletion? The semantics in Section \ref{SNPSP-sect} for $ \alpha \in \{\pm, \mp\}$ is sequential, requiring two time steps to perform such rules with such values for $ \alpha$. 
+We only list here a few other complexity parameters that can be used: the size of $syn$ during a computation, e.g. the number of synapses created (deleted), or  a bound on the size of $syn$ (related to synaptic homeostasis); in the universality proofs we had $ \alpha \in \{+,-, \pm\}$, so can we have universality with $ \alpha$ having at most two values only? Normal forms for ``standard'' SNPSP systems are interesting as well, as provided in this section are interesting.
+For example in \cite{norm-snpsp}, it is proven that two values for $\alpha$ suffice for universality.
+
+
+SNPSP systems and the proofs in Section \ref{universal-sect} are reminiscent of the more generalized extended SNP systems\footnote{Not to be confused with SNP systems using (or with) extended rules.} in \cite{alhazov} which, due to their generality, have produced impressive computability results but lacks biological motivations.\footnote{Personal communications with Rudolf Freund, 13th Brainstorming Week in Membrane Computing, Sevilla, Spain, 2 to 6 February 2015.}
+ Investigations  of ESNP and SNPSP systems further seems interesting, especially since the former are generalized versions of SNP systems while the latter are more restricted but with bio-inspirations. 
+More recently, SNP systems with rules on synapses were shown to be universal \cite{synrules}. In these systems, neurons are only spike repositories, and the spike processing (including nondeterminism) are done in the synapses. Investigating theoretical or practical usefulness of such systems, together with structural plasticty, is also interesting.
+Perhaps Hebbian SNP systems in \cite{snp-hebb} and as mentioned in Section \ref{sect-ncaa1-intro} could be combined with SNPSP systems, thereby providing a framework which includes both functional and structural plasticity.
+This combined framework could perhaps be further investigated along the lines of, among others, machine learning.
+
+SNPSP systems equipped with input and one output neurons can be used as transducers, to compute (in)finite strings as in \cite{snpmorph}. 
+Furthermore, SNPSP systems with multiple inputs or outputs are also interesting, for computing strings or vectors of numbers as in \cite{alhazov} again.
+
+
+
+
+From the sequential SNPSP systems in  Chapter \ref{chap-snpsp-seq}, it is also interesting to consider the notion of homogeneous systems. 
+In \cite{Jiang-hsnp-maxs} for example, two types of neurons are enough for universality: one for $maxs$, and another for $maxps$. 
+It is then proved that homogeneous SNP (HSNP) systems as acceptors and generators are universal in both modes. 
+Since neurons are homogeneous, the connectivity of the neurons is important.
+For SNPSP systems, perhaps a pseudo-homogeneous construction is reasonable, where only the set $N$ is different among rules of neurons. %as follows: since the set $N$ of each plasticity rule cannot be equal 
+
+
+
+In asynchronous SNPSP systems from Chapter \ref{chap-snpsp-asyn}, it is interesting to realize the computing power of asynchronous unbounded (in spikes) SNPSP systems, since we know that bounded ones are not universal.
+Again, checking the regular expressions in these systems is interesting.
+It can be argued that when $\alpha \in \{ \pm, \mp \}$, the synapse creation (resp., deletion) immediately followed by a synapse deletion (resp., creation) is another form of synchronization.
+Can asynchronous WSNPSP systems maintain their computing power, if we further restrict them by removing such semantic?
+Another interesting question is as follows: in the ADD module in Theorem \ref{thm-asyn-weight-snpsp}, we have $nd_{syn}$.
+Can we still maintain universality if we remove this level, so that  $nd_{neur}$ in $asyn$ mode is the only source of nondeterminism?
+In \cite{asyn-snp} for example, the modules used $asyn$ mode and $nd_{rule}$, while in \cite{asyn-loc}, only $asyn$ mode  was used (but with the use of a new ingredient called local synchronization).
+
+In Theorem \ref{thm-asyn-weight-snpsp}, the construction is based on the value $|S_r|$.
+Can we have a uniform construction while maintaining universality?
+i.e. can we construct a $\Pi$ such that $N(\Pi) = NRE$, but is independent on the number of $\mathtt{SUB}$ instructions of $M$?
+Then perhaps parameters $m$ and $l$  in Theorem \ref{thm-asyn-weight-snpsp} can be reduced.
+
+
+
+From Chapter \ref{chap-apps}, it is interesting to ask other ways to encode instances of other  \textbf{NP}-complete  problems for (non)deterministic synapse selection. 
+
+In computer science we work to have efficient solutions, seeking minimal parameters. 
+However, and as we mentioned Chapter \ref{chap-snp}, biology is usually not space efficient: there are billions of neurons, each with thousands of synapses in our brains. 
+So the semi-uniform solution may not immediately appeal to our search for minimal parameters, but it seems biologically appealing. 
+Depending on the instance to be solved, the number of neurons for example (and possibly the spikes and synapses) in ${\Pi}_{\mathtt{ss}}$ can be exponential with respect to the instance size.
+The uniform solution can use much fewer neurons than the semi-uniform solution, but again, both presented solutions are nondeterministic.
+How can we use plasticity rules to provide deterministic solutions?
+Again, adding the constraint that our solution must be deterministic, it is likely that we must pay the price of ``space'' i.e. exponential number of neurons in the system.
+Confluent solutions are also desirable, especially with the interest of simulating or implementing solutions with traditional hardware or software.
+
+
+From the above mentioned problems directly related to the results in this work, much is left to be investigated for SNPSP systems.
+We here only list a few  established results in membrane computing and SNP systems which can be applied to SNPSP systems: 
+investigating the type of regular expression in (e.g. sequential, asynchronous) standard or plasticity rules used, e.g. bounded, unbounded, or general rules as in \cite{asyn-snp} and \cite{asyn-loc};
+constructing small universal systems, another active line of investigation in models of computation, as in \cite{snp-small-univer}, \cite{paun-paun} and \cite{simple-snp-weights};
+this dissertation focused on the generating or accepting of numbers, but another well investigated area in SNP systems and its many variants is generating or accepting languages as in \cite{chen2008}\cite{snp-omega}\cite{hand-snp};
+%control languages 
+%normal forms,
+the processing of (in)finite sequences, similar to SNP transducers as in \cite{spike-train};
+%generating vectors of numbers;
+the exhaustive use of rules (maximal parallelism) as in \cite{pan-zeng-small-exhaust}. 
+
+We also emphasize that most results in this dissertation on SNPSP systems, regardless of semantics or mode, operated under in nonsaving mode.
+Further investigation on this semantic for SNPSP systems, among other semantics, seems interesting to apply to the open problems mentioned above.
+The idea of using semantics rather than syntax, as another frontier for tractability, has recently been raised in the recently concluded Brainstorming Week on Membrane Computing 2015.\footnote{See also the related presentation in \url{http://www.gcn.us.es/files/bwmc2015_gutierrez.pdf}.}
+It is also interesting to investigate the possibility of hierarchies in SNP and SNPSP systems, whether universal or not, depending on parameters mentioned here or otherwise.
+For example the techniques in \cite{ibarra-hierarchy} could be used for other P systems other than those considered in the article (restricted communicating P systems).
+Creation of a synapse is analogous to opening a ``communication channel'' between two neurons, while deleting synapses is analogous to removing a channel.
+In several of the proofs presented here using SNPSP systems, in certain cases plasticity rules can operate similar to a forgetting rule or a rule with delay.
+An interesting line of investigation is to provide a more systematic analysis and simulation (perhaps structurally or behaviourally) between plasticity rules, spiking rules (with or without delays), and forgetting rules (among other features).
+
+%On structural and behavioural issues of several types of rules
+
+
+%For further applications, 
+SNPSP systems could also be investigated together with arithmetic operations as in \cite{snp-arithm}.
+Recently, SNPSP systems were used to simulate Boolean circuits in \cite{snpsp-ckt}.
+%Another model of computation that is rich in theoretical as well as practical results is the Petri net \cite{petri-lect}.
+%Petri nets share many common semantics with SNP systems and have been investigated with SNP systems and other P systems, as in \cite{cabarle-snp-petri} and references therein. 
+Since the connectivity of neurons in SNPSP systems is important, a more systematic study of the (non)existence and effects (e.g. on the computing power, applications) of cycles or loops in the system graph also seems promising theoretically and practically.
+Perhaps SNPSP systems, with certain modifications in syntax and semantics, could be applied to networks (e.g. traffic) where switching between several routes or options is common.
+The switching could be considered as a (non)deterministic selection of which synapse (or route, path etc.) to connect or disconnect.
+Further investigations also on SNPSP systems can also provide ideas on their linear algebra properties.
+The graphics processing unit simulators in \cite{snpgpu-cmc} and \cite{snpgpu-romjist} for example, are based on the work in \cite{snpmatlncs}.
+In \cite{snpmatlncs}, SNP systems without delays, their configurations, and computations, were represented as matrices, vectors, and linear algebra operations.
+
+
+%Time free solutions.
+%Small universal.
+%Language generators or acceptors.
+
+
+%Unconventional Computation and Natural Computation, Lecture Notes in Computer Science 2014, pp 379-391, âDevelopment of Physical Super Turing Analog Hardwareâ. A. Steven Younger, Emmett Redd, Hava Siegelmann
+
+We end this dissertation with the firm belief, first mentioned in Chapter \ref{chap-intro}, that  much inspiration from nature still remains, with the goal of moving the human condition forward.
+%We end this dissertation with the 
+%The final line in this work is  
+Quoting the final line in ``Computing Machinery and Intelligence'' by A.M. Turing (published in \textit{Mind}, 59, pp. 433-460, 1950):
+%\begin{centering}
+\textit{``We can only see a short distance ahead, but we can see plenty there that needs to be done.''}
+%\end{centering}

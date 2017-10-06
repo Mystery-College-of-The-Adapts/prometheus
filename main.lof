@@ -1,0 +1,19 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4.1}{\ignorespaces A 2-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text {T}[i+j]$ and $\text {P}[j]$ assuming $\delimiter "026A30C \Sigma \delimiter "026A30C =2$ for example purposes. The top qubit is initialized in state $\delimiter "026A30C \Sigma ^\phi (\text {T}[i+j]) \delimiter "526930B $ and the next qubit is initialized in state $\delimiter "026A30C \Sigma ^\phi (\text {P}[j]) \delimiter "526930B $. The bottom two qubits serve as ancillary bits for keeping the results of comparison and are initialized in state $\delimiter "026A30C 1 \delimiter "526930B $. The bottommost qubit serves as a binary indicator and is put into state $\delimiter "026A30C 1 \delimiter "526930B $ if symbols $\text {T}[i+j]$ and $\text {P}[j]$ do not match and $-\delimiter "026A30C 1 \delimiter "526930B $ otherwise. The circuit can be extended to accommodate larger $\delimiter "026A30C \Sigma \delimiter "026A30C $ by adding qubits to the substring, pattern and ancillary register.\relax }}{9}{figure.caption.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {figure}{\numberline {4.2}{\ignorespaces A 4-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text {T}[i+j]$ and $\text {P}[j]$ assuming $\delimiter "026A30C \Sigma \delimiter "026A30C =4$ for example purposes. The top two qubits are initialized in state $\delimiter "026A30C \Sigma ^\phi (\text {T}[i+j]) \delimiter "526930B $ and the next two qubits are initialized in state $\delimiter "026A30C \Sigma ^\phi (\text {P}[j]) \delimiter "526930B $. The bottom three qubits serve as ancillary qubits for holding the results of comparison and are initialized in state $\delimiter "026A30C 1 \delimiter "526930B $. The bottommost qubit serves as a binary indicator and is put into state $\delimiter "026A30C 1 \delimiter "526930B $ if the symbols do not match and into state $-\delimiter "026A30C 1 \delimiter "526930B $ otherwise.\relax }}{10}{figure.caption.10}
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }
+\defcounter {refsection}{0}\relax 
+\addvspace {10\p@ }

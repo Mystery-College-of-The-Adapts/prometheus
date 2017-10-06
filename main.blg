@@ -1,0 +1,9 @@
+[0] Config.pm:318> INFO - This is Biber 1.8
+[0] Config.pm:321> INFO - Logfile is 'main.blg'
+[75] biber-darwin:275> INFO - === Fri Oct  6, 2017, 15:02:14
+[75] Biber.pm:333> INFO - Reading 'main.bcf'
+[147] Biber.pm:630> INFO - Found 30 citekeys in bib section 0
+[180] Biber.pm:3053> INFO - Processing section 0
+[210] Biber.pm:3190> INFO - Looking for bibtex format file 'Reference/qpm.bib' for section 0
+[822] Utils.pm:185> ERROR - Cannot find 'Reference/qpm.bib'!
+[822] Biber.pm:109> INFO - ERRORS: 1

@@ -1,0 +1,235 @@
+\chapter{Circuit design}
+\label{app:circuits}
+
+\section{Operator $U_{\mathrm{Loc}}$}
+\label{app:ULoc}
+Given the input instance where text $\text{T}=abccabcd$, pattern $\text{P}=abcd$ and distance threshold $d=2$, we construct the unitary matrix for the $U_{\mathrm{Loc}}$ operator as
+\begin{align*}
+	U_{\mathrm{Loc}} = \kbordermatrix{
+		   &                -                  &                 +                \\
+		-  &  U_{\mathrm{Loc}}^- &                  0                \\
+		+ &                0                 &  U_{\mathrm{Loc}}^+ \\
+	}
+\end{align*}
+where
+\begin{align*}
+	U_{\mathrm{Loc}}^+ = \kbordermatrix{
+		      & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7\\
+		0 &  U_{\mathrm{Loc_0}}^+ &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		1 &  0   &  U_{\mathrm{Loc_1}}^+   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		2 &  0   &  0   &  U_{\mathrm{Loc_2}}^+   &  0   &  0   &  0   &  0   &  0  \\
+		3 &  0   &  0   &  0   &  U_{\mathrm{Loc_3}}^+   &  0   &  0   &  0   &  0  \\
+		4 &  0   &  0   &  0   &  0   &  U_{\mathrm{Loc_4}}^+   &  0   &  0   &  0  \\
+		5 &  0   &  0   &  0   &  0   &  0   &  U_{\mathrm{Loc_5}}^+   &  0   &  0  \\
+		6 &  0   &  0   &  0   &  0   &  0   &  0   &  U_{\mathrm{Loc_6}}^+   &  0  \\
+		7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  U_{\mathrm{Loc_7}}^+  \\
+	}
+\end{align*}
+and the elements of the diagonal are defined as follows,
+\begin{align*}
+	U_{\mathrm{Loc_0}}^+ = \kbordermatrix{
+		      & 0,0 & 0,1 & 0,2 & 0,3 & 0,4 & 0,5 & 0,6 & 0,7\\
+		0,0 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		0,1 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		0,2 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		0,3 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		0,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		0,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		0,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		0,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\
+	}
+	U_{\mathrm{Loc_1}}^+ = \kbordermatrix{
+		      & 1,0 & 1,1 & 1,2 & 1,3 & 1,4 & 1,5 & 1,6 & 1,7\\
+		1,0 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		1,1 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		1,2 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		1,3 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		1,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		1,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		1,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		1,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\ 
+	}
+\end{align*}
+\begin{align*}
+	U_{\mathrm{Loc_2}}^+ = \kbordermatrix{
+		      & 2,0 & 2,1 & 2,2 & 2,3 & 2,4 & 2,5 & 2,6 & 2,7\\
+		2,0 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		2,1 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		2,2 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		2,3 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		2,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		2,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		2,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		2,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\
+	}
+	U_{\mathrm{Loc_3}}^+ = \kbordermatrix{
+		      & 3,0 & 3,1 & 3,2 & 3,3 & 3,4 & 3,5 & 3,6 & 3,7\\
+		3,0 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		3,1 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		3,2 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		3,3 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		3,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		3,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		3,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		3,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\ 
+	}
+\end{align*}
+\begin{align*}
+	U_{\mathrm{Loc_4}}^+ = \kbordermatrix{
+		      & 4,0 & 4,1 & 4,2 & 4,3 & 4,4 & 4,5 & 4,6 & 4,7\\
+		4,0 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		4,1 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		4,2 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		4,3 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		4,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		4,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		4,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		4,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\
+	}
+	U_{\mathrm{Loc_5}}^+ = \kbordermatrix{
+		      & 5,0 & 5,1 & 5,2 & 5,3 & 5,4 & 5,5 & 5,6 & 5,7\\
+		5,0 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		5,1 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		5,2 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		5,3 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		5,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		5,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		5,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		5,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\ 
+	}
+\end{align*}
+\begin{align*}
+	U_{\mathrm{Loc_6}}^+ = \kbordermatrix{
+		      & 6,0 & 6,1 & 6,2 & 6,3 & 6,4 & 6,5 & 6,6 & 6,7\\
+		6,0 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		6,1 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		6,2 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		6,3 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		6,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		6,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		6,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		6,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\
+	}
+	U_{\mathrm{Loc_7}}^+ = \kbordermatrix{
+		      & 7,0 & 7,1 & 7,2 & 7,3 & 7,4 & 7,5 & 7,6 & 7,7\\
+		7,0 &  0   &  0   &  0   &  1   &  0   &  0   &  0   &  0  \\
+		7,1 &  0   &  1   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		7,2 &  0   &  0   &  1   &  0   &  0   &  0   &  0   &  0  \\
+		7,3 &  1   &  0   &  0   &  0   &  0   &  0   &  0   &  0  \\
+		7,4 &  0   &  0   &  0   &  0   &  1   &  0   &  0   &  0  \\
+		7,5 &  0   &  0   &  0   &  0   &  0   &  1   &  0   &  0  \\
+		7,6 &  0   &  0   &  0   &  0   &  0   &  0   &  1   &  0  \\
+		7,7 &  0   &  0   &  0   &  0   &  0   &  0   &  0   &  1  \\ 
+	}
+\end{align*}
+The matrix for $U_{\mathrm{Loc}}^-$ is just an identity matrix since $i_k = 0,\ldots,N-1$ for all indices $i_k$ in T where $count(i_k) > 0$. The vector for superposition state $\vert \psi_{\mathrm{init}} \rangle$ will be a $\left(2^n \times 2^{n+1}\right) \times 1$ vector where the first half, i.e. first $2^{2n}$ elements, will be composed of zeros and the second half, i.e. last $2^{2n}$ elements, will be composed of the tensor of the basis vectors for states $\vert i \rangle\vert 0 \rangle, i=0,\ldots,N-1$.
+
+\section{Operator $U_{\mathrm{Sub}}$}
+\label{app:USub}
+The unitary operator $U_{\mathrm{Sub}}$ is basically a quantum adder operator. The design of the quantum adder operator used in this work is based on the works of Vedral et. al. in \cite{Barenco1996} regarding quantum circuits for elementary arithmetic operations. A 1-qubit quantum adder circuit is shown in Figure~\ref{fig:1-qubit-quantum-adder}. A sequence of two 1-qubit adders in Figure~\ref{fig:1-qubit-quantum-adder}  make up a 2-qubit quantum adder shown in Figure~\ref{fig:2-qubit-quantum-adder}.
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \lstick{\vert c_1 \rangle}				&	\qw		& 	\qw  		& \ctrl{2}   	& \ctrl{2} 	&	\qw 		& \qw & \rstick{\vert c_1 \rangle} \\
+				& \lstick{\vert a_1 \rangle}				& 	\ctrl{1}	&	\ctrl{1}	& \qw 		& \qw 		&	\qw 		& \qw & \rstick{\vert a_1 \rangle} \\
+				& \lstick{\vert b_1 \rangle}	      		& 	\ctrl{1}	&	\targ 		& \ctrl{2}	& \targ		&	\qw 		& \qw & \rstick{\vert( a_1 + b_1)\ mod\ 2 \rangle} \\
+				& \lstick{\vert \alpha0_1 \rangle}	 	& 	\targ		&	\qw		& \qw		& \qw		&	\ctrl{1}	& \qw &	\rstick{\vert a_1 \wedge b_1 \rangle} \\
+				& \lstick{\vert \alpha1_1 \rangle} 		&	\qw		&	\qw		& \targ		& \qw		& 	\targ		& \qw &	\rstick{\vert c_2 \rangle} 
+			}		
+		\]
+	\end{minipage}
+	\caption{The first half of a circuit for a 1-qubit quantum adder. Input $c_1$ is an input carry bit, $a_1$ and $b_1$ are input addend bits, $\alpha0_1$ is a scratch bit while $\alpha1_1$ is a result carry bit. The sum of bits $a_1$ and $b_1$ are stored into the state of bit $b_1$. The second half of the circuit is a vertical reflection of the first half for cleaning scratch bits. The initial value of bits $\alpha0_1$ and $\alpha1_1$ is 0.}
+	\label{fig:1-qubit-quantum-adder}
+\end{figure}
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \lstick{\vert c_1 \rangle}				&	\qw		& 	\qw  		& \ctrl{3}   	& \ctrl{3} 	&	\qw 		& \qw 		& 	\qw 		&	\qw		&	\qw		& \qw 		& \qw &	\rstick{\vert c_1 \rangle}\\
+				& \lstick{\vert a_1 \rangle}				& 	\ctrl{2}	&	\ctrl{2}	& \qw 		& \qw 		&	\qw 		& \qw 		& 	\qw 		&	\qw		&	\qw		& \qw 		& \qw &	\rstick{\vert a_1 \rangle}\\
+				& \lstick{\vert a_2 \rangle}				&	\qw		&	\qw		& \qw		& \qw		&	\qw		& \ctrl{2} 	&	\ctrl{2} 	&	\qw		&	\qw		& \qw 		& \qw &	\rstick{\vert a_2 \rangle}\\					
+				& \lstick{\vert b_1 \rangle}	      		& 	\ctrl{2}	&	\targ 		& \ctrl{3}	& \targ		&	\qw 		& \qw 		& 	\qw		&	\qw		&	\qw		& \qw 		& \qw &	\rstick{\vert (a_1 + b_1 + c_1)\ mod\ 2\rangle} \\
+				& \lstick{\vert b_2 \rangle}	      		& 	\qw		&	\qw 		& \qw		& \qw		&	\qw 		& \ctrl{3} 	& 	\targ		&	\ctrl{2}	&	\targ		& \qw 		& \qw &	\rstick{\vert (a_2 + b_2 + c_2)\ mod\ 2\rangle} \\
+				& \lstick{\vert \alpha0_1 \rangle} 	& 	\targ		&	\qw		& \qw		& \qw		&	\ctrl{1}	& \qw 		&	\qw		&	\qw		&	\qw		& \qw 		& \qw &	\rstick{\vert a_1 \wedge b_1 \rangle} \\
+				& \lstick{\vert \alpha1_1 \rangle} 	&	\qw		&	\qw		& \targ		& \qw		& 	\targ		& \qw 		&	\qw		&	\ctrl{2}	&	\ctrl{-2}	& \qw 		& \qw &	\rstick{\vert c_2 \rangle} \\
+				& \lstick{\vert \alpha0_2 \rangle} 	& 	\qw		&	\qw		& \qw		& \qw		&	\qw		& \targ 		&	\qw		&	\qw		&	\qw		& \ctrl{1} 	& \qw &	\rstick{\vert a_2 \wedge b_2 \rangle} \\
+				& \lstick{\vert \alpha1_2 \rangle} 	&	\qw		&	\qw		& \qw		& \qw		& 	\qw		& \qw 		&	\qw		&	\targ		&	\qw		& \targ	 	& \qw &	\rstick{\vert c_3 \rangle} \gategroup{1}{2}{7}{7}{.9em}{--} \gategroup{3}{8}{9}{13}{.9em}{--}
+			}		
+		\]
+	\end{minipage}
+	\caption{The first half of a circuit for a \textit{2}-qubit quantum adder. The circuit is composed of 1-qubit quantum adders in Figure~\ref{fig:1-qubit-quantum-adder}. The second half of the circuit is a vertical reflection of the first half for cleaning scratch bits. The initial value of bits $\alpha0_i$ and $\alpha1_i$ is 0,$i=1,2$.}
+	\label{fig:2-qubit-quantum-adder}
+\end{figure}
+A general \textit{n}-qubit quantum adder will be composed of cascading 1-qubit quantum adders as in a 2-qubit adder.
+
+Since operator $U_{\mathrm{Sub}}$ subtracts the values $\gamma(\text{T}[i])$ from their corresponding indices $i$, we need to represent each value $\gamma(\text{T}[i])$ as a negative number. We do so by representing each value $\gamma(\text{T}[i])$ in 2's-complement notation with the last qubit of register B as the sign qubit. We let register B be acted upon by a complementing operator prior to application of operator $U_{\mathrm{Sub}}$ to start register and index register. We design the complementing operator as shown in Figure~\ref{fig:2s-complement-circuit}. The complete circuit for the $U_{\mathrm{Sub}}$ will be as shown in Figure~\ref{fig:USub-circuit}.
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \lstick{\vert 1 \rangle} 		& \qw 		& \multigate{7}{\mathrm{Adder}}	& \qw	& \rstick{\vert 1 \rangle}\\
+				& \lstick{\vert 0 \rangle} 		& \qw		& \ghost{Adder}				& \qw	& \rstick{\vert 0 \rangle} \\
+				& \lstick{\vdots} 	& \qw		& \ghost{Adder}				& \qw	& \rstick{\vdots} \\
+				& \lstick{\vert 0 \rangle} 		& \qw		& \ghost{Adder}				& \qw	& \rstick{\vert 0 \rangle} \\
+				& \lstick{\vert \beta_1 \rangle}	& \gate{X}		& \ghost{Adder}				& \qw	& \quad \\
+				& \lstick{\vert \beta_2 \rangle} 	& \gate{X}		& \ghost{Adder}				& \qw	& \quad \\
+				& \lstick{\vdots} 	& \gate{X}		& \ghost{Adder} 				& \qw	& \ustick{\quad\quad\quad\quad -\vert \beta \rangle} \\
+				& \lstick{\vert \beta_n \rangle} 	& \gate{X}		& \ghost{Adder}				& \qw	& \quad \gategroup{5}{6}{8}{6}{.7em}{\}}
+			}
+		\]
+	\end{minipage}
+	\caption{A quantum circuit for a 2's-complement operator. The input to the circuit are the number to complement, $\beta$, and the binary value of 1. The complement of the input number represents its negative value, $-\beta$.}
+	\label{fig:2s-complement-circuit}
+\end{figure}
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+							&  				& \multigate{7}{\mathrm{2's\ complement}}	& \qw						& \qw	& \\
+							& 		 		& \ghost{2's\ complement}				& \qw						& \qw	& \\
+				\ustick{\vert 1 \rangle\quad}	&			 	& \ghost{2's\ complement}				& \qw						& \qw	& \ustick{\quad \vert 1 \rangle} \\
+							& 		 		& \ghost{2's\ complement}				& \qw						& \qw	& \\
+							& 				& \ghost{2's\ complement}				& \multigate{11}{\mathrm{Adder}}	& \qw 	& \\
+							&  				& \ghost{2's\ complement}				& \ghost{\mathrm{Adder}}		& \qw 	& \\
+			\ustick{\vert \beta \rangle \quad} 	&  				& \ghost{2's\ complement} 				& \ghost{\mathrm{Adder}}		& \qw 	& \ustick{\quad\quad\quad\vert \alpha - \beta \rangle} \\				
+							&  				& \ghost{2's\ complement}				& \ghost{\mathrm{Adder}}		& \qw 	& \\
+							& 				& \qw								& \ghost{\mathrm{Adder}}		& \qw 	& \\
+							& 				& \qw								& \ghost{\mathrm{Adder}}		& \qw 	& \\
+			\ustick{\vert \alpha \rangle \quad}	&			 	& \qw								& \ghost{\mathrm{Adder}}		& \qw 	& \ustick{\quad\vert \alpha \rangle} \\
+							& 				& \qw								& \ghost{\mathrm{Adder}}		& \qw 	& \\
+							& 				& \qw								& \ghost{\mathrm{Adder}}		& \qw 	& \\
+							& 				& \qw								& \ghost{\mathrm{Adder}}		& \qw 	& \\
+				\ustick{\vert 0 \rangle\quad}	& 				& \qw								& \ghost{\mathrm{Adder}}		& \qw 	& \ustick{\quad \vert 0 \rangle} \\
+							& 				& \qw								& \ghost{\mathrm{Adder}}		& \qw 	&. \gategroup{5}{5}{8}{5}{.7em}{\}} \gategroup{1}{2}{4}{2}{.7em}{\{} \gategroup{1}{5}{4}{5}{.7em}{\}} \gategroup{5}{2}{8}{2}{.7em}{\{} \gategroup{9}{2}{12}{2}{.7em}{\{} \gategroup{9}{5}{12}{5}{.7em}{\}} \gategroup{13}{2}{16}{2}{.7em}{\{} \gategroup{13}{5}{16}{5}{.7em}{\}} 
+			}
+		\]
+	\end{minipage}
+	\caption{A high-level circuit for operator $U_{\mathrm{Sub}}$ composed of 2's-complement operator and Adder operator.}
+	\label{fig:USub-circuit}
+\end{figure}
+
+\section{Operator $U_{\mathrm{Mark}}$}
+Operator $U_{\mathrm{Mark}}$ is a unitary operator which marks candidate starting indices of P represented as $\vert i \rangle$ with a negative amplitude phase. The decision on whether to mark an index or not is based on the output of an initial unitary operator which we denote as $C$. This operator is a quantum comparator which compares two input values $x$ and $y$ \cite{Thapliyal2010}. Two binary indicator bits, initially in state $\vert 0 \rangle$, are used to represent the result of its computation. The first bit is put into state $\vert 1 \rangle$ if $x > y$. The second bit is put into state $\vert 1 \rangle$ otherwise. We let $x = i_{\mathrm{mis}}$ and $y=d$. We use the output of the first qubit as trigger for application of a Pauli-Z operator into the state $\vert i \rangle$. A high-level schema of the $U_{\mathrm{Mark}}$ is shown in Figure~\ref{fig:UMark-circuit}
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1.25em {
+				& \lstick{\vert i_{\mathrm{ham}} \rangle}	& \multigate{3}{C}& \qw			& \qw	& \rstick{\vert i_{\mathrm{ham}} \rangle}\\
+				& \lstick{\vert d \rangle} 						& \ghost{C}			& \qw			& \qw	& \rstick{\vert d \rangle}\\
+				& \lstick{\vert 0 \rangle} 					& \ghost{C}					&	\ctrlo{2}		&	\qw	& \rstick{\vert q_1^{\prime} \rangle}\\
+				& \lstick{\vert 0 \rangle} 					& \ghost{C}					& \qw			&	\qw	&	\rstick{\vert q_2^{\prime} \rangle}\\
+				& \lstick{\vert i \rangle}							&	\qw					&	\gate{Z}	& \qw	& \rstick{(-1)^{f(i_{\mathrm{ham}},d)}\vert i \rangle}
+			}
+		\]
+	\end{minipage}
+	\caption{A high-level schema for the implementation of operator $U_{\mathrm{Mark}}$. Operator $C$ corresponds to a binary tree structure-based quantum comparator circuit in \cite{Thapliyal2010}. Operator $Z$ is a Pauli-Z operator triggered by a state $\vert  0\rangle$ of qubit $q_1$. Phase of amplitude of state $\vert i \rangle$ of input index register is shifted to $-$ if $i_{\mathrm{ham}} \leq d$.}
+	\label{fig:UMark-circuit}
+\end{figure}
+
+

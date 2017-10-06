@@ -1,2 +1,42 @@
-\section{String Section}
-STRING SECTION.
+The String Matching Problem is generalized into the \textit{exact} string matching and \textit{approximate} string matching variants. In exact string matching, exact copies of a shorter sequence of symbols (pattern) need to be found in a much longer sequence of symbols (text) but the criteria of a match is defined specific to the application of interest \cite{Baker1993,Amir1995}. In approximate string matching a distance metric is defined for measuring nearness of a candidate match, \textit{i.e. Hamming distance, Edit distance}, and all text locations satisfying an mismatch count threshold, \textit{distance}, are returned as solution.
+
+We first define some convention on the notations which we will use in this work. The following is a list of notations we will use throughout this document. 
+\begin{itemize}
+	\item $\Sigma$ - alphabet; set of symbols in which the pattern and text are defined
+	\item $\vert \Sigma \vert$ - the size of $\Sigma$
+	\item T - text; a long sequence of symbols from which we will search a shorter sequence of symbols
+	\item \textit{N} - the length of T
+	\item $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ - an \textit{M}-length subsequence of T starting at index \textit{i}
+	\item P - pattern; a much shorter sequence of symbols which we need to find from the text
+	\item \textit{M} - the length of P
+	\item $\mathrm{P}_{\Sigma}$ - alphabet of P; the set of all distinct symbols in P
+\end{itemize}
+
+In the exact string matching a text T and a pattern P is given as input and the task is to find an exact copy, or copies, of P in T. The output of an algorithm solving the exact string matching problem is the index, or indices, in T in which an exact copy of P occurs. Formally, this problem is defined as follows:\newline
+\newline
+	\textbf{Exact String Matching Problem} \\
+	\begin{tabular}{ l  p{10cm}}
+		\textit{Input:} & alphabet $\Sigma$, text $\mathrm{T} \in \Sigma^N$, pattern $\mathrm{P} \in \Sigma^M$\\
+		\textit{Output:} & an index \textit{i} where $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]=\mathrm{P}$
+	\end{tabular}\newline
+	
+On the other hand, in approximate string matching the task is to find copies of P in T which may have some mismatches up to some defined threshold distance \textit{d}. Variants of this problem may require returning only the first or all solution indices in T. Formally this problem is defined as follows:\newline
+\newline	
+	\textbf{Approximate String Matching Problem}\\
+	\begin{tabular}{ l  p{10cm}}
+		\textit{Input:} & alphabet $\Sigma$, text $\mathrm{T} \in \Sigma^N$, pattern $\mathrm{P} \in \Sigma^M$, threshold distance $d < M,N$ defined with respect to some distance metric $Dist(\cdot,\cdot)$\\
+		\textit{Output:} & an index \textit{i} where $Dist(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1],\mathrm{P}) \leq d$
+	\end{tabular}\newline
+
+Several distance metrics has been designed to model different problems of applications of the approximate string matching problem. In this thesis, we use a more basic distance metric, called \textit{Hamming distance} for quantifying the distance between any \textit{M}-length subsequence of T and P. Given a subsequence $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ and P, the Hamming distance between the two sequences in denoted as $H\left( \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1], P \right)$ and is defined as
+\[
+	H\left( \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1], P \right) = \sum_{j=0}^{M-1} \delta(j)
+\] 
+where $\delta(\cdot)$ is a function given by
+\[
+	\delta(j)=
+	\begin{cases}
+		1, & \text{if}\ \mathrm{P}[j] = \mathrm{T}[i+j]\\
+		0, & \text{otherwise}.
+	\end{cases}
+\]

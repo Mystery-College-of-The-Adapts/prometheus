@@ -1,0 +1,59 @@
+\boolfalse {citerequest}\boolfalse {citetracker}\boolfalse {pagetracker}\boolfalse {backtracker}\relax 
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Acknowledgements}{iv}{chapter*.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{Abstract}{v}{chapter*.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{List of Figures}{ix}{chapter*.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{List of Tables}{x}{chapter*.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {part}{I\hspace {1em}Preliminaries}{2}{part.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {2}String matching}{3}{chapter.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {3}Quantum computing}{4}{chapter.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {part}{II\hspace {1em}Body of Work}{5}{part.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {4}An oracle design for Grover's quantum search algorithm for exact string matching}{6}{chapter.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.1}Problem}{6}{section.4.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.2}Idea}{6}{section.4.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.3}Contributions}{6}{section.4.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.4}Notation}{7}{section.4.4}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.5}Quantum registers}{7}{section.4.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.6}Oracle operator $U_{g}$}{8}{section.4.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.7}Correctness}{13}{section.4.7}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.8}Complexity}{14}{section.4.8}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.8.1}Time}{14}{subsection.4.8.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.8.2}Space}{15}{subsection.4.8.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.8.3}Gate}{15}{subsection.4.8.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {4.9}Simulation}{16}{section.4.9}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.9.1}Increasing N}{16}{subsection.4.9.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.9.2}Increasing M}{16}{subsection.4.9.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsection}{\numberline {4.9.3}Increasing $\delimiter "026A30C \Sigma \delimiter "026A30C $}{16}{subsection.4.9.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {5}Convolution-based algorithm for approximate string matching}{17}{chapter.5}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {6}Filtering-based algorithm for approximate string matching}{18}{chapter.6}
+\defcounter {refsection}{0}\relax 
+\contentsline {part}{III\hspace {1em}Final Remarks}{19}{part.3}
+\defcounter {refsection}{0}\relax 
+\contentsline {chapter}{\numberline {7}Conclusions}{20}{chapter.7}

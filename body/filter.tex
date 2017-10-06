@@ -1,1 +1,1132 @@
-FILTER CHAPTER.
+In the previous two chapters we presented quantum algorithms which tried to find exact or approximate copies of P in T in the whole search space $\{0,\ldots,N-1\}$. In this chapter we present a quantum algorithm for minimizing the search space by removing elements of the space which do not satisfy a specific criteria. We present a quantum algorithm for the approximate string matching problem which outputs an index \textit{i} in T satisfying the distance threshold requirement with probability directly proportional to the number of matching distinct symbols in P and the substring of T. We use the alphabet $\Sigma=\{a,b,c,d\}$, text $\text{T}= abccabcd$, pattern $\text{P}= abcd$, and distance threshold $d=1$ all throughout this chapter for illustration purposes.
+
+\todo{list explicit contributions}
+
+%The quantum algorithm presented in Chapter \ref{chapter:quantum-convolution} is better suited for instances of the approximate string matching problem in which the size of $\Sigma$ is small since the initial quantum superposition states need to be initialized for T and P for each symbol $\sigma \in \Sigma$. In this chapter we present a quantum algorithm which assumes a an alphabet of large size and a pattern P reach in symbols from $\Sigma$. We use the alphabet $\Sigma=\{a,b,c,d\}$, text $\text{T}= dcbcbaa$, pattern $\text{P}= cbad$ and distance threshold $d=1$ all through out this chapter for illustration purposes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Filtering phase %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Filtering phase}\label{sec:filtering-phase}
+\section{Preliminary: A classical filtering algorithm}\label{subsec:filtering-phase-preliminaries}
+A. Amir, M. Lewenstein and E. Porat in \cite{Amir2004} proposed a classical algorithm which minimizes the solution space of a string matching problem with specified number of mismatches. We use the following notation in order to explain the filtering concept in the classical algorithm of Amir et al. Let 
+\begin{itemize}
+	\item $\text{P}_{\Sigma} = \{\alpha_1,\alpha_2, \ldots, \alpha_{q}\}$, $\vert \mathrm{P}_{\Sigma} \vert = q$, set containing all distinct symbols in P
+	\item $\text{P}_{\Sigma}^{2d} = $ set containing arbitrary 2\textit{d} elements of the set $\text{P}_{\Sigma}$
+	\item $\gamma: \text{P}_{\Sigma} \rightarrow \{0,\ldots,M-1\}; \gamma(\alpha_{j}) = i$ such that $\alpha_{j} \neq \text{P}[k]$ for $0 \leq k < i < M$
+\end{itemize}
+$\gamma(\cdot)$ is a mapping between elements of $\text{P}_{\Sigma}$ and their index of first occurrence in P.
+%We define two sets $P_{\mathrm{Sym}}$ and $P_{\mathrm{Loc}}$. Let $P_{\mathrm{Sym}}$ be the set of all distinct symbols in P. Let $P_{\mathrm{Loc}}$ be the set of indices of first occurrence in P of each symbol in $P_{\mathrm{Sym}}$.  Let both sets be totally ordered such that for any two symbols $x$ and $y$ in $P_{\mathrm{Sym}}$ and two indices $k$ and $l$ in $P_{\mathrm{Loc}}$, $x$ precedes $y$ in $P_{\mathrm{Sym}}$ and $k$ precedes $l$ in $P_{\mathrm{Loc}}$ only if $T[k]=x$, $T[l]=y$ and $k < l$. Let $\vert P_{\mathrm{Sym}} \vert = \vert P_{\mathrm{Loc}} \vert = q$. We denote the $i$-th symbol element of $P_{\mathrm{Sym}}$ to be $P_{\mathrm{Sym}_i}$ and the $i$-th element of $P_{\mathrm{Loc}}$ to be $P_{\mathrm{Loc}_i}$ for $1 \leq i \leq q$.
+%substring
+%Let $P_{\mathrm{Sym}}$ be the set of distinct symbols in P. Let $P_{\mathrm{Sym}}$ be a totally ordered set such that for any two symbols $P_{\mathrm{Sym}}(i)$, and $P_{\mathrm{Sym}}(j)$, symbol $P_{\mathrm{Sym}}(i)$ precedes symbol $P_{\mathrm{Sym}}(j)$ in set $P_{\mathrm{Sym}}$ only if $P[k]=P_{\mathrm{Sym}}(i), P[l]=P_{\mathrm{Sym}}(j)$ and $k < l$. Let $\vert P_{\mathrm{Sym}} \vert = q$. Let $P_{\mathrm{Loc}}$ be the set of location of first occurrence in P of each symbol in $P_{\mathrm{Sym}}$. Let $P_{\mathrm{Loc}}$ also be a totally ordered set. Given $P_{\mathrm{Sym}}$ and $P_{\mathrm{Loc}}$ we define a mapping $\phi: P_{\mathrm{Sym}} \rightarrow P_{\mathrm{Loc}}$ such that $\phi(P_{\mathrm{Sym}}(i)) = P_{\mathrm{Loc}}(i) \  \forall i, 1 \leq i \leq q$. We assume that $q \geq 2d$. In our example instance, $P_{\mathrm{Sym}}=\{a,b,c,d\}$ and $P_{\mathrm{Loc}}=\{0,1,2,3\}$, $q=4$. Mapping $\phi$ is defined such that $\phi(a)=0, \phi(a)=1, \phi(a)=2, \phi(a)=3$. 
+
+%Let $A=\{\sigma_1, \sigma_2, \ldots, \sigma_q\}$ be a set of all distinct symbols in $\Sigma$ found in P. Let $\vert A \vert = q \geq 2d$. Also, let $A_{loc}=\{j_{\sigma_1}, j_{\sigma_2}, \ldots, j_{\sigma_q} \}$ be the set of locations in P corresponding to the distinct symbols in $A$ such that $P[i_{\sigma_k}] = \sigma_k$ and there exists no other location $0 \leq i < i_{\sigma_k}$ where $P[i] = \sigma_k$. In the quantum algorithm we assume that we can look into sets $A$ and $A_{loc}$ any time as databases in unit time step. Given P, set $A$ is defined to be the set $A=\{a,b,c,d\}$ and the set of locations of symbols in $A$ is defined to be the set $A_{loc}=\{2,1,0,3\}$. We see that $\vert A \vert = 4 $ and $\vert A \vert > 2d$.
+In \cite{Amir2004} the elements of $\text{P}_{\Sigma}^{2d}$ is limited only to $2d$ distinct symbols in P. Given a symbol $\mathrm{T}[i]$ and index $\gamma(\mathrm{T}[i])$, index $(i - \gamma(\mathrm{T}[i]))$ in T indicates a possible starting location of P in T. We can slide through T starting at index 0 up to index \textit{N}-1 and evaluate and record the value $(i - \gamma(\mathrm{T}[i]))$ at each index \textit{i}. After the evaluation of each index \textit{i} in T, starting locations of occurrences of P in T will correspond to the most frequently occurring indices $(i - \gamma(\mathrm{T}[i]))$ in our record. We can imagine this process as having \textit{N} buckets labelled from $j=0,\ldots,N-1$ in which we drop a ball in bucket \textit{j} whenever $j=i-\gamma(\mathrm{T}[i])$. The label of the buckets with most number of balls will correspond to a probable starting location of an exact or approximate copy of P in T. Figure~\ref{fig:Amir-filtering-algorithm} illustrates how the classical algorithm of Amir et al. works. We denote the count of points for each index $(i - \gamma(\mathrm{T}[i]))$ in T as $count(i - \gamma(\mathrm{T}[i]))$. Only indices $(i - \gamma(\mathrm{T}[i]))$ in T which satisfies the condition
+\begin{equation}\label{eqn:count}
+	count(i - \gamma(\mathrm{T}[i])) \geq d
+\end{equation}
+will be subjected to classical verification in a succeeding phase. The number of remaining indices after the verification phase is bounded above as given in Lemma~\ref{lem:Amir-filtering-algorithm-remaining-locations}.
+
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.4]{Amir-filtering-algorithm.png}
+	\caption{The classical filtering algorithm in \cite{Amir2004} can be thought of dropping a ball to bucket \textit{j} whenever $j=i - \gamma(\mathrm{T}[i])$. In the example instance where T=\textit{abccabcd}, P=\textit{abcd} and $d=1$, $\mathrm{P}_{\Sigma}^{2d} = \{a,b\}, \vert \mathrm{P}_{\Sigma}^{2d} \vert = 2d = 2$. Also, $\gamma(a)=0,\gamma(b)=1$. Sliding from index 0 to index 7 of T will result to bucket 0 and bucket 4 having 2 points each. Only bucket 0 and bucket 4 satisfies Equation~\ref{eqn:count} and will continue on to the verification phase.}
+	\label{fig:Amir-filtering-algorithm}
+\end{figure}
+
+%By subtracting the index of first occurrence of symbol $\text{T}[i]$, $\gamma(\text{T}[i])$, from its index \textit{i} in T, i.e. $i - \gamma(\text{T}[i])$, the algorithm is able to identify a possible starting index of P in T. For each computed index $i - \gamma(\text{T}[i])$ in T a \textit{mark} is accounted to. Let $count\left(i - \gamma(\text{T}[i])\right)$ be the count of marks accounted to an index $i - \gamma(\text{T}[i])$. $count\left(i - \text{T}[i]\right) < d$ implies $H\left(\text{T}[i-\gamma(\text{T}[i]),\ldots,i - \gamma(\text{T}[i]) + M -1],\text{P}\right) > d$. Only indices \textit{i} in T where $count\left(i - \gamma(\text{T}[i])\right) \geq d$ will be passed into the verification phase. This minimizes the size of the search space for verification up to an upper bound as stated in Lemma~\ref{lem:remaining-locations-classical}.
+
+%In the classical algorithm in \cite{Amir2004} the elements of $P_{\mathrm{Sym}}$ is limited only to $2d$ number of distinct symbols in P and so $q=2d$. To filter the search space for the problem each symbol $\text{T}[i]$ in T is checked for its index of first occurrence in P using $P_{\mathrm{Sym}}$ and $P_{\mathrm{Loc}}$. If a symbol $\text{T}[i]$ is in $P_{\mathrm{Sym}}$ then its index of first occurrence in P is given by $\phi(\text{T}[i])$. By subtracting the identified index of first occurrence $\phi(\text{T}[i])$ of a symbol $\text{T}[i]$ from its index \textit{i} in T, i.e. $i - \phi(\text{T}[i])$, the algorithm is able to identify a possible starting index of P in T. For each computed index $i - \phi(\text{T}[i])$ in T a mark is accounted to. An index $i - \phi(\text{T}[i]$ with count of marks less than $2d$ implies a starting index for an M-length substring in T with number of mismatches when compared to P to be greater than \textit{d}. In the filtering phase of the classical algorithm in \cite{Amir2004} only indices $i - \phi(\text{T}[i])$ in T with count of marks greater than or equal to $d$ are qualified to be passed into the verification phase. This minimizes the size of the search space for the verification phase up to an upper bound as stated in Lemma~\ref{lem:remaining-locations-classical}.
+
+%In \cite{Amir2004} the set $A$ is limited to a chosen $2d$ distinct symbols in P and thus $\vert A \vert = \vert A_{loc} \vert = 2d$. Given $A$ and $A_{loc}$, each location $i$ in T is queried for its symbol $\text{T}[i]$ from $A$ and then $A_{loc}$ is queried for the location $j_{T[i]}$ of the symbol $\text{T}[i]$'s first occurrence in P. A mark is then accounted to location $i - j_{T[i]}$. After all the locations in T has been evaluated, locations with fewer than $d$ marks are discarded since it implies that substrings of T which start at these locations have $d$ or more mismatches. An upper bound on the number of remaining locations in T after the filtering phase is stated in \ref{lem:remaining-locations-classical}.
+
+\begin{lemma}[\cite{Amir2004}]
+\label{lem:Amir-filtering-algorithm-remaining-locations}
+	At the conclusion of the filtering phase there are at most $\frac{N}{d}$ remaining indices of text T for verification.
+\end{lemma}
+\begin{proof}
+	Since the filtering algorithm makes a total of \textit{N} points and the \textit{M}-length substrings of T starting at every remaining index has at least \textit{d} marks, it implies that at most $\frac{N}{d}$ indices in T will remain.
+\end{proof}
+
+\subsection{Quantum filtering}
+We look into the operation of the filtering step of the algorithm of Amir et al. in the quantum circuit model. Instead of restricting the operation of the step into the set $\text{P}_{\Sigma}^{2d}$ we consider the set $\text{P}_{\Sigma}$, i.e. $q \geq 2d$. All candidate solutions in quantum computing cannot be produced simultaneously as output of a quantum algorithm. We can only mark each candidate solution and produce one of these classical solutions using a measurement operation. We thus need to reformulate the statement pertaining to the upper bound on the number of remaining locations in T after an execution of the filtering step in the quantum setting with consideration to this output restriction.
+
+\begin{lemma}
+The execution of the quantum filtering step will mark at most $\frac{N}{q-d}$ indices in T.
+\end{lemma}
+\begin{proof}
+Proof here.
+\end{proof}
+\begin{proof}
+	Since the filtering operation in the quantum circuit model makes a total of \textit{N} points and since every remaining index in T has at least $q-d$ marks it implies that at most $\frac{N}{q-d}$ indices remain.
+\end{proof}
+
+The application of Lemma~\ref{lem:quantum-filtering-algorithm-remaining-locations} to our sample instance is shown in Figure~\ref{fig:quantum-filtering-algorithm}.
+\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.4]{quantum-filtering-algorithm.png}
+	\caption{The quantum filtering algorithm includes all distinct symbols in P. In the example instance where T=\textit{abccabcd}, P=\textit{abcd} and $d=1$, $\mathrm{P}_{\mathrm{Sym}} = \{a,b\}, \vert \mathrm{P}_{\mathrm{Sym}} \vert = 4$. Also, $\gamma(a)=0,\gamma(b)=1,\gamma(c)=2, \gamma(d)=3$. Sliding from index 0 to index 7 of T will result to bucket 0 having 3 points and bucket 4 with 4 points. Only bucket 0 and bucket 4 satisfies Equation~\ref{eqn:count} and will continue on to the verification phase.}
+	\label{fig:quantum-filtering-algorithm}
+\end{figure}
+
+%In application to our example instance we compute for the locations $i - i_j$ as shown in Table~\ref{tab:start-locations}.
+%\begin{table}[h!]
+%	\begin{center}
+%		\begin{tabular}{|| c | c | c | c ||}
+%					\hline
+%					$i$ & $\text{T}[i]$ & $\gamma(\text{T}[i])$ & $i-\gamma(\text{T}[i])$ \\
+%					\hline
+%					\hline			
+%					 0	  &	a					&		0						&	0							\\
+%					 \hline
+%					 1	  &	b					&		1						&	0							\\
+%					\hline 
+%					 2	  &	c					&		2						&	0							\\
+%					\hline 
+%					 3	  &	c					&		2						&	1							\\
+%					\hline 
+%					 4	  &	a					&		0						&	4							\\
+%					\hline 
+%					 5	  &	b					&		1						&	4							\\
+%					\hline 
+%					 6	  & 	c					&		2						&	4							\\	
+%					\hline
+%					 7	  & 	d					&		3						&	4							\\	
+%					\hline
+%		\end{tabular}
+%	\end{center}
+%	\caption{Computation of values $i-\gamma(\text{T}[i])$ for sample input instance. Index $i-\gamma(\text{T}[i])=0$ has three marks accounted to it, index $i-\gamma(\text{T}[i])=1$ has one and index $i-\gamma(\text{T}[i])=4$ has four marks. The input threshold distance is $d=2$. The classical filtering algorithm will output $\frac{N}{d}=\frac{8}{2}=2$ indices $i-\gamma(\text{T}[i])$. Same will be the output for the quantum algorithm, $\frac{N}{q-d}=\frac{8}{4-2}=2$.}
+%	\label{tab:start-locations}
+%\end{table}
+
+\section{Outline}
+We discuss the outline of the quantum filtering step in this section and the details of each unitary operator used in the algorithm in the succeeding sections. We start off by initializing two quantum registers which we name as follows
+\begin{itemize}
+	\item \textit{index register}
+		\begin{itemize}
+			\item the state of which will represent all indices \textit{i} in T
+			\item composed of $n=\log_{2}(N)$ qubits for representing values $0,\ldots,N-1$
+			\item initialized into state $\vert \mathbf{0} \rangle = \vert 0 \rangle^{\otimes n}$, decimal representation of the 0 state
+		\end{itemize}
+	\item \textit{start register}
+		\begin{itemize}
+			\item the state of which will represent indices $\gamma(\text{T}[i])$ in P and eventually the indices $i - \gamma(\text{T}[i])$ in T
+			\item composed of $n+1$ qubits for representing values $-N,\ldots,0,\ldots,N-1$
+			\item initialized into state $\vert \mathbf{0} \rangle=\vert 0 \rangle^{\otimes n+1}$
+		\end{itemize}
+\end{itemize}
+The initial state of the two registers will be 
+\begin{align}
+	\label{eqn:zero-state}
+	\vert \psi \rangle = \vert \mathbf{0} \rangle\vert \mathbf{0} \rangle
+\end{align}
+
+We encode the result of the computation of the value $(i-\gamma(\mathrm{T}[i]))$ for all $i=0,\ldots,N-1$ in T using the state of the two registers. We first put the registers into the uniform superposition state
+\begin{align}
+	\label{eqn:superposition-state}
+	\vert \psi_{\mathrm{init}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert \mathbf{0} \rangle
+\end{align}
+Assuming that $\text{P}_{\Sigma}$ has already been prepared prior to the quantum computation we perform the evaluation of each substring $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ using a unitary operator applied to state $\vert \psi_{\mathrm{init}} \rangle$. The identification of the index $\gamma(\text{T}[i])$ in P for each index \textit{i} in T can be viewed as a query task. We use a unitary operator $U_{\sigma}$ to facilitate this effect into the quantum registers in state $\vert \psi_{\mathrm{init}} \rangle$. Each identified index $\gamma(\text{T}[i])$ is represented with the state of the start register, $\vert \gamma(\text{T}[i]) \rangle$. The resulting superposition state from application of operator $U_{\sigma}$ into the two registers will be
+\begin{align}\label{eqn:psi-loc}
+	\vert \psi_{\mathrm{loc}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert \gamma(\text{T}[i]) \rangle
+\end{align}
+
+%The identification of the location $\phi(\text{T}[i])$ for each location $i$ in T represented by each state $\vert i \rangle$ can be interpreted as a querying task since we assume that sets $P_{\mathrm{Sym}}$ and $P_{\mathrm{Loc}}$ were prepared prior to computation. We use a unitary operator $U_{\mathrm{Loc}}$ to facilitate this effect on the quantum registers in state $\vert \psi_{\mathrm{init}} \rangle$. Given location $i$ in T this operator facilitates the querying of each location $\phi(\text{T}[i])$ from set $P_{\mathrm{Loc}}$. Each identified first occurrence location $\phi(\text{T}[i])$ is loaded into the second register, initially in state $\vert \mathbf{0} \rangle$. Since the utility of this operator is for querying the readily accessible sets $P_{\mathrm{Sym}}$ and $P_{\mathrm{Loc}}$ we assume a unit time step operation for this operator. The resulting state from application of operator $U_{\mathrm{Loc}}$ into state $\vert \psi_{\mathrm{init}} \rangle$ is the state
+%\begin{align}
+%	\label{eqn:location-state-1}
+%	\vert \psi_{\mathrm{loc}} \rangle = \sqrt{\frac{1}{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert \phi(\text{T}[i]) \rangle
+%\end{align}
+
+We compute each index $(i - \gamma(\text{T}[i]))$ in T using another operator, $U_{\mathrm{Sub}}$. Given the quantum state $\vert \psi_{\mathrm{loc}} \rangle$, $U_{\mathrm{Sub}}$ facilitates the computation of each value $(i - \gamma(\text{T}[i]))$ and encodes it into the state of the start register. The superposition state resulting from application of $U_{\mathrm{Sub}}$ into state $\vert \psi_{\mathrm{loc}} \rangle$ is the state
+\begin{align}\label{eqn:psi-sub}
+	\vert \psi_{\mathrm{sub}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert i - \gamma(\text{T}[i]) \rangle
+\end{align}
+We may in concept implement operator $U_{\mathrm{Sub}}$ using the design of a quantum adder in \cite{Barenco1996}. We discuss the details of implementation of operator $U_{\mathrm{Sub}}$ using the design in \cite{Barenco1996} in Section~\ref{sec:u_sub}.
+
+In the classical filtering step of Amir et al. we count the resulting number of points for each index $(i - \gamma(\text{T}[i]))$ in T. In our quantum filtering step we can rewrite the summation in state $\vert \psi_{\mathrm{sub}} \rangle$  as a summation of summations such that states $\vert i \rangle$ of index register with same associated state $\vert i - \gamma(\text{T}[i]) \rangle$ for start register are grouped together in form of summations,
+\begin{align}\label{eqn:psi-sub-sum}
+	\vert \psi_{\mathrm{sub}} \rangle = \sqrt{\frac{c_{i_1}}{N}} \sum_{i, (i- \gamma(\text{T}[i]))=i_1} \vert i \rangle \vert i_1 \rangle + \sqrt{\frac{c_{i_2}}{N}} \sum_{i, (i- \gamma(\text{T}[i]))=i_2} \vert i \rangle \vert i_2 \rangle + \ldots + \sqrt{\frac{c_{i_m}}{N}} \sum_{i, (i-\gamma(\text{T}[i]))=i_m} \vert i \rangle \vert i_m \rangle
+\end{align}
+where $c_{i_k} = count\left( i_k \right)$, $1 \leq k \leq m$, is the count of points of index $i_k$ in T. Indices $i_k$ which have higher count of points will have greater amplitude as compared to those states which have lower count of points in the superposition state $\vert \psi_{\mathrm{sub}} \rangle$. In the classical filtering step of Amir et al. we discard indices $i_k$ where $count(i_k) < d$ and we retain at most $\frac{N}{d}$ indices. In the quantum filtering step we cannot deterministically select and retain the indices $i_k$ which have $count(i_k) \geq q-d$ since we are working with a superposition of states. Instead, we iterate the quantum filtering step until we get $\frac{N}{q-d}$ distinct indices. With high probability we get the indices $i_k$ in T which satisfy the condition $count(i_k) \geq q-d$.
+
+In the succeeding sections we discuss the details of the unitary operators used in each step in the quantum filtering phase.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Unitary operator U_Loc %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quantum filtering phase sub-routines}
+\subsection{Identification of each symbol $\mathrm{T}[i]$}
+We assume that text T is accessible through a memory device abstracted using the QRAM model implemented using the bucket brigade architecture \cite{Giovannetti2008b}. We provide the quantum superposition state $\vert \psi_{\mathrm{init}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle$ as input to the address register of QRAM. We get as output of QRAM a superposition state
+\[
+	\vert \psi_{\mathrm{ram}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle\vert 0 \rangle\vert \mathrm{T}[i] \rangle
+\]
+where each symbol $\mathrm{T}[i]$ is encoded as the state of QRAM's output register. 
+\todo{Move this content to the dedicated section for QRAM in the preliminaries for quantum computing}
+QRAM implemented using the bucket brigade architecture has a circuit complexity in $\Om(N)$ but has circuit depth of only $\Om(\log N)$. Its time complexity for each query will then also be in $\Om(\log N)$. It has a space complexity of $\Om(N)$. 
+
+\subsection{Identification of each location of first occurrence $\gamma(\sigma_i)$}
+To identify the location of first occurrence of each symbol $\mathrm{T}[i]$ in $\vert \psi_{\mathrm{ram}} \rangle$, $\lambda(\mathrm{T}[i])$,we construct controlled \textit{location operators} $U_{\sigma_k}$ for $k=1,\ldots,\vert \Sigma \vert$. The qubits of the output register of QRAM will serve as control qubits of each of the controlled location operators $U_{\sigma_k}$. Given a symbol $\sigma_k$ as input state only operator $U_{\sigma_k}$ will be activated and will transform the state of the start register from its initial state $\vert \mathbf{0} \rangle$ into the state $\vert \gamma(\sigma_k) \rangle$. Since the state $\vert \psi_{\mathrm{ram}} \rangle$ is a superposition of states the location operators will be applied linearly to each state $\vert i \rangle\vert 0 \rangle\vert \mathrm{T}[i] \rangle$ in $\vert \psi_{\mathrm{ram}} \rangle$. The resulting state from the operation of the location operators $U_{\sigma_k}$ on state $\vert \psi_{\mathrm{ram}} \rangle$ will be the superposition state
+\[
+	\vert \psi_{\mathrm{loc}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle\vert \gamma(\mathrm{T}[i]) \rangle \vert \mathrm{T}[i] \rangle
+\]
+for all $i=0,\ldots,N-1$. A quantum circuit for a controlled location operator $U_{\sigma_k}$ is illustrated in Figure~\ref{fig:location-operator}.
+\begin{figure}[ht]
+	\centering
+	\footnotesize
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \quad                                     & \quad & \qw & \ctrl{1}                                 & \qw  & \quad & \quad \\
+				& \lstick{\vert \sigma_k \rangle} & \quad & \qw & \ctrl{1}                                 & \qw & \quad & \quad \vert \sigma_k \rangle \\
+				& \quad                                      & \quad & \qw & \ctrl{1}                                 & \qw & \quad & \quad \\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \multigate{2}{U_{\sigma_k}} & \qw & \quad & \quad \\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \ghost{U_{\sigma_k}}           & \qw & \quad & \quad\quad \vert \gamma(\sigma_k) \rangle \\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \ghost{U_{\sigma_k}}           & \qw & \quad & \quad\\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \qw			           & \qw & \quad & \quad\\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \qw           			& \qw & \quad & \quad
+				\gategroup{1}{3}{3}{3}{1em}{\{}\gategroup{4}{6}{8}{6}{1em}{\}} \\
+			}		
+		\]
+	\end{minipage}
+	\caption{An example of a quantum circuit for a location operator $U_{\sigma_k}$ where $\log(\vert \Sigma \vert) = 3$, $\log(M) = 3$ and $\log(N) = 5$. The control qubits in state $\vert \sigma_{k} \rangle$ correspond to the output register of a QRAM which encodes a symbol $\mathrm{T}[i]=\sigma_k$. The state of the control qubits depends on the encoding of the symbol $\sigma_k$. In this figure the encoding of $\sigma_k$ is $\vert 111 \rangle$. The operation of operator $U_{\sigma_k}$ includes only the top $\log(M) = 3$ qubits of the start register where the topmost qubit is the least significant bit.}
+	\label{fig:location-operator}
+\end{figure}
+\begin{claim}\label{cla:U-sigma-multi-cnot}
+A $U_{\sigma_k}$ operator can be decomposed into at most $\log(M)$ $C^{\log \vert \Sigma \vert}NOT$ gates.
+\end{claim}
+\begin{proof}
+Each symbol $\sigma_k \in \Sigma$ can be represented using $\log(\vert \Sigma \vert)$ qubits. These qubits make up the output register of the QRAM and will serve as control qubits for our controlled location operators $U_{\sigma_k}$. The range of values of $\gamma(\cdot)$ will be $\{0,\ldots,M-1\}$ and can be represented with $\log(M)$ qubits. Given that the start index is composed of $\log(N) + 1$ qubits and is initiated in state $\vert \mathbf{0} \rangle$, only $\log(M)$ of these qubits at most will be flipped during the operation. We can then decompose our operator $U_{\sigma_k}$ into at most $\log(M)$ $\log(\vert \Sigma \vert)$-qubit controlled \textit{NOT} operators ($C^{\log(\vert \Sigma \vert)}NOT$).
+\end{proof}
+An illustration of the $C^{\log(\vert \Sigma \vert)}NOT$ decomposition of $U_{\sigma_k}$ is shown in Figure~\ref{fig:location-operator-multi-CNOT}.
+\begin{figure}[ht]
+	\centering
+	\footnotesize
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \quad                                     & \quad & \qw  & \ctrl{1} & \ctrl{1}  & \qw  & \quad \\
+				& \lstick{\vert \sigma_k \rangle} & \quad & \qw & \ctrl{1}  & \ctrl{1} & \qw & \quad \vert \sigma_k \rangle \\
+				& \quad                                      & \quad & \qw & \ctrl{1}  & \ctrl{2} & \qw & \quad \\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \targ     & \qw       & \qw & \quad \\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \qw       & \targ     & \qw & \rstick{\vert \gamma(\sigma_k) \rangle} \\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \qw       & \qw       & \qw & \quad\\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \qw       & \qw       & \qw & \quad\\
+				& \lstick{\vert 0 \rangle}             & \quad & \qw & \qw       & \qw       & \qw & \quad
+				\gategroup{1}{3}{3}{3}{1em}{\{}\gategroup{4}{7}{8}{7}{1em}{\}} \\
+			}		
+		\]
+	\end{minipage}
+	\caption{An example of a multi-controlled \textit{NOT} decomposition of the quantum operator $U_{\sigma_k}$ where $\log(\vert \Sigma \vert) = 3$, $\log(M) = 3$ and $\log(N) = 5$. The operation of the $U_{\sigma_k}$ operator on the qubits of the start register flips the state of the top two qubits of the register and keeps the initial state of the third register. This indicates that the location of first occurrence of the symbol $\sigma_{k}$ in P is in index $2^{0} \times 1 + 2^{1} \times 1 = 3$.}
+	\label{fig:location-operator-multi-CNOT}
+\end{figure}
+\begin{lemma}[2-qubit-controlled unitary operator decomposition \cite{Barenco1995b}]\label{lem:2-controlled-not-elementary-decomposition}
+For any $2\times 2$ unitary matrix U, $C^{2}U$ gate can be simulated by a network of the form
+\begin{figure}[H]
+	\centering
+	\footnotesize
+	\begin{minipage}[b]{0.8\linewidth}
+		\begin{align*}
+			\Qcircuit @C=1em @R=1em {
+				& \ctrl{1} & \qw & \quad  		& \qw		& \ctrl{1}	& \qw			& \ctrl{1}	& \ctrl{2}	& \qw\\
+				& \ctrl{1} & \qw & \quad = \quad\quad  & \ctrl{1} 	&  \targ{} 	& \ctrl{1}		& \targ{}	& \qw		& \qw\\
+				& \gate{U} & \qw & \quad 		& \gate{V} 	& \qw		& \gate{V^{\dagger}}	& \qw		& \gate{V}	& \qw
+			}
+		\end{align*}
+	\end{minipage}
+\end{figure}
+where V is unitary.
+\end{lemma}
+\begin{lemma}[\textit{n}-qubit-controlled unitary operator decomposition \cite{Barenco1995b}]\label{lem:multi-controlled-not-elementary-decomposition}
+For any $n \geq 3$ and any unitary $2 \times 2$  matrix \textit{U}, a $C^{n-1}U$ gate can be simulated by an \textit{n}-bit network consisting of $2^{n-1} - 1$ $C^1 V$ and $C^1 V^\dagger$ gates and $2^{n-1} - 2$ \textit{CNOT} gates, where \textit{V} is unitary.
+\end{lemma}
+Lemma \ref{lem:multi-controlled-not-elementary-decomposition} is a generalization of Lemma~\ref{lem:2-controlled-not-elementary-decomposition} from two qubits to arbitrary \textit{n} control qubits. The decomposition of the controlled $U_{\sigma_{k}}$ gates in Figure~\ref{fig:location-operator-multi-CNOT} requires the use of $C^{\log(\vert\Sigma\vert)}NOT$ gates. A single controlled $U_{\sigma_{k}}$ gate will require $\log(M)$ $C^{\log(\vert\Sigma\vert)}NOT$ gates at most.
+\begin{claim}\label{cla:U-sigma-elementary-gates}
+A single operator $U_{\sigma_k}$ will require elementary gates in $\Om\left(\vert \Sigma \vert \log(M) \right)$ count.
+\end{claim}
+\begin{proof}
+By Claim~\ref{cla:U-sigma-multi-cnot} each operator $U_{\sigma_k}$ can be decomposed into at most $\log(M)\ C^{\log(\vert \Sigma \vert)}NOT$ gates. Let $n=\log \vert \Sigma \vert$. By Lemma~\ref{lem:multi-controlled-not-elementary-decomposition} we can decompose each $C^{\log(\vert \Sigma \vert)}NOT$ gate into $(\vert \Sigma \vert - 1)$ $C^1 V$ and $C^1 V^\dagger$ gates and $(\vert \Sigma \vert - 2)$ \textit{CNOT} gates where \textit{V} is unitary. Thus, each operator $U_{\sigma_k}$ can be decomposed into $\Om(\vert \Sigma \vert \log(M))$ elementary gates.
+\end{proof}
+\todo{Determine V when U=X.}
+
+\begin{lemma}\label{lem:U-sigma-circuit-complexity}
+The set of operators $U_{\sigma_k}$ for $k=1,\ldots,\vert \Sigma \vert$ can be synthesized into a quantum circuit with elementary gate count in $\Om\left(\vert \Sigma \vert^2\log(M)\right)$.
+\end{lemma}
+\begin{proof}
+By Claim~\ref{cla:U-sigma-elementary-gates} each operator $U_{\sigma_k}$ can be decomposed into $\Om\left(\vert \Sigma \vert \log M \right)$ elementary gates and by our construction we will require $\vert \Sigma \vert$ controlled location operators $U_{\sigma_k}$. We can then synthesize the quantum circuit for all the location operators $U_{\sigma_k}$ with gate count in $\Om\left(\vert \Sigma \vert^2\log(M)\right)$
+\end{proof}
+
+\begin{lemma}\label{lem:U-sigma-time-complexity}
+The time complexity for the operation of the location operators $U_{\sigma_k}$ will be in $\Om\left(\vert \Sigma \vert \log(M)\right)$.
+\end{lemma}
+\begin{proof}
+During the step for identifying the location of occurrence of symbol $\mathrm{T}[i]$ in P, $\gamma(\mathrm{T}[i])$, only a single operator $U_{\sigma_k}$ will be activated. Thus, only $\Om\left(\vert \Sigma \vert\log(M)\right)$ elementary gates will be activated at a single time.
+\end{proof}
+
+%\subsubsection{Unitary operator $U_{\mathrm{Loc}}$}
+%We discuss about the details of the design for the unitary operator $U_{\mathrm{Loc}}$. Given state $\vert \psi_{\mathrm{init}} \rangle$ in Equation \ref{eqn:superposition-state}, the application of operator $U_{\mathrm{Loc}}$ will result to state $\vert \psi_{\mathrm{loc}} \rangle$ in Equation \ref{eqn:psi-loc}. Operator $U_{\mathrm{Loc}}$ can be expressed as a matrix representing the mapping of each symbol $\text{T}[i]$ to indices $\gamma(\text{T}[i])$. It will work on the index register and start register states as given by the mapping $\vert i \rangle\vert 0 \rangle \rightarrow \vert i \rangle\vert \gamma(\mathrm{T}[i]) \rangle$ for $i=0,\ldots,N-1$. Since the size of the index register will be $n$ and that of start register will be $n+1$ then the dimension of the unitary matrix for $U_{\mathrm{Loc}}$ will be $\left(2^{n} \times 2^{n+1}\right) \times \left(2^{n} \times 2^{n+1}\right)$. The $2^n$ $2^{n+1} \times 2^{n+1}$ square matrices along the diagonal of this unitary matrix will be sparse permutation matrices with at most one transposition of indices and all 1s along the diagonal. The unitary matrix for $U_{\mathrm{Loc}}$ is then also a sparse permutation matrix with at most \textit{N} transpositions. We denote the $2^{n+1} \times 2^{n+1}$ permutation matrix along the \textit{i}-th block of $2^{n+1}$ rows and \textit{j}-th block of $2^{n+1}$ columns of the unitary matrix for $U_{\mathrm{Loc}}$ as $U_{\mathrm{Loc}}[i,j]$. We label the rows of this permutation matrix as $(i,-N),\ldots,(i,0),\ldots,(i,N-1)$ and its columns as $(j,-N),\ldots,(j,0),\ldots,(j,N-1)$. The sub-matrix of $U_{\mathrm{Loc}}[i,j]$ defined by rows $(i,-N),\ldots,(i,-1)$ and columns $(j,-N),\ldots,(j,-1)$ correspond to negative indices of P and we denote it as $U_{\mathrm{Loc}}^-[i,j]$. Since the range of $\gamma(\cdot)$ is composed only of indices $0,\ldots,M-1$, we let this sub-matrix be an identity matrix. On the other hand, the sub-matrix of $U_{\mathrm{Loc}}[i,j]$ defined by rows $(i,0),\ldots,(i,N-1)$ and columns $(j,0),\ldots,(j,N-1)$ correspond to positive indices in P. We denote this sub-matrix as $U_{\mathrm{Loc}}^+[i,j]$ its elements are given by 
+%\begin{align}
+%	U_{\mathrm{Loc}}^+[i,j]\left((i,k),(j,l)\right)=
+%	\begin{cases}
+%		1, & \mathrm{if\ i=j \bigwedge \left(\left(k=0 \wedge \gamma(\mathrm{T[i]})=l\right) \bigvee \left(k \neq 0 \wedge k=l\right)\right) }\\
+%		0, & \mathrm{otherwise}
+%	\end{cases}
+%\end{align}  
+%for $k,l=0,\ldots,N-1$.
+%%Each contiguous block of $2^{(n+1)}$ rows and columns of the matrix will correspond to a single index $i$ in T. Each row (column) within such block of rows (columns) will correspond to an integer in the range $\{-N,\ldots,0,\ldots,N-1\}$. To facilitate the fetching of indices $\gamma(\text{T}[i])$ given state $\vert i \rangle\vert 0 \rangle$ into state $\vert i \rangle\vert \gamma(\text{T}[i]) \rangle$, a value of 1 will be assigned into each cell $\left([i,0],[i,\gamma(\text{T}[i])]\right)$ and each cell $\left( [i,\gamma(\text{T}[i])],[i,0] \right)$. The other cells in the diagonal be assigned a value of 1 and the rest a value of 0. Based on these rules we define operator $U_{\mathrm{Loc}}$ as the unitary matrix given by
+%%\begin{align}
+%%	U_{\mathrm{Loc}}(x,y) = 
+%%		\begin{cases}
+%%			1, & \text{if}\ \left((x,y) = ([i,0],[i,\gamma(\text{T}[i])])\ \mathrm{OR}\ (x,y) = ([i,\gamma(\text{T}[i])],[i,0])\right)\ \mathrm{XOR}\ x=y\\ 
+%%			0, & \mathrm{otherwise}
+%%		\end{cases}
+%%\end{align}
+%%for $0 \leq i \leq N-1$. 
+%Note that the normalizing factor for the matrix of operator $U_{\mathrm{Loc}}$ is just 1 since it is just a permutation matrix. Thus, application of $U_{\mathrm{Loc}}$ have no effect on the amplitude of the state of the register. 
+
+\begin{example}
+Given our example input instance where $\text{P}_{\mathrm{Sym}}=\{a,b,c,d\}$ we define operator $U_{\sigma}$ as the unitary matrix with value 1 in cells [(0,0),(0,0)], [(1,0),(1,1)], [(1,1),(1,0)], [(2,0),(2,2)], [(2,2),(2,0)], [(3,0),(3,2)], [(3,2),(3,0)], [(4,0),(4,0)], [(5,0),(5,1)], [(5,1),(5,0)], [(6,0),(6,2)], [(6,2),(6,0)], [(7,0),(7,3)], [(7,3),(7,0)] and the rest of the diagonal entries not coinciding with the rows of these cells. For brevity we present the matrix of $U_{\sigma}$ for the sample input instance in the Appendix~\ref{app:ULoc}. %Some details on simulation of operator $U_{\mathrm{Loc}}$ will be discussed in Section~\ref{sec:filtering-simulation}. 
+The resulting state from application of operator $U_{\sigma}$ will be the state $\vert \psi_{\mathrm{loc}} \rangle$ in Equation~\ref{eqn:psi-loc}. In our input instance the resulting state will be
+\begin{align}
+	\vert \psi_{\mathrm{loc}} \rangle = \sqrt{\frac{1}{8}}\left( \vert 0 \rangle\vert 0 \rangle + \vert 1 \rangle\vert 1 \rangle + \vert 2 \rangle\vert 2 \rangle + \vert 3 \rangle\vert 2 \rangle + \vert 4 \rangle\vert 0 \rangle + \vert 5 \rangle\vert 1 \rangle + \vert 6 \rangle\vert 2 \rangle + \vert 7 \rangle\vert 3 \rangle\right)
+\end{align}
+\end{example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Unitary operator U_Sub %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Identification of each starting location $(i - \gamma(\sigma_i))$}\label{sec:u_sub}
+The computation of the state $\vert i-\gamma(\mathrm{T}[i]) \rangle$ in Equation~\ref{eqn:psi-sub} can be implemented using the operator $U_{\mathrm{Sub}}$. Given input state 
+\begin{align*}
+\vert \psi_{\mathrm{loc}} \rangle &= \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle\vert \gamma(\mathrm{T}[i]) \rangle \vert \mathrm{T}[i] \rangle
+\end{align*}
+the operator $U_{\mathrm{Sub}}$ transforms the state of the index and start register from $\vert i \rangle\vert \gamma(\mathrm{T}[i]) \rangle$ into a superposition of states $\vert i \rangle\vert i - \gamma(\text{T}[i]) \rangle, 0 \leq i < N$. This operation can be implemented using \textit{component adder} and \textit{complement operators}. A \textit{quantum full-adder} can be implemented using a cascade of \textit{quantum half-adder}. A circuit implementing a quantum half-adder is shown in Figure~\ref{fig:half-adder}.
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \lstick{x_i} & \ctrl{2}  & \ctrl{1}   & \qw & \rstick{x_i}         \\
+				& \lstick{y_i} & \ctrl{1}  & \gate{X} & \qw & \rstick{x_i + y_i} \\
+				& \lstick{0}	  & \gate{X} & \qw        & \qw & \rstick{c_i}        
+			}		
+		\]
+	\end{minipage}
+	\caption{A circuit for a quantum half-adder for adding values represented by states of two qubits where addition is done modulo 2. The third qubit is an auxiliary qubit for holding carry value $c_i$.}
+	\label{fig:half-adder}
+\end{figure}
+A circuit for a quantum adder for two qubits with carry value propagation is shown in Figure~\ref{fig:full-adder}.
+\begin{figure}[ht]
+	\centering
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \lstick{c_{i-1}} & \qw	      & \qw        & \ctrl{4}  & \ctrl{2}  &	\qw         & \qw & \rstick{c_{i-1}}\\
+				& \lstick{x_i}       & \ctrl{2}  & \ctrl{1}   & \qw       & \qw        & \qw        & \qw & \rstick{x_i}\\
+				& \lstick{y_i}       & \ctrl{1}  & \gate{X} & \ctrl{2}  & \gate{X} & \qw        & \qw & \rstick{z_i}\\
+				& \lstick{0}	        & \gate{X} & \qw        & \qw       & \qw        & \ctrl{1}   & \qw & \rstick{x_i \wedge y_i} \\
+				& \lstick{0}         & \qw        & \qw        & \gate{X} & \qw       &	\gate{X} & \qw & \rstick{c_i}
+			}		
+		\]
+	\end{minipage}
+	\caption{A quantum circuit for adding two binary values represented by states of two qubits where addition is performed modulo 2. The carry values are propagated through scratch qubits initially set to state 0. $z_i = x_i + y_i + c_{i-1}$ and $c_i$ is the total carry resulting from the addition.}
+	\label{fig:full-adder}
+\end{figure}
+The circuit for adding two qubits of information makes use of one auxiliary qubit for scratch and one carry qubit. We allot an auxiliary register composed of a multiple of two qubits with exact count depending on the pre-fixed size of the index and start registers. The circuit for this adder is based on what was proposed in \cite{Barenco1996} for a  \textit{full quantum adder}. For brevity, we show a quantum circuit for a full adder composed of a cascade of half-adders and its corresponding unitary matrix operator $U_{\mathrm{Sub}}$ in Appendix~\ref{app:USub}. Since the state of the start register is designed to represent values in range $\{-N,\ldots,0,\ldots,N-1\}$ a negative result is indicated by a state 1 in the bottom-most qubit of the circuit due to two's complement notation.
+
+%Let $j_{\text{T}[i]}^\prime$ be the $2'$s complement of $j_{\text{T}[i]}$. We can implement the operator $U_{Sub}$ using reversible adder network as what was proposed in \cite{Barenco1996}. Since $0 \leq i, (i - j_{\text{T}[i]}) < N$ we allocate a first $(\log{(N)}+1)$-qubit register for each value $i$, a second $(\log{(N)}+1)$-qubit register for each value $j^\prime_{\text{T}[i]}$, a third $(\log{(N)}+1)$-qubit register for the sum of the pairs of bits representing $i$ and $j^\prime_{\text{T}[i]}$, and a fourth $(\log{(N)}+1)$-qubit register for the carry values. A quantum adder network for each bit representing \textit{i} and $j_{\text{T}[i]}^\prime$ can be designed as shown in Figure~\ref{fig:sum} and Figure~\ref{fig:carry} \cite{Barenco1996}.
+%
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{0.45\linewidth}
+%		\[
+%			\Qcircuit @C=.7em @R=1em {
+%				& \lstick{\text{x}_k} & \gate{X} & \gate{X} & \qw \\
+%				& \lstick{i_k} 			 & \ctrl{-1} & \qw 		& \qw \\
+%				& \lstick{j_{T[i],k}^\prime} 			 & \qw 		  & \ctrl{-2} & \qw
+%			}	
+%		\]
+%		\caption{\textit{Sum}. A network which performs modulo 2 addition of bit values for bit $i_k$ and $j_{T[i],k}^\prime$}
+%		\label{fig:sum}
+%	\end{minipage}
+%	\quad\quad\quad
+%	\begin{minipage}[b]{0.45\linewidth}
+%		\[
+%			\Qcircuit @C=.7em @R=1em {
+%				& \lstick{c_k} 			& \gate{X} 	& \qw 			& \gate{X} 	& \qw \\
+%				& \lstick{i_k} 			& \ctrl{-1} 	& \gate{X}	& \ctrl{-1} 	& \qw \\
+%				& \lstick{j_{T[i],k}^\prime} 	& \ctrl{-2} 	& \ctrl{-1} 	& \qw 			& \qw \\
+%				& \lstick{c_{k-1}} 	& \qw			& \qw			& \ctrl{-3} 	& \qw 
+%			}	
+%		\]
+%		\caption{\textit{Carry}. A quantum network which computes for current carry value $c_k$ from values $i_k$, $j_{T[i],k}^\prime$ and previous carry value $c_{k-1}$.}
+%		\label{fig:carry}
+%	\end{minipage}
+%\end{figure}
+
+%\begin{table}[h!]
+%	\centering
+%	\begin{tabular}{c c c}
+%		$
+%			\Qcircuit @C=.7em @R=1em {
+%				& \lstick{\text{x}_k} & \gate{X} & \gate{X} & \qw \\
+%				& \lstick{i_k} 			 & \ctrl{-1} & \qw 		& \qw \\
+%				& \lstick{j_{T[i],k}} 			 & \qw 		  & \ctrl{-2} & \qw
+%			}	
+%		$
+%		&
+%			\quad \quad \quad \quad \quad
+%		&
+%		$
+%			\Qcircuit @C=.7em @R=1em {
+%				& \lstick{c_k} 			& \gate{X} 	& \qw 			& \gate{X} 	& \qw \\
+%				& \lstick{i_k} 			& \ctrl{-1} 	& \gate{X}	& \ctrl{-1} 	& \qw \\
+%				& \lstick{j_{T[i],k}} 	& \ctrl{-2} 	& \ctrl{-1} 	& \qw 			& \qw \\
+%				& \lstick{c_{k-1}} 	& \qw			& \qw			& \ctrl{-3} 	& \qw 
+%			}	
+%		$\\
+%		\quad & \quad \quad \quad \quad \quad & \quad \\
+%		$(a) \ \text{Sum}$ & \quad \quad \quad & $(b) \ \text{Carry}$
+%	\end{tabular}
+%	\caption{Quantum adder network based from \cite{Barenco1996}. $(a)$ is . $(b)$ }
+%	\label{fig:adder}
+%\end{table}
+
+%In Figures~\ref{fig:sum} and \ref{fig:carry}, qubit $i_k$ is the \textit{k}-th qubit of the first register, $j_{\text{T}[i],k}^\prime$ is the \textit{k}-th qubit of the second register, $\text{x}_k$ is the \textit{k}-th qubit of the third register and is the \textit{k}-th binary digit of the binary representation for $i - j_{\text{T}[i]}$. Also, $c_k$ and $c_{k-1}$ are the \textit{k}-th and $(k-1)$-th carry values of the binary representation of $i - j_{\text{T}[i]}$. We can combine the networks in Figure~\ref{fig:sum} and Figure~\ref{fig:carry} into a single network to illustrate a computation for a \textit{k}-th digit of the binary representation of the value $i - j_{\text{T}[i]}$. This is shown in Figure~\ref{fig:sum-carry} with some rearrangement on the qubits.
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{.5\linewidth}
+%		\[
+%			\Qcircuit @C=.7em @R=1em {
+%				& \lstick{c_k = 0}					& \qw							&	\multigate{3}{Carry} & \qw & \qw & \rstick{c_k} \\
+%				& \lstick{c_{k-1}}					& \qw							&	\ghost{Carry}			  & \qw & \qw & \rstick{c_{k-1}} \\
+%				& \lstick{i_k} 			 				& \multigate{2}{Sum} & \ghost{Carry} 			  & \gate{X} & \qw & \rstick{i_k} \\
+%				& \lstick{j_{T[i],k}^\prime} 	& \ghost{Sum} 		  	& \ghost{Carry} 			  & \ctrl{-1} & \qw & \rstick{j_{T[i],k}^\prime} \\
+%				& \lstick{\text{x}_k = 0} 		& \ghost{Sum} 			& \qw 							  & \qw & \qw & \rstick{(i_k + j^\prime_{\text{T}[i]}) mod\ 2} \\
+%			}	
+%		\]
+%		\caption{A network which performs modulo 2 addition of binary values for bit $i_k$ and $j^\prime_{T[i],k}$ and computes the \textit{k}-th carry value of the binary representation of $i - j_{\text{T}[i]}$.}
+%		\label{fig:sum-carry}
+%	\end{minipage}
+%\end{figure}
+%Note that we added a controlled NOT gate in Figure~\ref{fig:sum-carry} to restore the original state of qubit $i_k$ since it is modified in the carry network in Figure~\ref{fig:carry}.
+%
+%Since we are using $2'$s complement for binary representation of $- j_{T[i]}$ we will know if the value $i - j_{T[i]}$ is a negative value if the qubit $x_{\log{(N)} + 1}$ is in state 1 after the computation. 
+
+Given the quantum circuit for adder for the implementation of operator $U_{\mathrm{Sub}}$ we see that the computation of the sum and carry for each digit of the binary number representing values $i$ and $i_j$ will require $\Om(\log(N))$ steps in which each step is composed of a linear number of \textit{CNOT} and $C^{2}NOT$ operations.
+
+The complement operator component of the the $U_{\mathrm{Sub}}$ operator on the other hand provides the representation of the negative value for each index $(i-\gamma(\mathrm{T}[i]))$. The result of this operation is an input to the adder operator wherein the other inputs are the qubits representing the indices $i$ and the ancillary qubits. A quantum circuit for the complement operator is shown in Figure~\ref{fig:2s-complement-circuit}.
+
+A high-level quantum circuit for the $U_{\mathrm{Sub}}$ operator is shown in Figure~\ref{fig:USub-circuit}.
+
+\begin{lemma}[2-qubit controlled unitary operator decomposition \cite{Barenco1995b}]\label{lem:2-qubit-cnot-decomposition}
+For any unitary $2 \times 2$ matrix U, a $C^2U$ gate can be simulated using 2 \textit{CNOT} gates and 3 $C^1V$ and $C^1 V^\dagger$ gates, where \textit{V} is unitary
+\end{lemma}
+
+\begin{lemma}\label{lem:U-sub-time-complexity}
+The $U_{\mathrm{Sub}}$ operator can be synthesized with elementary gate count in $\Om\left(\log(N) \right)$.
+\end{lemma}
+\begin{proof}
+By Lemma~\ref{lem:2-qubit-cnot-decomposition} a $C^2NOT$ can be decomposed into 2 \textit{CNOT} gates and 3 $C^1V$ and $C^1 V^\dagger$ gates. The construction of an adder with carry quantum circuit in \cite{Barenco1996} requires 2 \textit{CNOT} and 3 $C^2NOT$ gates. The 3 $C^2NOT$ gates can then be decomposed into 6 \textit{CNOT} gates and 9 $C^1V$ and $C^1 V^\dagger$ gates. An adder with carry quantum circuit can then be implemented using 8 \textit{CNOT} gates and 9 $C^1V$ and $C^1 V^\dagger$ gates. Operator $U_{\mathrm{Sub}}$ will have $\log(N)$ cascaded adders and so can be constructed with $8\log(N)$ \textit{CNOT} gates and $9\log(N)$ $C^1V$ and $C^1 V^\dagger$ unitary gates. Since the gate count of the elementary gates $CNOT, V, V^\dagger$ are all linear constant, the elementary gate count for operator $U_{\mathrm{Sub}}$ will be in $\Om(\log(N))$ and we assume so about its time complexity.
+\end{proof}
+
+%The qubits in the first register are entangled with the qubits of the second register and are initialized into the state 
+%\[
+%	\vert \psi_{init} \rangle = \sqrt{\frac{1}{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert 0 \rangle
+%\]
+% We put each of the state value in the second register into it
+
+%\subsection{Sequence $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$ as permutation matrix}
+%In this subsection we analyze the circuit complexity of the sequence of operation $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$.
+%
+%\begin{claim}[$C^nNOT$-count for a $2^n \times 2^n$ permutation matrix]\label{obs:kn-CNOT}
+%Given a permutation matrix for a quantum operation on \textit{n} qubits, a quantum circuit implementing the permutation will require a count of $C^{n}NOT$ gates in $\Omega(kn)s$  where \textit{k} is the number of transpositions in the permutation. 
+%\end{claim}
+%\begin{proof}
+%Given a quantum state $\vert q_1 q_2 \ldots q_n \rangle$, a permutation operation on the state will flip all \textit{n} qubits at the worst case, e.g. $\vert 00\ldots0 \rangle \rightarrow \vert 11\ldots1 \rangle$. Each flip will correspond to a single $C^{n} NOT$ gate where the \textit{n} control states will depend on the \textit{n}-qubit state to be transformed and the target will be an ancillary register with at least \textit{n} qubits for storing the flip-or-retain command.
+%\end{proof}
+%
+%\begin{claim}[$C^nNOT$-count for $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$'s permutation matrix]\label{obs:n2n-CNOT}
+%Given the $(2^n \times 2^{n+1}) \times (2^n \times 2^{n+1})$ unitary matrix of the sequence of operators $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$, a quantum circuit for $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$ can be constructed with count of $C^{n}NOT$ gates in $\Omega(n2^n)$ .
+%\end{claim}
+%\begin{proof}
+%The matrix for $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$ will be a permutation matrix of dimension $(2^n \times 2^{n+1}) \times (2^n \times 2^{n+1})$ with its diagonal composed of $2^{n+1} \times 2^{n+1}$ permutation sub-matrices. For each sub-matrix there will only be a single transposition of two indices. Hence, there will be at most $2^n$ transpositions in the matrix of $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$. For each transposition in the matrix of $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$, only \textit{n} qubits will be flipped at most. By Claim~\ref{obs:kn-CNOT} the quantum circuit for each permutation sub-matrix will require at least $kn=1\cdot n = n$ $C^{n}NOT$ gates. Thus, the quantum circuit for $U_{\mathrm{Sub}}U_{\mathrm{Loc}}$ can be constructed with at least $n2^n$ $C^{n}NOT$ gates with ancillary register composed of at least $n+1$ qubits for storing the flip-or-retain command.
+%\end{proof}
+%
+%$C^{n}NOT$ gates can be decomposed into one- to 2-qubit elementary gates. A more detailed analysis by Saeedi et al. in \cite{Saeedi2010} using their cycle-based (transposition) approach provides a tight upper bound on the number of elementary gates needed in synthesizing a permutation matrix into a reversible circuit. This is stated in Theorem~\ref{thm:Syn-22}.
+%
+%\begin{theorem}[$Syn_{2,2}$ method \cite{Saeedi2010}]\label{thm:Syn-22}
+%An arbitrary pair of 2-cycles (transpositions) (a,b)(c,d) can be simulated by at most $34\log N - 64$ elementary gates.
+%\end{theorem}
+
+%\begin{table}[h!]
+%	\centering
+%	\begin{tabular}{ | r || c | c | c |}
+%		\hline
+%		\quad & circuit complexity & time complexity & space complexity\\
+%		\hline\hline
+%		filtering & $\Om\left( N\log N - N \right)$ & $\Om\left( N\log N - N \right)$  & $\Om\left(\log N\right)$\\
+%		\hline
+%		verification & $\Om\left(M\log\vert \Sigma \vert\right)$  & $\Om\left( \left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t\left(q-d\right)}}\right\rfloor \log N \right)$ & $\Om\left( \log \frac{N}{q-d} + M\log \vert \Sigma \vert + M + \log M \right)$ \\
+%		\hline
+%	\end{tabular}
+%	\caption{The circuit, time and space complexity of Algorithm~\ref{alg:quantum-filtering-verification} when identifying at most \textit{t} solution indices in T.}
+%	\label{tab:quantum-filtering-verification-complexity}
+%\end{table}
+%
+%\begin{table}[h!]
+%	\centering
+%	\begin{tabular}{ | r || c | c | c |}
+%		\hline
+%		\quad & circuit complexity & time complexity & space complexity\\
+%		\hline\hline
+%		filtering & $\Om\left( N\log N - N \right)$ & $\Omega\left( t\left(N\log N - N\right) \right)$  & $\Om\left(\log N\right)$\\
+%		\hline
+%		verification & $\Om\left(M\log\vert \Sigma \vert\right)$ & $\Omega\left( t\left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t\left(q-d\right)}}\right\rfloor \log N \right)$ & $\Om\left( \log \frac{N}{q-d} + M\log \vert \Sigma \vert + M + \log M \right)$\\
+%		\hline
+%	\end{tabular}
+%	\caption{The time and space complexity of Algorithm~\ref{alg:quantum-filtering-verification} when identifying at least \textit{t} solution indices in T. We necessarily repeat the execution of Algorithm~\ref{alg:quantum-filtering-verification} at least \textit{t} times for the filtering and verification phase to get at least \textit{t} distinct solution indices in T.}
+%	\label{tab:quantum-filtering-verification-complexity}
+%\end{table}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Quantum filtering algorithm %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Quantum algorithm 3}
+We define a filtering-based quantum algorithm approximate string matching in Algorithm~\ref{alg:quantum-filtering}. It returns a single index $i$ that satisfies the condition $H(\mathrm{P},\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]) \leq d$ with probability $\frac{c_{i}}{N}$ where $c_i$ is the count of matching first occurrences of distinct symbols in P and $\mathrm{T}[i],\ldots,\mathrm{T}[+M-1]$. A high-level quantum circuit for Algorithm~\ref{alg:quantum-filtering} is also shown in Figure~\ref{fig:quantum-filtering-circuit}.
+\begin{algorithm}[h!]
+	\caption{Filtering-based quantum algorithm for approximate string matching with single solution return}
+	\label{alg:quantum-filtering}
+	\begin{algorithmic}[1]
+		\REQUIRE { index register and start register in state $\vert \psi_{\mathrm{init}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert 0 \rangle$ }
+		\ENSURE { a solution index $i$ in T }
+		\STATE $\vert \psi_{\mathrm{loc}} \rangle = U_{\mathrm{\sigma}} \vert \psi_{\mathrm{init}} \rangle$
+%		\STATE Apply unitary operator $U_{\mathrm{Loc}}$ to superposition state 
+%				\[
+%					\vert \psi_{\mathrm{init}} \rangle = \sqrt{\frac{1}{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert 0 \rangle
+%				\].
+		\STATE $\vert \psi_{\mathrm{sub}} \rangle = U_{\mathrm{Sub}} \vert \psi_{\mathrm{loc}} \rangle$
+%		\STATE Apply unitary operator $U_{\mathrm{Sub}}$ to superposition state 
+%				\[
+%					\vert \psi_{\mathrm{loc}} \rangle = \sqrt{\frac{1}{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert \gamma(\text{T}[i]) \rangle
+%				\]
+		\STATE $\left(M \otimes I\right) \vert \psi_{\mathrm{sub}} \rangle$
+		\STATE $i = \left(I \otimes M\right) \vert \psi_{\mathrm{sub}} \rangle$
+%		\STATE Measure the state of the second register in state 
+%			\begin{align*}
+%					\vert \psi_{\mathrm{sub}} \rangle &= \sqrt{\frac{1}{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert i - \gamma(\text{T}[i]) \rangle\\
+%					&= \sqrt{\frac{c_{l_1}}{N}} \sum_{i\ s.t.\ (i- \gamma(\text{T}[i]))=l_1} \vert i \rangle \vert l_1 \rangle + \ldots + \sqrt{\frac{c_{l_m}}{N}} \sum_{i\ s.t.\ (i-\gamma(\text{T}[i]))=l_m} \vert i \rangle \vert l_m \rangle
+%			\end{align*}
+		\RETURN \textit{i}.
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[ht]
+	\caption{Filtering-based quantum algorithm for approximate string matching with multiple solution return}
+	\label{alg:quantum-filtering-many-solutions}
+	\begin{algorithmic}[1]
+		\REQUIRE {index register and start register in state $\vert \psi_{\mathrm{init}} \rangle = \frac{1}{\sqrt{N}} \sum_{i=0}^{N-1} \vert i \rangle \vert 0 \rangle$ }
+		\ENSURE {$Sol = \{i \vert H\left(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1],\mathrm{P}\right) \leq d \}$}
+		\FOR {1 to \textit{t}}
+			\STATE $\vert \psi_{\mathrm{loc}} \rangle = U_{\mathrm{\sigma}} \vert \psi_{\mathrm{init}} \rangle$
+			\STATE $\vert \psi_{\mathrm{sub}} \rangle = U_{\mathrm{Sub}} \vert \psi_{\mathrm{loc}} \rangle$
+			\STATE $\left(M \otimes I\right) \vert \psi_{\mathrm{sub}} \rangle$
+			\STATE $i = \left(I \otimes M\right) \vert \psi_{\mathrm{sub}} \rangle$
+			\STATE $Sol\ \bigcup\ \{i\}$
+		\ENDFOR
+		\RETURN \textit{Sol}.
+	\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[ht]
+	\centering
+	\footnotesize
+	\begin{minipage}[b]{0.8\linewidth}
+		\[
+			\Qcircuit @C=1em @R=1em {
+				& \lstick{\vert \mathbf{0} \rangle} & \targ      & \gate{QRAM} & \qw & \vert \phi_i \rangle & \quad & \ctrl{3}  & \qw                                              & \qw & \qw    & \qw  & \qw                                               & \qw & \qw  & \qw      & \qw                                                                           & \qw & \qw & \quad\\    
+				& \lstick{\vert \mathbf{i} \rangle}  & \ctrl{-1} & \qw               & \qw & \qw                        & \qw   & \qw        & \qw                                              & \qw & \qw     & \qw  & \qw                                            & \qw & \qw  & \qw      & \qw                                                                          & \multigate{1}{U_{\mathrm{Sub}}}  & \qw & \vert \mathbf{i} \rangle\\
+				& \lstick{\vert \mathbf{0} \rangle} & \qw       & \qw               & \qw & \qw                        & \qw   & \qw        & \gate{\gamma\left(\sigma_1\right)} & \qw & \ldots  & \quad & \gate{\gamma\left(\sigma_i\right)} & \qw & \ldots  & \quad & \gate{\gamma\left(\phi_{\vert \Sigma \vert}\right)} & \ghost{U_{\mathrm{Sub}}}  & \qw & \quad\quad\quad\vert i - \gamma(\sigma_i) \rangle\\
+                & \lstick{\vert \mathbf{0} \rangle}	 & \qw       & \qw               & \qw & \qw                        & \qw   & \targ      & \ctrl{-1}                                    & \qw & \qw     & \qw   & \ctrl{-1}                                      & \qw & \qw     & \qw    & \ctrl{-1}                                                                    & \qw  & \qw & \quad\gategroup{1}{3}{4}{8}{1em}{--}\gategroup{3}{9}{4}{17}{.7em}{--}
+			}		
+		\]
+	\end{minipage}
+	\caption{A quantum circuit for the transformation $\vert i \rangle\vert 0 \rangle \rightarrow \vert i \rangle\vert i - \gamma(\sigma_i) \rangle$. The first dashed line box corresponds to the fetching of symbol in $\mathrm{T}[i]$ given address $\vert i \rangle$ using a QRAM \cite{Giovannetti2008}. The QRAM outputs an encoding of the symbol $\mathrm{T}[i]$. The second box is composed of a sequence of operators which correspond to each index of first occurrence $\gamma(\sigma_i)$ for all $i=1,\ldots,\vert \mathrm{P}_{\Sigma} \vert$. The output symbol encoding $\sigma_i$ from the first dashed line box serve as control qubits to the operators in the second dashed line box. Only a single operator $\gamma(\sigma_i)$ will be activated during computation. The last operator is $U_{\mathrm{Sub}}$. It facilitates the operation $\vert i \rangle\vert \gamma(\sigma_i) \rangle \rightarrow \vert i \rangle\vert i - \gamma(\sigma_i) \rangle$. A quantum superposition state $\sum_i \alpha_i \vert i \rangle$ may also serve as input to QRAM for the address and it will return also a quantum superposition state $\sum_i \alpha_i \vert i \rangle\vert D_i \rangle$ where $\vert D_i \rangle$ is the data associated with address $\vert i \rangle$.}
+	\label{fig:quantum-filtering-circuit}
+\end{figure}
+
+\begin{theorem}\label{lem:quantum-filtering}
+Given $q \geq 2d$, where \textit{q} is the alphabet size of P, there exists a quantum algorithm which with probability $\frac{c_{i_k}}{N}$ outputs a single candidate starting index $i_k$ of an approximate copy of P in T with circuit complexity in
+\[
+	\Om\left(N + \log N + \vert \Sigma \vert^2\log M \right),
+\]
+time complexity in
+\[
+	\Om\left( \log N + \vert \Sigma \vert\log M \right),
+\]
+and space complexity in
+\[
+	\Omega\left( N\log\vert \Sigma \vert + \log N + \log \vert \Sigma \vert \right)
+\]
+where $c_{i_k}$ is the count of matching first occurrences of all distinct symbols between $\mathrm{P}$ and $\mathrm{T}[i_k],\ldots,\mathrm{T}[i_k+M-1]$, 
+\end{theorem}
+\begin{proof}
+By Lemma~\ref{lem:U-sigma-circuit-complexity} and \ref{lem:U-sub-time-complexity} the elementary gate count of operators $U_{\mathrm{\sigma_k}}$ for $k=1,\ldots,\vert \Sigma \vert$ will be in $\vert \Sigma \vert^2\log M$ and that of operator $U_{\mathrm{Sub}}$ will be in $\Om\left( \log N \right)$. A QRAM will have a gate count of $N$. In total, the quantum algorithm in Algorithm~\ref{alg:quantum-filtering} will have circuit complexity in $\Om\left( N + \log N + \vert \Sigma \vert^2\log M \right)$.
+
+For the time complexity, by Lemma~\ref{lem:U-sigma-time-complexity} the operators $U_{\mathrm{\sigma_k}}$ will have time complexity in $\Om\left(\vert \Sigma \vert \log M\right)$ while for operator $U_{\mathrm{Sub}}$ we assume its time complexity to be the same as its circuit complexity. A QRAM will only have $\Om\left( \log N \right)$ of its gates activated at during each access \cite{Giovannetti2008} and so we assume its time complexity to be same. In total, the quantum algorithm in Algorithm~\ref{alg:quantum-filtering} will have time complexity in $\Om\left( \log N + \vert \Sigma \vert\log M \right)$.
+
+The $U_{\mathrm{\sigma_k}}$ operators will work on the $(\log N + 1)$-qubit start register and a $\log \vert \Sigma \vert$-qubit ancillary register. Operator $U_{\mathrm{Sub}}$ will work on the $\log N$-qubit index register and the start register. The QRAM on the other hand will have $\Om\left( N \right)$ data cells where each cell will have $\log \vert \Sigma \vert$ qubits for storing each symbol $\mathrm{T}[i]$. In total, the space complexity of the quantum algorithm will be in $\Omega\left( N\log\vert \Sigma \vert + \log N + \log \vert \Sigma \vert \right)$. 
+
+By Equation~\ref{eqn:psi-sub-sum} the amplitude of each state $\vert i_k \rangle$ in the superposition state $\vert \psi_{\mathrm{sub}} \rangle$ is given by 
+\[
+	\sqrt{\frac{c_{i_k}}{N}}
+\]
+where $c_{i_k}$ is the count of matching first occurrences of all distinct symbols between $\mathrm{P}$ and $\mathrm{T}[i_k],\ldots,\mathrm{T}[i_k+M-1]$. The probability then of occurrence of index $i_k$ as a result of measurement of the state of the index register will be 
+\[
+	\left\vert \sqrt{\frac{c_{i_k}}{N}} \right\vert^2 = \frac{c_{i_k}}{N}.
+\]
+\end{proof}
+
+\begin{claim}
+The probability of occurrence of a solution index $i_k$ is bounded above by $\frac{\vert \Sigma \vert}{N}$.
+\end{claim}
+\begin{proof}
+Since the maximum number of distinct symbols in P is $\vert \Sigma \vert$, assuming $\vert \Sigma \vert \leq M$, i.e. all symbols in $\Sigma$ is in P, the maximum number of matches of first occurrence of the distinct symbols in P with any substring of T will also be bounded by $\vert \Sigma \vert$. The amplitude of any state $\vert i_k \rangle$ in Equation~\ref{eqn:psi-sub-sum} will thus be bounded above as
+\[
+	\sqrt{\frac{c_{i_k}}{N}} \leq \sqrt{\frac{\vert \Sigma \vert}{N}}
+\]
+and its probability by
+\begin{align*}
+	\left\vert \sqrt{\frac{c_{i_k}}{N}} \right\vert^2 &\leq \left\vert \sqrt{\frac{\vert \Sigma \vert}{N}} \right\vert^2\\
+	                                                          &\leq \frac{\vert \Sigma \vert}{N}.
+\end{align*}
+\end{proof}
+
+Though we are not able to qualify exactly only those indices in T which have points $\geq d$, we are guaranteed that the indices with higher number of matching distinct symbols in P will have higher probability as compared to those with lower number of matches.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Verification phase %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\section{Verification phase}\subsection{Outline}
+%We define $Loc=\{i \vert i \text{ is an output of Algorithm}~\ref{alg:quantum-filtering}\}$. We refer to substrings $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ for all $i \in Loc$ when we say substrings of T in this chapter. The verification phase will mainly use binary arithmetic operations on quantum circuits for (1) marking solution indices in T and (2) amplitude amplification for increasing the probability of occurrence of these indices. Main steps of the quantum verification algorithm will be the computation of the number of mismatches of each substring of T and the comparison of the number of mismatches to the input threshold \textit{d}.
+%
+%We first discuss about the outline of the quantum verification algorithm. We start off with the initial superposition state
+%\begin{equation}\label{eqn:delta-init}
+%	\vert \delta_{\mathrm{init}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert \mathbf{0} \rangle\vert \mathbf{0} \rangle\vert d \rangle
+%\end{equation}
+%where $\Sigma^{\phi}\left( \cdot \right)$ is a function which converts a sequence of symbols $\sigma \in \Sigma$ into its binary encoding. A unitary operator $U_{\mathrm{Mis}}$ is applied to state $\vert \delta_{\mathrm{init}} \rangle$. This results to a new superposition state
+%\begin{equation}\label{eqn:delta-mis}
+%	\vert \delta_{\mathrm{mis}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle\vert \mathbf{0} \rangle\vert d \rangle
+%\end{equation}
+%where the state $\vert i_{\mathrm{mis}} \rangle$ encodes the mismatching symbols between substrings $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ and P for all $i \in Loc$. We then compute for the Hamming distance between the substrings $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ and P by summing the mismatches $i_{\mathrm{mis}}$ in the previous step. We apply operator $U_{\mathrm{Ham}}$ into state $\vert \delta_{\mathrm{mis}} \rangle$ which will result to a new superposition state
+%\begin{equation}\label{eqn:delta-ham}
+%	\vert \delta_{\mathrm{ham}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle\vert i_{\mathrm{ham}} \rangle\vert d \rangle
+%\end{equation}
+%We then evaluate the expression $i_{\mathrm{mis}} \leq d$ by applying operator $U_\mathrm{Mark}$ to state $\vert \delta_{\mathrm{ham}} \rangle$ which will result to the superposition state
+%\begin{equation}\label{eqn:delta-mark}
+%	\vert \delta_{\mathrm{mark}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} (-1)^{f(i_{\mathrm{mis}}, d)} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle\vert i_{\mathrm{ham}} \rangle\vert d \rangle
+%\end{equation}
+%where function $f(\cdot,\cdot)$ is given by
+%\begin{equation}
+%	f(x,y)=
+%	\begin{cases}
+%		1, & \mathrm{if}\ x \leq y\\
+%		0, & \mathrm{otherwise.}
+%	\end{cases}
+%\end{equation}
+%We refer to the states $-\vert i \rangle$ in Equation~\ref{eqn:delta-mark} as \textit{marked} states. These states correspond to the starting indices \textit{i} in T where $H\left( P, \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1] \right) \leq d$. Next we apply a quantum counting algorithm by Brassard et al. in \cite{Brassard1998} to get an exact count of the mark states with probability $> \frac{3}{4}$. Let \textit{t} be the classical value output of the counting algorithm. 
+%
+%Given count \textit{t} of marked states in superposition state $\vert \delta_{\mathrm{mark}} \rangle$, we apply Grover operator $U_{\mathrm{Amp}}U_{\mathrm{Mark}}$ to state $\vert \delta_{\mathrm{ham}} \rangle$ to maximize the amplitude of the marked states.
+%
+%Finally, we measure the state of the index register and with equally high probability we get a classical value corresponding to a solution index as result of measurement.
+%
+%We define the registers in $\vert \delta_{\mathrm{init}} \rangle$. Let the register in state
+%\begin{itemize}
+%	\item $\vert i \rangle$ be the $\log \frac{N}{q-d}$-qubit  \textit{index register} corresponding to indices $i \in Loc$
+%	\item $\vert \Sigma^\phi(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]) \rangle$ be a $M\log \vert \Sigma \vert$-qubit \textit{substring register}
+%	\item $\vert \Sigma^\phi(P) \rangle$ be a $M\log \vert \Sigma \vert$-qubit \textit{pattern register}
+%	\item $\vert \mathbf{0} \rangle$ be a $M$-qubit \textit{mismatches register}
+%	\item $\vert \mathbf{0} \rangle$ be a $\log M$-qubit \textit{distance register}
+%	\item $\vert d \rangle$ be a $\log M$-qubit \textit{threshold register}
+%\end{itemize}
+%The substring and pattern registers are sequences of symbol registers. The mismatches register corresponds to a binary indicator sequence given by
+%\[
+%	q_j  = \begin{cases}
+%		1, & \mathrm{if}\ \mathrm{P}[j] \neq \mathrm{T}[j+i]\\
+%		0, & \mathrm{otherwise}
+%	\end{cases}
+%\]
+%for $i \in Loc, j=0,\ldots,M-1$. Its qubits correspond to the bottom ancillary qubits in the circuit in Figure~\ref{fig:symbol-comparator-parallel}. The distance register will hold the count of the mismatches between substrings in T and P. Finally, the threshold register will hold the input distance threshold value.
+%
+%We discuss the details of each operator used in each step of the quantum verification algorithm in the succeeding sections.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Computation of Hamming distance %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsection{Operators}
+%
+%\subsubsection{Unitary operator $U_{\mathrm{Mis}}$}\label{subsec:Umis}
+%In order to compute for the Hamming distance between substrings in T and P, we need to (1) identify the mismatching symbols between the substrings and P and then (2) count the number of these mismatching symbols. We identify the mismatches between substrings of T and P using operator $U_{\mathrm{Mis}}$.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Identifying mismatches with operator U_Mis$ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\subsubsection{Identifying mismatches with operator $U_{\mathrm{Mis}}$}
+%%\label{subsec:identifying-mismatches}
+%% How do we identify the mismatches between a substring of T and P?
+%
+%We represent each symbol $\sigma \in \Sigma$ as a state of a register. We call such register a \textit{symbol register} and is composed of $\log \vert \Sigma \vert$ qubits. A sequence of \textit{M} symbols is represented with the tensor product of states of a sequence of \textit{M} symbol registers. To each symbol $\sigma \in \Sigma$ we arbitrarily assign a $\log \vert \Sigma \vert$-bit binary number. Let 
+%\begin{itemize}
+%	\item $\phi = \{0,1\}^{\log \vert \Sigma \vert}$
+%	\item $\Sigma^\phi: \Sigma \rightarrow \phi$
+%	\item $\Sigma^\phi_j: \Sigma^\phi \rightarrow \{0,1\}$
+%\end{itemize}
+%$\Sigma^{\phi}(\cdot)$ is an arbitrary mapping of each symbol $\sigma \in \Sigma$ into a binary number in $\phi$. $\Sigma^{\phi}_j(\cdot)$ is a function which returns the state of the \textit{j}-th bit in a binary encoding $\Sigma^{\phi}(\cdot)$.
+%
+%We extend our definition of $\Sigma^\phi$ into a sequence of symbols. Given a sequence of symbols $S=s_1,s_2,\ldots,s_n$, 
+%\[
+%	\Sigma^\phi(S)= \Sigma^\phi(s_1), \Sigma^\phi(s_2), \ldots, \Sigma^\phi(s_n).
+%\]
+%We represent a symbol $\text{T}[i]$ as the state $\vert \Sigma^\phi(\text{T}[i]) \rangle$ of a symbol register. A substring $\text{T}~[~i~,~i~+~M~-~1~]$ is represented with the state 
+%\begin{equation}
+%	\vert \Sigma^\phi(\text{T}[i],\ldots,\mathrm{T}[i+M-1]) \rangle = \vert \Sigma^\phi(\text{T}[i]) \rangle \otimes \vert \Sigma^\phi(\text{T}[i+1]) \rangle \otimes \ldots \otimes \vert \Sigma^\phi(\text{T}[i+M-1]) \rangle
+%\end{equation}
+%of a sequence of \textit{M} symbol registers.
+%
+%To identify the mismatches between any substring $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ and P, we compare each of their corresponding symbols. To compare two symbols $\text{P}[j]$ and $\text{T}[i+j]$ we use a \textit{symbol comparator} quantum circuit as shown in Figure~\ref{fig:1-qubit-symbols-comparator}. Input to the circuit are the symbol register for $\text{P}[j]$, symbol register for $\text{T}[i+j]$ and an ancillary register for holding the result of the comparison. An extended circuit for the case in which $\vert \Sigma \vert = 4$ is shown in Figure~\ref{fig:2-qubit-symbols-comparator}. To compare a substring $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ and P we can arrange \textit{M} symbol comparator circuits to perform the comparison in parallel manner. Such a circuit is shown in Figure~\ref{fig:symbol-comparator-parallel} with assumption $\vert \Sigma \vert=2$. We denote the generalization of the circuit in Figure~\ref{fig:symbol-comparator-parallel}, $\vert \Sigma \vert = k, k \in \Sigma^+$, as the unitary operator $U_{\mathrm{Mis}}$. Since the quantum circuit for the symbol comparator can be parallelized to come up with a generalized comparator for substrings of T and P, the time complexity for the $U_{\mathrm{Mis}}$ is in $\Om(1)$.
+%
+%%We assign a unique positive binary number in $\{1,\ldots,\vert \Sigma \vert\}$ to each symbol $\sigma \in \Sigma$. Each state $\vert \sigma \rangle$ is a tensor product of state of qubits representing the binary number assigned to $\sigma$. The step of identifying mismatches between substrings of T and P is then a series of binary operations on each $\vert \sigma \rangle$ representing the substring and the states $\vert \text{P}[i] \rangle$ representing symbols in P.
+%%
+%%To represent a symbol $\sigma$ we prepare a quantum register composed of $\log(\vert \Sigma \vert)$ qubits initialized in state $\vert \sigma \rangle$. We let $\vert \sigma_i \rangle$ denote the state of the \textit{i}-th qubit of a register in state $\vert \sigma \rangle$. To compare two symbols $\alpha$ and $\beta$ we prepare two registers each with $\log(\vert \Sigma \vert)$ qubits, the first prepared in state $\vert \alpha \rangle$ and the other in state $\vert \beta \rangle$.  We then apply a binary comparison operation on these two registers to compare the symbols $\alpha$ and $\beta$. In Figure~\ref{fig:1-qubit-symbols-comparator} we show a quantum circuit for comparing symbols $\alpha$ and $\beta$ such that $\Sigma=\{\alpha,\beta\}$. We extend this circuit in Figure~\ref{fig:2-qubit-symbols-comparator} for the case in which $\vert \Sigma \vert = 4$.
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}	& \ctrl{2}	&	\qw		& \qw 			& \qw		& \qw 			& \qw			& 	\qw		&	\ctrl{2} 	& \qw	& \quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[j]) \rangle} 	&	\qw		& \ctrl{1}	& \qw			& \qw		& \qw  			& \qw			&	\ctrl{1}	& \qw 			& \qw	& \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[j]) \rangle}\\
+%				& \lstick{\vert 0 \rangle} 				& \targ 		& \targ 		& \gate{X} 	& \ctrl{1}	& \qw			& \gate{X}		& \targ 		& \targ			& \qw	& \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}				& \qw		& \qw		& \qw			& \targ		& \gate{X}		& \qw			& \qw		& \qw			& \qw	& 
+%				\quad\quad\quad\quad\quad\quad\quad\quad\quad{
+%					\begin{cases}
+%						\vert 0 \rangle, \Sigma^{\phi}(\text{T}[i+j]) = \Sigma^{\phi}(\text{P}[j]) \\
+%						\vert 1 \rangle, \mathrm{otherwise}
+%					\end{cases}
+%				}
+%			}	
+%		\]
+%		\caption{A 2-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text{T}[i+j]$ and $\text{P}[j]$ assuming $\vert \Sigma \vert=2$ for example purposes. The top qubit is initialized in state $\vert \Sigma^\phi(\text{T}[i+j]) \rangle$ and the next qubit is initialized in state $\vert \Sigma^\phi(\text{P}[j]) \rangle$. The bottom two qubits serve as ancillary bits for keeping the results of comparison and are initialized in state $\vert 0 \rangle$. The bottommost qubit serves as a binary indicator and is put into state $\vert 1 \rangle$ if symbols $\text{T}[i+j]$ and $\text{P}[j]$ do not match and $\vert 0 \rangle$ otherwise. The circuit can be extended to accommodate larger $\vert \Sigma \vert$ by adding qubits to the input symbol registers and ancillary register.}
+%		\label{fig:1-qubit-symbols-comparator}
+%	\end{minipage}
+%\end{figure}
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw 			& \qw 		  & \qw			& \qw 		& 	\qw			&	\ctrl{4} 	& \qw & \quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(T[i+j]) \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  		& \qw 		  & \qw			& \ctrl{4}	&	\qw			& \qw			& \qw &\quad\quad\quad\quad\quad{\vert \Sigma^\phi_2(T[i+j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[j]) \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  		& \qw 		  & \qw			& \qw		&	\ctrl{2}	& \qw 			& \qw & \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[j]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(\text{P}[j]) \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  		& \qw 		  & \ctrl{2} 	& \qw		& \qw 		  	& \qw			& \qw & \quad\quad\quad{\vert \Sigma^\phi_2(\text{P}[j]) \rangle}\\
+%				& \lstick{\vert 0 \rangle} 							& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \ctrlo{1} & \qw  		& \gate{X} & \qw			& \qw		& \targ 		& \targ			& \qw & \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \ctrlo{1} & \qw  		& \gate{X} & \targ 		& \targ		& \qw			& \qw			& \qw & \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \targ		 & \gate{X}  & \qw 		  & \qw			& \qw		& \qw			& \qw			& \qw & 
+%				\quad\quad\quad\quad\quad\quad\quad\quad\quad{
+%					\begin{cases}
+%						\vert 0 \rangle, \text{T}[i+j] = \text{P}[j] \\
+%						\vert 1 \rangle, \text{T}[i+j] \neq \text{P}[j]
+%					\end{cases}
+%				}
+%			}	
+%		\]
+%		\caption{A 4-qubit symbol comparator circuit (with ancillary qubits) for comparing two symbols $\text{T}[i+j]$ and $\text{P}[j]$ assuming $\vert \Sigma \vert=4$ for example purposes. The top two qubits are initialized in state $\vert \Sigma^\phi(\text{T}[i+j]) \rangle$ and the next two qubits are initialized in state $\vert \Sigma^\phi(\text{P}[j]) \rangle$. The bottom three qubits serve as ancillary qubits for holding the results of comparison and are initialized in state $\vert 0 \rangle$. The bottommost qubit serves as a binary indicator and is put into state $\vert 1 \rangle$ if the symbols do not match and into state $\vert 0 \rangle$ otherwise.}
+%		\label{fig:2-qubit-symbols-comparator}
+%	\end{minipage}
+%\end{figure}
+%%We have shown comparison of a symbol with another symbol. In order to be able to compare an \textit{M}-length substring of T with P we can perform the symbol comparison in a parallel manner. In Figure~\ref{fig:symbol-comparator-parallel} we show a quantum circuit for comparing a substring of T with P using the quantum circuit in Figure~\ref{fig:1-qubit-symbols-comparator}, assuming $\vert \Sigma \vert = 2$.
+%\begin{figure}[ht]
+%	\centering
+%	\begin{minipage}[b]{\linewidth}
+%		\[
+%			\Qcircuit @C=.75em @R=1.25em {
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i]) \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw 			& \qw 		  	& \qw			& \qw 			& 	\qw			&	\qw			& \ctrl{4} 	& \qw 		& \quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(\text{T}[i]) \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			& \ctrl{4}		&	\qw			& \qw			& \qw 		& \quad\quad\quad{\vert \Sigma^\phi_2(\text{T}[i]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[0]) \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			&	\qw			& \ctrl{2}		& \qw 			& \qw 		& \quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[0]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(\text{P}[0]) \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \ctrl{2} 	& \qw			& \qw 		  	& \qw			& \qw 		& \quad\quad\quad{\vert \Sigma^\phi_2(\text{P}[0]) \rangle}\\
+%				& \lstick{\vert 0 \rangle} 							& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \ctrlo{1} & \qw  		& \qw			& \gate{X} 	& \qw			& \qw			& \targ 		& \targ			& \qw 		& \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \ctrlo{8} & \qw  		& \qw			& \gate{X} 	& \targ 		& \targ			& \qw			& \qw			& \qw 		& \vert 0 \rangle\\
+%				& \quad														& \quad		& \quad	& \quad		& \quad		& \quad		& \quad	& \quad		& \vdots		& \quad		& \quad		& \quad		& \quad		& \quad 		& \quad	& \quad\\
+%				& \lstick{\vert \Sigma^\phi_1(\text{T}[i+M-1]) \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw 			& \qw 		  	& \qw			& \qw 			& 	\qw			& \qw			&	\ctrl{4} 	& \qw 		& \quad\quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{T}[i+M-1]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(\text{T}[i+M-1]) \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			& \ctrl{4}		&	\qw			& \qw			& \qw 		& \quad\quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_2(\text{T}[i+M-1]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_1(\text{P}[M-1]) \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  		& \qw 		  	& \qw			& \qw			& \qw			&	\ctrl{2}	& \qw 			& \qw 		& \quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_1(\text{P}[M-1]) \rangle}\\
+%				& \lstick{\vert \Sigma^\phi_2(\text{P}[M-1]) \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  		& \qw 		  	& \qw			& \ctrl{2} 	& \qw			& \qw 		  	& \qw			& \qw 		& \quad\quad\quad\quad\quad\quad{\vert \Sigma^\phi_2(\text{P}[M-1]) \rangle}\\
+%				& \lstick{\vert 0 \rangle} 							& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \qw		& \ctrlo{1} 	& \qw  			& \gate{X} 	& \qw			& \qw			& \targ 		& \targ			& \qw 		& \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \qw		& \ctrlo{3} 	& \qw  			& \gate{X} 	& \targ 		& \targ			& \qw			& \qw			& \qw 		& \vert 0 \rangle\\
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \targ		 & \qw			& \gate{X}  	& \qw 		  	& \qw			& \qw			& \qw			& \qw			& \qw 		& \quad\quad\quad\quad\quad\quad\quad{\begin{cases}
+%				\vert 0 \rangle, & \mathrm{P}[0]=\mathrm{T}[i]\\
+%				\vert 1 \rangle, & \mathrm{otherwise}
+%			\end{cases}} \\			
+%				& \quad														& \quad		& \quad	& \quad		& \quad		& \quad		& \quad	& \quad 			& \vdots		& \quad		& \quad		& \quad		& \quad		& \quad		& \quad		& \quad \\
+%				& \lstick{\vert 0 \rangle}							& \qw			& \qw		& \qw			& \qw			& \qw			& \qw		& \targ		 	& \gate{X}  	& \qw 		  	& \qw			& \qw			& \qw			& \qw			& \qw 		& \quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad\quad{\begin{cases}
+%				\vert 0 \rangle, & \mathrm{P}[M-1]=\mathrm{T}[i+M-1]\\
+%				\vert 1 \rangle, & \mathrm{otherwise}
+%			\end{cases}} \\	
+%			}	
+%		\]
+%		\caption{A parallel 4-qubit symbol comparator circuit with ancillary qubits. It compares symbols in $\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]$ to their corresponding symbols in P in parallel manner. The ancillary qubits serve as binary indicator for identifying a match and a mismatch.}
+%		\label{fig:symbol-comparator-parallel}
+%	\end{minipage}
+%\end{figure}
+%
+%%The register in state $\vert i \rangle$ in Equation~\ref{eqn:delta-init} is the index register used in the filtering phase. In the verification phase, it is put into a superposition state corresponding to indices $i \in Loc$. The following is a series of symbol registers in the superposition state 
+%%\[
+%%	\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle=\vert \Sigma^\phi(\text{T}[i]) \rangle \otimes \ldots \otimes \vert \Sigma^\phi(\text{T}[i+M-1]) \rangle
+%%\]
+%%and we call the composition of these registers as \textit{substring register}. The following is also a series of symbol registers in state 
+%%\[
+%%	\vert \Sigma^\phi(P) \rangle=\vert \Sigma^\phi(P[0]) \rangle \otimes \ldots \otimes \vert \Sigma^\phi(P[M-1]) \rangle
+%%\]
+%%and we call their composition as \textit{pattern register}. Each symbol register is composed of $\log(\sigma)$ qubits. The following register in Equation~\ref{eqn:delta-init} is in state $\vert \mathbf{0} \rangle$ and we call it as \textit{mismatches register}. This register is composed of \textit{M} qubits and corresponds to the bottom ancillary register in the circuit in Figure~\ref{fig:symbol-comparator-parallel}. 
+%
+%The application of operator $U_{\mathrm{Mis}}$ into the registers in superposition state $\vert \delta_{\mathrm{init}} \rangle$ is
+%\begin{equation}
+%	\begin{split}
+%		\vert \delta_{\mathrm{mis}} \rangle &= U_{\mathrm{Mis}}\left( \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle \vert \mathbf{0} \rangle \vert \mathbf{0} \rangle \vert d \rangle \right) \\ 
+%																&= \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle \vert \mathbf{0} \rangle \vert d \rangle \rangle 
+%	\end{split}
+%\end{equation}
+%%The state $\vert i_{\mathrm{mis}} \rangle$ of the mismatches register corresponds to the state of a binary indicator vector describing the comparison of each corresponding symbol of $\text{T}[i,i+M-1]$ and P.
+%
+%\begin{example}
+%In application to our sample problem instance, assume the output of the quantum filtering sub-routine is $Loc=\{0,1,2,4\}$. We also adjust $d=2$ so that $\frac{N}{q-d}=4$ will be an integer. Applying operator $U_{\mathrm{Mis}}$ to state $\vert \delta_{\mathrm{init}} \rangle$ will result to state
+%	\begin{equation*}
+%		\begin{split}
+%			\vert \delta_{\mathrm{mis}} \rangle &= U_{\mathrm{Mis}}\left( \vert \delta_{\mathrm{init}} \rangle \right) \\
+%			 &= U_{\mathrm{Mis}} \Bigg( \frac{1}{\sqrt{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[0],\ldots,\mathrm{T}[3] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert \mathbf{0} \rangle \vert \mathbf{0} \rangle \vert d \rangle  + \vert 1 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[1],\ldots, \mathrm{T}[4] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert \mathbf{0} \rangle \vert \mathbf{0} \rangle \vert d \rangle\ + \\
+%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[2],\ldots,\mathrm{T}[5] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert \mathbf{0} \rangle \vert \mathbf{0} \rangle \vert d \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[4],\ldots,\mathrm{T}[7] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert \mathbf{0} \rangle \vert \mathbf{0} \rangle \vert d \rangle\Bigg)\Bigg)\\
+%%			&= U_{\mathrm{Mis}}\Bigg( \sqrt{\frac{1}{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \text{T}[0,3] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert \mathbf{0} \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \text{T}[1,4] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert \mathbf{0} \rangle\ + \\
+%%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \text{T}[2,5] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert \mathbf{0} \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \text{T}[4,7] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert \mathbf{0} \rangle\Bigg)\Bigg)\\
+%            &= \frac{1}{\sqrt{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[0],\ldots,\mathrm{T}[3] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0001 \rangle \vert \mathbf{0} \rangle \vert d \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[1],\ldots, \mathrm{T}[4] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1101 \rangle \vert \mathbf{0} \rangle \vert d \rangle\ + \\
+%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[2],\ldots,\mathrm{T}[5] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1111 \rangle \vert \mathbf{0} \rangle \vert d \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[4],\ldots,\mathrm{T}[7] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0000 \rangle \vert \mathbf{0} \rangle \vert d \rangle\Bigg)
+%%			&= \sqrt{\frac{1}{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \text{T}[0,3] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 0001 \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \text{T}[1,4] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 1101 \rangle\ + \\
+%%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \text{T}[2,5] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 1111 \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \text{T}[4,7] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 0000 \rangle\Bigg)
+%		\end{split}
+%	\end{equation*}
+%\end{example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Counting mismatches %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsubsection{Unitary operator $U_{\mathrm{Ham}}$}\label{subsec:Uham}
+%% How do we count the number of mismatches between a substring of T and P?
+%
+%%We first establish some notation and convention necessary for discussion of the concepts in this section. First, we arbitrarily assign a unique $\log{\vert \Sigma \vert}$-digit unsigned binary value to each symbol in $\Sigma$. We denote the binary value assigned to a symbol $\sigma$ as $\sigma_{bin}$. For the given example $\Sigma=\{a,b,c,d\}$ let 00 correspond to \textit{a}, 01 to \textit{b}, 10 to \textit{c} and 11 to \textit{d}. In the computation we represent a symbol $\sigma$ as a quantum state by using its binary representation, $\vert \sigma_{bin} \rangle$. Furthermore, we denote the \textit{i}-th qubit in $\vert \sigma_{bin} \rangle$ as $\vert \sigma_{bin} \rangle_i$. Given a substring $\text{T}[i~,~i~+~M~-~1~]$ we represent it as the quantum state $\vert \text{T}[i]_{bin} \rangle \vert \text{T}[i+1]_{bin} \rangle \ldots \vert \text{T}[i+M-1]_{bin} \rangle$. To compute for the Hamming distance of each substring $\text{T}[i,i+M-1]$ starting at each location $i \in Loc$ we need to identify first the mismatches for each substring. We denote the mismatches in each substring using an \textit{M}-qubit binary indicator quantum state in the second register. The \textit{j}-th qubit of this indicator state is in state $\vert 0 \rangle$ if P[\textit{j}] and T[\textit{i}+\textit{j}] matches and in state $\vert 1 \rangle$ otherwise.
+%We next count the mismatches in $\vert \delta_{\mathrm{mis}} \rangle$. We make use of a circuit for quantum full-adder for counting the number of qubits of the mismatches register currently in state $\vert 1 \rangle$. This count is the Hamming distance $i_{\mathrm{ham}} = H(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1], \mathrm{P})$ for all $ i \in Loc$. We can arrange the full-adders into a binary tree structure to perform the computation in $\log(\cdot)$ time only. Since the mismatches register is composed of \textit{M} qubits the counting will require $\Om\left( \log M \right)$ time complexity. We store each computed Hamming distance into the distance register. 
+%
+%We denote the unitary operator which performs the total counting operation as $U_{\mathrm{Ham}}$. Given state $\vert \delta_{\mathrm{mis}} \rangle$ the effect of applying operator $U_{\mathrm{Ham}}$ into the mismatches register will be the state
+%\begin{equation}
+%	\begin{split}
+%		\vert \delta_{\mathrm{ham}} \rangle &= U_{\mathrm{Ham}} \left( \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]) \rangle\vert \Sigma^\phi(\mathrm{P}) \rangle\vert i_{\mathrm{mis}} \rangle\vert \mathbf{0} \rangle\vert d \rangle \right)\\
+%																&= \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1]) \rangle\vert \Sigma^\phi(\mathrm{P}) \rangle\vert i_{\mathrm{mis}} \rangle \vert i_{\mathrm{ham}} \rangle\vert d \rangle
+%	\end{split}
+%\end{equation}
+%
+%\begin{example}
+%	In application to our sample problem instance, the application of operator $U_{\mathrm{Ham}}$ to state $\vert \delta_{\mathrm{mis}} \rangle$ will result into the state
+%	\begin{equation*}
+%		\begin{split}
+%			\vert \delta_{\mathrm{ham}} \rangle &= U_{\mathrm{Ham}}\left( \vert \delta_{\mathrm{mis}} \rangle \right) \\
+%			&= U_{\mathrm{Ham}} \Bigg( \frac{1}{\sqrt{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[0],\ldots,\mathrm{T}[3] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0001 \rangle\vert \mathbf{0} \rangle \vert d \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[1],\ldots,\mathrm{T}[4] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1101 \rangle\vert \mathbf{0} \rangle  \vert d \rangle\ + \\
+%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[2],\ldots,\mathrm{T}[5] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1111 \rangle\vert \mathbf{0} \rangle  \vert d \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[4],\ldots,\mathrm{T}[7] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0000 \rangle\vert \mathbf{0} \rangle  \vert d \rangle \Bigg) \Bigg) \\
+%			&= \sqrt{\frac{1}{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[0],\ldots,\mathrm{T}[3] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0001 \rangle\vert 1 \rangle  \vert d \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[1],\ldots,\mathrm{T}[4] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1101 \rangle\vert 3 \rangle \vert d \rangle\ + \\
+%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[2],\ldots,\mathrm{T}[5] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1111 \rangle\vert 4 \rangle \vert d \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[4],\ldots,\mathrm{T}[7] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0000 \rangle\vert \mathbf{0} \rangle  \vert d \rangle\Bigg)
+%		\end{split}
+%	\end{equation*}
+%\end{example}
+%%We start the computation with an initial quantum superposition state 
+%%\[
+%%	\vert \delta_{init} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle \vert T[i,i+M-1] \rangle \vert P \rangle \vert 0 \rangle \vert 0 \rangle \vert d \rangle
+%%\]
+%%. The first register is composed of $\log{N}$ qubits for indexing each element of $Loc$, the second register composed of $M\log{\vert \Sigma \vert}$ qubits for representing substrings $\text{T}[i,i+M-1]$ as quantum state
+%%\[
+%%	\vert \text{T}[i,i+M-1] \rangle = \vert \text{T}[i]_{bin} \rangle \vert \text{T}[i+1]_{bin} \rangle \ldots \vert \text{T}[i+M-1]_{bin} \rangle
+%%\]
+%%, the third register composed of $M\log{\vert \Sigma \vert}$ qubits for representing P as quantum state
+%%\[
+%%	\vert \text{P} \rangle = \vert \text{P}[0]_{bin} \rangle \vert \text{P}[1]_{bin} \rangle \ldots \vert \text{P}[M-1]_{bin} \rangle
+%%\]
+%%and the fourth composed of \textit{M} qubits to serve as binary indicator for mismatches between substrings $\text{T}[i,i+M-1]$ and P. The fifth register is allotted for the Hamming distance $H(\text{T}[i,i+M-1,\text{P}])$ and lastly the sixth register composed of $\log{d}$ qubits for holding the threshold value \textit{d}.
+%%
+%%We define an operator $U_{Mis}$ for identifying the mismatches in each candidate substring. The effect of $U_{Mis}$ on the state 
+%%\[
+%%	\langle i \vert \delta_{init} \rangle = \vert i \rangle \vert T[i,i+M-1] \rangle \vert P \rangle \vert 0 \rangle \vert 0 \rangle \vert d \rangle
+%%\] is as follows
+%%\[
+%%	U_{Mis_{1,2}} \langle i \vert \delta_{init} \rangle = \vert i \rangle \vert T[i,i+M-1] \rangle \vert P \rangle \vert i_{mis} \rangle \vert 0 \rangle \vert d \rangle
+%%\]
+%%We denote the superposition quantum state resulting from application of operator $U_{Mis}$ to initial superposition state $\vert \delta_{init} \rangle$ as $\vert \delta_{mis} \rangle$. The state $\vert i_{mis} \rangle$ is a binary indicator state for representing mismatches between $\text{T}[i,i+M-1]$ and P. We go through the details of the operation of $U_{Mis}$. We compare each symbol in $\text{T}[i,i+M-1]$ with there corresponding symbol in P by using a quantum network which indicates a mismatch by changing the state of an auxiliary qubit from state $\vert 0 \rangle$ to $\vert 1 \rangle$ and retains its state $\vert 0 \rangle$ otherwise. Such a symbol comparator quantum network is defined in Figure~\ref{fig:symbol-comparator}.
+%
+%%To be able to identify all mismatches between a substring $\text{T}[i,i+M-1]$ and P we can execute \textit{M} such comparator networks in parallel with each other. We may also adjust the number of necessary qubits for representing each symbol as the size of $\Sigma$ varies. Such parallel network is illustrated in Figure~\ref{fig:symbol-comparator-parallel}
+%%
+%%
+%%Once we have identified all mismatches between a substring $\text{T}[i,i+M-1]$ and P we count the number of these mismatches, which corresponds to the Hamming distance $H(\text{T}[i, i+M-1], \text{P})$. We define an operator $U_{Ham}$ which is implemented using a quantum adder network such as that of \cite{Barenco1996} for adding the identified mismatches. A quantum adder network for $U_{Ham}$ is illustrated in Figure~\ref{fig:quantum-adder}.
+%%The effect of operator $U_{Ham}$ on the quantum state \[
+%%	\langle i \vert \delta_{mis} \rangle = \vert i \rangle \vert \text{T}[i,i+M-1] \rangle \vert \text{P} \rangle \vert i_{mis} \rangle \vert 0 \rangle \vert d \rangle
+%%\] 
+%%is as follows
+%%\[
+%%	U_{Ham_{4,5}} \langle i \vert \delta_{mis} \rangle  = \vert i \rangle \vert \text{T}[i,i+M-1] \rangle \vert \text{P} \rangle \vert i_{mis} \rangle \vert H(\text{T}[i,i+M-1],P) \rangle \vert d \rangle
+%%\]
+%%We denote the superposition quantum state resulting from application of operator $U_{Ham}$ to superposition state $\vert \delta_{mis} \rangle$ as $\vert \delta_{ham} \rangle$. 
+%
+%
+%
+%%Given two $M\log{\vert \Sigma \vert}$-qubit quantum registers representing a substring $\text{T}[i, i+M-1]$ and pattern P we can perform the verification for each index $j$ in $\text{T}[i, i+M-1]$ in parallel with each other. Given the example text $\text{T}=dcbcbaa$, $\text{P}=cbad$ and alphabet $\Sigma=\{a,b,c,d\}$ and comparing the substring $\text{T}[0,3]=dcbc$ to P, we will need two quantum registers with $M \log\vert \Sigma \vert$ qubits each. We also arbitrarily assign a unique integer in $\{0,\ldots,\vert \Sigma \vert\}$ to each symbol $\sigma \in \Sigma$. For the example alphabet $\Sigma=\{a,b,c,d\}$ we could assign the value 0 to symbol \textit{a}, 1 to \textit{b}, 2 to \textit{c} and 3 to \textit{d}. Also we assign the substring $\text{T}[0,3]=dcbc$ to the first register and P to the second register. We represent $\text{T}[0,3]$ in the first register as the state
+%%\[
+%%	\vert \text{T}_{0,3} \rangle = \vert 11 \rangle_0 \vert 10 \rangle_1 \vert 01 \rangle_2 \vert 10 \rangle_3
+%%\]
+%%and P in the second register as the state
+%%\[
+%%	\vert P \rangle = \vert 10 \rangle_0 \vert 01 \rangle_1 \vert 00 \rangle_2 \vert 11 \rangle_3
+%%\]
+%%where each state $\vert jk \rangle$ is the binary representation of the integer $(2^1 \times j) + (2^0 \times k)$, $j,k \in \{0,1\}$ , assigned to its corresponding symbol in $\Sigma$. To compare a symbol in $\text{T}[i,i+M-1]$ against its corresponding symbol in P we construct a quantum network as shown in Figure~\ref{fig:symbol-comparator} which will put the state of an auxiliary qubit into $\vert 1 \rangle$ if the two symbols match and into state $\vert 0 \rangle$ otherwise. The symbols $\text{T}[0]$ and $\text{P}[0]$ represented as the states $\vert 11 \rangle$ and $\vert 10 \rangle$ respectively are compared in Figure~\ref{fig:symbol-comparator}.
+%%\begin{figure}[ht]
+%%	\centering
+%%	\begin{minipage}[b]{\linewidth}
+%%		\[
+%%			\Qcircuit @C=1em @R=1em {
+%%				& \lstick{\vert\text{T}[0]_0 \rangle=\vert 1 \rangle}	& \ctrl{4}		&	\qw 		& \qw 			& \qw 			& \qw 			& \qw		 & \qw & \rstick{\vert 1 \rangle}\\
+%%				& \lstick{\vert\text{T}[0]_1 \rangle=\vert 1 \rangle}	&	\qw			& \qw		&	\ctrl{4}	& \qw 			& \qw 			& \qw		 & \qw  & \rstick{\vert 1 \rangle}\\
+%%				& \lstick{\vert\text{P}[0]_0 \rangle=\vert 1 \rangle} 	&	\qw	 		& \ctrl{2} & \qw 			& \qw 			& \qw			& \qw		 & \qw  & \rstick{\vert 1 \rangle}\\
+%%				& \lstick{\vert\text{P}[0]_1 \rangle=\vert 0 \rangle} 	& \qw 		  	& \qw 		& \qw 			& \ctrl{2} 	& \qw 			& \qw		 & \qw  & \rstick{\vert 0 \rangle}\\
+%%				& \lstick{\vert 0 \rangle} 					& \targ 		& \targ 	& \qw 			& \qw 			& \gate{X} 	& \ctrl{1} & \qw  & \rstick{\vert 1 \rangle}\\
+%%				& \lstick{\vert 0 \rangle}					& \qw			& \qw		& \targ			& \targ			& \gate{X} 	& \ctrl{1} & \qw  & \rstick{\vert 0 \rangle}\\
+%%				& \lstick{\vert 0 \rangle}					& \qw			& \qw		& \qw			& \qw			& \qw			& \targ		 & \gate{X}  & \rstick{\vert 1 \rangle}
+%%			}	
+%%		\]
+%%		\caption{A network which compares the two symbols T[0] and P[0]. The bottom three qubits are auxiliary for keeping the results of comparing each qubit representing T[0] against each qubit representing P[0]. The bottommost qubit serves as a binary indicator and is put into state $\vert 1 \rangle$ if the two symbols match and $\vert 0 \rangle$ otherwise.}
+%%		\label{fig:symbol-comparator}
+%%	\end{minipage}
+%%\end{figure}
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Comparison to d %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsubsection{Unitary operator $U_{\mathrm{Mark}}$}
+%We next compare each Hamming distance $i_{\mathrm{ham}}$ to the input threshold distance \textit{d} to identify the substrings satisfying the condition $H(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1],\mathrm{P}) \leq d$. We can use a reversible binary tree-structured circuit for an \textit{n}-qubit binary comparator such as what is proposed in Thapliyal et al.\cite{Thapliyal2010}. This reversible circuit has latency of $\Om(\log n)$ for comparing two \textit{n}-qubit binary numbers. The design of the circuit enables it to differentiate between the cases $x < y$ and $x > y$. Additionally, it can also identify the case $x == y$ by extending the binary tree structured-circuit with an additional reversible circuit. We are only interested in the indices \textit{i} where $i_{\mathrm{ham}} \leq d$ and so to be able identify that given inputs to the circuit satisfy the condition $\neg (x > y) == \mathrm{True}$ will suffice. For this reason we can just make use of the binary tree-structured part of the whole circuit.
+%
+%Let \textit{C} denote the binary tree-structured circuit of the proposed comparator design in Thapliyal et al.\cite{Thapliyal2010}. \textit{C} outputs two qubits $q_1$ and $q_2$ which are both initially set to the state $\vert 0 \rangle$. We let $x=i_{\mathrm{ham}}$ and $y=d$. Qubit $q_1$ is set to state $\vert 1 \rangle$ if $i_{\mathrm{ham}} > d$ while qubit $q_2$ is set to state $\vert 1 \rangle$ if $i_{\mathrm{ham}} < d$. We use $q_1$ as a control-0 qubit to a Pauli-Z operator. The target of this controlled \textit{Z} operator is the index register. If $(i_{\mathrm{ham}} > d) == \text{False}$, qubit $q_1$ will be in state $\vert 0 \rangle$ and this will trigger the \textit{Z} operator to be applied to the index register. This will give the amplitude of the state of the index register a negative phase, i.e. $-\vert i \rangle$. This procedure effectively marks those indices \textit{i} which satisfies the condition $H(\text{T}[i,i+M-1], P) \leq d$. A high-level view of the proposed circuit is shown in Figure~\ref{fig:UMark-circuit}.
+%
+%We denote the quantum operator for this step as $U_{\mathrm{Mark}}$ and applying it to state $\vert \delta_{\mathrm{ham}} \rangle$ will result to
+%\begin{equation}
+%	\begin{split}
+%		\vert \delta_{\mathrm{mark}} \rangle &= U_{\mathrm{Mark}} \left( \vert \delta_{\mathrm{ham}} \rangle \right) \\
+%																	&= U_{\mathrm{Mark}} \left( \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle \vert i_{\mathrm{ham}} \rangle\vert d \rangle \right) \\
+%																	&= \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} (-1)^{f(i_{\mathrm{mis}},d)} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle \vert i_{\mathrm{ham}} \rangle\vert d \rangle
+%	\end{split}
+%\end{equation}
+%where
+%\begin{equation*}
+%	f(x,y) =
+%	\begin{cases}
+%		1, & x \leq y\\
+%		0, & \mathrm{otherwise}
+%	\end{cases}
+%\end{equation*}
+%The circuit design of the \textit{n}-qubit binary comparator by Thapliyal et al. has latency $O(\log n)$. Since the size of the distance and threshold register is $\log(M+1)$, and the size of the index register is $\log N$, the time complexity for the execution of $U_{\mathrm{Mark}}$ will be $O(\log(\log(M+1)) + \log N)$.
+%
+%\begin{example}
+%	In application to our sample problem instance, the application of operator $U_\mathrm{Mark}$ to state $\vert \delta_{\mathrm{ham}} \rangle$ will result to the state
+%	\begin{equation*}
+%		\begin{split}
+%			\vert \delta_{\mathrm{mark}} \rangle &= U_{\mathrm{Mark}}\left( \vert \delta_{\mathrm{ham}} \rangle \right) \\
+%			&= U_{\mathrm{Mark}} \Bigg(\frac{1}{\sqrt{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[0],\ldots,\mathrm{T}[3] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0001 \rangle\vert 1 \rangle  \vert d \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[1],\ldots,\mathrm{T}[4] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1101 \rangle\vert 3 \rangle \vert d \rangle\ + \\
+%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[2],\ldots,\mathrm{T}[5] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 1111 \rangle\vert 4 \rangle \vert d \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \mathrm{T}[4],\ldots,\mathrm{T}[7] \right) \rangle\vert \Sigma^{\phi}\left( \mathrm{P} \right) \rangle\vert 0000 \rangle\vert \mathbf{0} \rangle  \vert d \rangle\Bigg)\Bigg)\\
+%%			&= U_{\mathrm{Mark}} \Bigg( \frac{1}{\sqrt{4}} \Bigg( \vert 0 \rangle\vert \Sigma^{\phi}\left( \text{T}[0,3] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 0001 \rangle\vert \mathbf{0} \rangle\vert d \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \text{T}[1,4] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 1101 \rangle\vert \mathbf{0} \rangle\vert d \rangle + \\
+%%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \text{T}[2,5] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 1111 \rangle\vert \mathbf{0} \rangle\vert d \rangle + \vert 4 \rangle\vert \Sigma^{\phi}\left( \text{T}[4,7] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 0000 \rangle\vert \mathbf{0} \rangle\vert d \rangle \Bigg) \Bigg) \\
+%			&= \frac{1}{\sqrt{4}} \Bigg( -\vert 0 \rangle\vert \Sigma^{\phi}\left( \text{T}[0,3] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 0001 \rangle\vert 1 \rangle\vert d \rangle + \vert 1 \rangle\vert \Sigma^{\phi}\left( \text{T}[1,4] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 1101 \rangle\vert 3 \rangle\vert d \rangle\ + \\
+%			& \quad\quad\quad\quad\quad \vert 2 \rangle\vert \Sigma^{\phi}\left( \text{T}[2,5] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 1111 \rangle\vert 4 \rangle\vert d \rangle - \vert 4 \rangle\vert \Sigma^{\phi}\left( \text{T}[4,7] \right) \rangle\vert \Sigma^{\phi}\left( \text{P} \right) \rangle\vert 0000 \rangle\vert \mathbf{0} \rangle\vert d \rangle\Bigg)
+%		\end{split}
+%	\end{equation*}
+%\end{example}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Amplitude amplification %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\subsubsection{Unitary operator $U_{\mathrm{Amp}}$}
+%In superposition state $\vert \delta_{\mathrm{mark}} \rangle$ the amplitude of the states are all equal, $\sqrt{\frac{q-d}{N}}$, even though having different phases, either $-$ or . We can amplify the amplitude of the marked states using an operator used in Grover's quantum search algorithm\cite{Grover1997},
+%\begin{equation*}
+%	U_{\mathrm{Amp}} = 2\vert \delta_{\mathrm{mark}} \rangle\langle \delta_{\mathrm{mark}} \vert - I
+%\end{equation*}
+%This operator increases the amplitude of the marked states to above the average of the amplitudes while decreasing that of the non-marked states below the average of the amplitudes. The sequence of application of operators $U_{\mathrm{Amp}}U_{\mathrm{Mark}}$ effectively marks solution indices and amplifies their amplitude to above the average. Given state $\vert \delta_{\mathrm{ham}} \rangle$ we can have an estimate of the number of solution indices, \textit{t}, out of the total number of candidate indices $\dfrac{N}{q-d}$ \cite{Brassard1998}. This approximate counting algorithm provides the exact count with probability $> \frac{3}{4}$. We apply the sequence of operations $U_{\mathrm{Amp}}U_{\mathrm{Mark}}$ a $\left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor$ number of iterations prior to measurement of state of the index register. This number of iterations was shown to be optimal in \cite{Hoyer1998}. The total time complexity for the marking-amplification step of the verification algorithm will be
+%\begin{align}
+%	\begin{split}
+%		&\Om\left(  \left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor \left( \log(\log M) + \log N + \log N \right) \right)\\
+%		& \quad\quad\quad\quad\quad\quad \in \Om\left( \left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor \log N \right)
+%	\end{split}
+%\end{align}
+%
+%\subsection{Quantum verification algorithm}
+%The quantum verification algorithm returns a solution index in T with time complexity
+%\begin{equation}
+%	\begin{split}
+%		\Om(1) + \Om(\log M) + \Om\left( \left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor \log N \right) \in \Om\left( \left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor \log N \right)
+%	\end{split}
+%\end{equation}
+%The quantum verification algorithm is described in Algorithm~\ref{alg:quantum-verification}. If we intend to identify all \textit{t} index solutions, we execute the quantum verification algorithm until we get a total of \textit{t} out of $\frac{N}{q-d}$ solution indices. The overall time complexity for the verification phase will thus be
+%\begin{equation}
+%	\begin{split}
+%		\Omega\left( t \left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor \log N \right)
+%	\end{split}
+%\end{equation}.
+%
+%\begin{algorithm}[h!]
+%	\caption{Quantum verification algorithm}
+%	\label{alg:quantum-verification}
+%	\begin{algorithmic}[1]
+%		\REQUIRE { index register, substring register, pattern register, mismatches register, distance register and threshold register in state 
+%							\[
+%								\vert \delta_{\mathrm{init}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert\mathbf{0} \rangle\vert\mathbf{0} \rangle\vert d \rangle
+%							\] }
+%		\ENSURE { index \textit{i} such that $H\left(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1],\mathrm{P}\right) \leq d$ }
+%		\STATE $\vert \delta_{\mathrm{mis}} \rangle = U_{\mathrm{Mis}}\vert \delta_{\mathrm{init}} \rangle$
+%%			\STATE Apply unitary operator $U_{\mathrm{Mis}}$ to superposition state 
+%%					\[
+%%						\vert \delta_{\mathrm{init}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert\mathbf{0} \rangle\vert\mathbf{0} \rangle\vert d \rangle
+%%					\]
+%		\FOR {1 \TO $\left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor$}
+%		    \STATE $\vert \delta_{\mathrm{mark}} \rangle = U_{\mathrm{Mark}}\vert \delta_{\mathrm{mis}} \rangle$
+%			\STATE $\vert \delta_{\mathrm{amp}} \rangle = U_{\mathrm{Amp}}\vert \delta_{\mathrm{mark}} \rangle$
+%		\ENDFOR
+%%			\STATE Apply unitary operator $U_{\mathrm{Ham}}$ to superposition state 
+%%					\[
+%%						\vert \delta_{\mathrm{mis}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle\vert\mathbf{0} \rangle\vert d \rangle
+%%					\]
+%%			\FOR {1 \TO $\left\lfloor\frac{\pi}{4}\sqrt{\frac{N}{t(q-d)}}\right\rfloor$}
+%%				\STATE Apply unitary operator $U_{\mathrm{Mark}}$ to superposition state 
+%%						\[
+%%							\vert \delta_{\mathrm{ham}} \rangle = \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle\vert i_{\mathrm{ham}} \rangle\vert d \rangle
+%%						\]
+%%				\STATE Apply unitary operator $U_{\mathrm{Amp}}$ to superposition state 
+%%						\[
+%%							\vert \delta_{\mathrm{mark}} \rangle = (-1)^{f(i_{\mathrm{mis}},d)} \sqrt{\frac{q-d}{N}} \sum_{i \in Loc} \vert i \rangle\vert \Sigma^\phi(\text{T}[i,i+M-1]) \rangle\vert \Sigma^\phi(\text{P}) \rangle\vert i_{\mathrm{mis}} \rangle\vert i_{\mathrm{ham}} \rangle\vert d \rangle
+%%						\]
+%%			\ENDFOR
+%		\STATE $i = M\vert \delta_{\mathrm{amp}} \rangle$
+%%			\STATE Measure the state of index register.
+%		\RETURN \textit{i}
+%	\end{algorithmic}
+%\end{algorithm}
+
+%\subsection{Quantum algorithm 3}
+%We define a quantum algorithm for the approximate string matching with filtering and verification phase in Algorithm~\ref{alg:quantum-filtering-verification}. We let $Loc = Sol = \{\}$ initially.
+%\begin{algorithm}[h!]
+%	\caption{Filtering-verification-base quantum algorithm for approximate string matching}
+%	\label{alg:quantum-filtering-verification}
+%	\begin{algorithmic}[1]
+%		\REQUIRE text $\mathrm{T} \in \Sigma^N$, pattern $\mathrm{P} \in \Sigma^M$
+%		\ENSURE $Sol = \{i \vert H\left(\mathrm{T}[i],\ldots,\mathrm{T}[i+M-1],\mathrm{P}\right) \leq d \}$
+%		\FOR {1 to $\left\lfloor \frac{N}{q-d} \right\rfloor$}	
+%		    \STATE \textit{i} = Quantum filtering algorithm(T,P)
+%		    \STATE $Loc\ \bigcup\ \{i\}$
+%		\ENDFOR
+%		\FOR {1 to \textit{t}}
+%		    \STATE \textit{i} = Quantum verification algorithm(\textit{Loc})
+%		    \STATE $Sol\ \bigcup\ \{i\}$
+%		\ENDFOR
+%		\RETURN \textit{Sol}
+%    \end{algorithmic}
+%\end{algorithm}
+
+\section{Asymptotic complexity}
+The circuit, time and space complexity of the sub-routines of Algorithm~\ref{alg:quantum-filtering} are summarized in Table~\ref{tab:quantum-filtering-verification-complexity} and \ref{tab:quantum-filtering-verification-complexity-multiple-solutions} for single and multiple solution indices requirement.
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{ | r || c | c | c |}
+		\hline
+		\quad                              & circuit complexity                                                  & time complexity                                                 & space complexity\\
+		\hline\hline
+		$H$                                & $\Omega\left(\log N\right)$                              & $\Om(1)$                                                         & $\Omega\left(\log N\right)$\\
+		\hline
+		$QRAM$                          & $\Om\left( N \right)$                                            & $\Om\left( \log N \right)$                             & $\Om\left( N\log \vert \Sigma \vert + \log\vert \Sigma \vert \right)$\\
+		\hline
+		$U_{\mathrm{\sigma}}$  & $\Om\left(\vert \Sigma \vert^2\log M \right)$  & $\Om\left( \vert \Sigma \vert\log M \right)$  & --\\
+		\hline
+		$U_{\mathrm{Sub}}$      & $\Om\left( \log N \right)$                                 & $\Om\left( \log N \right)$                              & --\\
+		\hline
+		$Meter$                         & $\Om\left(\log N\right)$                                   & $\Om(1)$                                                          & --\\
+		\hline
+	\end{tabular}
+	\caption{The circuit, time and space complexity of the sub-routines of the filtering-based quantum algorithm for approximate string matching when identifying a single solution index \textit{i} in T.}
+	\label{tab:quantum-filtering-verification-complexity}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{ | r || c | c | c |}
+		\hline
+		\quad                              & circuit complexity                                                  & time complexity                                                 & space complexity\\
+		\hline\hline
+		$H$                                & $\Omega\left(\log N\right)$                              & $\Om(t)$                                                         & $\Omega\left(\log N\right)$\\
+		\hline
+		$QRAM$                          & $\Om\left( N \right)$                                            & $\Om\left( t\log N \right)$                             & $\Om\left( N\log \vert \Sigma \vert + \log\vert \Sigma \vert \right)$\\
+		\hline
+		$U_{\mathrm{\sigma}}$  & $\Om\left(\vert \Sigma \vert^2\log M \right)$  & $\Om\left( t\vert \Sigma \vert\log M \right)$  & --\\
+		\hline
+		$U_{\mathrm{Sub}}$      & $\Om\left( \log N \right)$                                 & $\Om\left( t\log N \right)$                              & --\\
+		\hline
+		$Meter$                         & $\Om\left(\log N\right)$                                   & $\Om(t)$                                                          & --\\
+		\hline
+	\end{tabular}
+	\caption{The circuit, time and space complexity of the sub-routines of the filtering-based quantum algorithm for approximate string matching when identifying a multiple $t < \frac{N}{q-d}$ solution indices \textit{i} in T.}
+	\label{tab:quantum-filtering-verification-complexity}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{| r || c |}
+		\hline
+		\quad            & complexity \\
+		\hline\hline
+		circuit           & $\Om\left(N + \log N + \vert \Sigma \vert^2\log M \right)$\\
+		\hline
+		time             & $\Om\left( \log N + \vert \Sigma \vert\log M \right)$\\
+		\hline
+		space           & $\Omega\left( N\log\vert \Sigma \vert + \log N + \log \vert \Sigma \vert \right)$\\
+		\hline
+	\end{tabular}
+	\caption{The total circuit, time and space complexity of Algorithm~\ref{alg:quantum-filtering}.}
+	\label{tab:quantum-filtering-verification-complexity-multiple-solutions}
+\end{table}
+
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{| r || c |}
+		\hline
+		\quad            & complexity \\
+		\hline\hline
+		circuit           & $\Om\left(N + \log N + \vert \Sigma \vert^2\log M \right)$\\
+		\hline
+		time             & $\Om\left( t\left(\log N + \vert \Sigma \vert\log M \right)\right)$\\
+		\hline
+		space           & $\Omega\left( N\log\vert \Sigma \vert + \log N + \log \vert \Sigma \vert \right)$\\
+		\hline
+	\end{tabular}
+	\caption{The total circuit, time and space complexity of Algorithm~\ref{alg:quantum-filtering-many-solutions}. We may always bound the number of iterations \textit{t} to maintain advantage over other algorithms.}
+	\label{tab:quantum-filtering-verification-complexity-multiple-solutions}
+\end{table}
+
+
+%\begin{table}[h!]
+%	\centering
+%	\begin{tabular}{ | r || c | c | c |}
+%		\hline
+%		\quad                                                    & circuit complexity                     & time complexity                         & space complexity\\
+%		\hline\hline
+%		$H$                                                      & $\Omega\left(\log N\right)$ & $\Om(t)$                                  & $\Omega\left(\log N\right)$\\
+%		\hline
+%		$U_{\mathrm{Sub}}U_{\mathrm{Loc}}$ & $\Om\left( N\log N \right)$  & $\Om\left( tN\log N \right)$  & --\\
+%		\hline
+%		$Meter$                                                & $\Omega\left(\log N\right)$ & $\Om(t)$                                  & --\\
+%		\hline
+%	\end{tabular}
+%	\caption{The circuit, time and space complexity of the sub-routines of the filtering-based quantum algorithm for approximate string matching when identifying multiple solution indices in T.}
+%	\label{tab:quantum-filtering-verification-complexity-multiple-solutions}
+%\end{table}
+
+\section{Simulation}
+\subsection{Increasing N}
+
+\subsection{Increasing M}
+
+\subsection{Increasing $\vert\Sigma\vert$}
+
+\section{Summary}
+In this chapter we presented a filtering-based quantum algorithm for approximate string matching with assumption that $q \geq d$ where \textit{q} is the size of the alphabet of P. A single iteration of the filtering algorithm outputs an index \textit{i} in T which with probability $\frac{c_i}{N}$ belongs to the $\frac{N}{q-d}$ substrings in T where $H\left( \mathrm{P}, \mathrm{T}[i],\ldots,\mathrm{T}[i+M-1] \right) \leq d$. A single iteration of the filtering algorithm will have circuit complexity in $\Om\left(N + \log N + \vert \Sigma \vert^2\log M \right)$, time complexity in $\Om\left( \log N + \vert \Sigma \vert\log M \right)$ and space complexity in $\Omega\left( N\log\vert \Sigma \vert + \log N + \log \vert \Sigma \vert \right)$. We also assume that we have access to a QRAM from which we can query a symbol $\mathrm{T}[i]$ given address \textit{i} in time complexity $\Om\left( \log N \right)$.
+
+We have also provided analysis of the circuit complexity of the operators used in the algorithm. With reference to previous works on decomposition of unitary gates, we quantified the elementary gate count of each operator. We have also provided quantum circuit construction for these operators.
+
+Assuming we have multiple approximate copies of P in T satisfying the threshold distance requirement, the quantum algorithm can be iterated \textit{t} times to get multiple solution indices. \textit{t} can be bounded to maintain advantage over classical methods.
+
+
+
+
+
